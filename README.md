@@ -10,6 +10,7 @@
 ![Version](https://img.shields.io/badge/version-2.5.2-1975ca?style=flat-square)
 ![Electron](https://img.shields.io/badge/Electron-45-293744?style=flat-square)
 ![Realm](https://img.shields.io/badge/Realm-local%20%26%20encrypted-5f4bb6?style=flat-square)
+[![License: MIT](https://img.shields.io/badge/License-MIT-5f4bb6?style=flat-square)](LICENSE)
 ![Languages](https://img.shields.io/badge/English%20%2F%20Arabic-293744?style=flat-square)
 
 [**Download for Windows**](https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/latest) · [Features](FEATURES.md) · [Browser setup](BROWSER-INTEGRATION.md) · [Development](docs/DEVELOPMENT.md) · [Report a problem](https://github.com/Mohamedabdelnaby1/flow-download-manager/issues/new/choose)
@@ -25,6 +26,8 @@ Menus now close consistently, browser handoff opens separate desktop windows, an
 ## Built around the actual workflow
 
 Send a file from the browser. Confirm its destination in a separate desktop window. Pause, resume, organize and verify it. Flow keeps the task, its partial data and the surrounding tools in one local system.
+
+Free to download and use. Original Flow code and artwork are open source under the [MIT License](LICENSE); third-party components retain their own licenses.
 
 Created by **mohamed abdelnaby** — [Facebook](https://www.facebook.com/mohamedabdelnaby190).
 

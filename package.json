@@ -61,7 +61,8 @@
       "docs/**",
       "COPYRIGHT.md",
       "CHANGELOG.md",
-      "VALIDATION.md"
+      "VALIDATION.md",
+      "LICENSE"
     ],
     "win": {
       "target": [
@@ -87,5 +88,6 @@
   "author": {
     "name": "mohamed abdelnaby",
     "url": "https://www.facebook.com/mohamedabdelnaby190"
-  }
+  },
+  "license": "MIT"
 }

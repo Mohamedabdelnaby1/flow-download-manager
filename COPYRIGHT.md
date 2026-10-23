@@ -1,7 +1,9 @@
 # Copyright and permissions
 
-Copyright (c) 2026 mohamed abdelnaby. All rights reserved for original Flow code and artwork unless a file says otherwise.
+Copyright (c) 2026 mohamed abdelnaby.
 
-This source is published for inspection and development reference. No general open-source license or additional redistribution/commercial-use grant is provided here. GitHub platform terms continue to apply. Contact the owner for permissions beyond applicable law and platform terms.
+The original Flow code, documentation and artwork are licensed under the [MIT License](LICENSE), effective 2026-10-23. You may use, modify and redistribute them, including commercially, while retaining the copyright and license notices.
+
+This grant also applies to Flow-owned code and artwork already distributed in the v2.5.2 release artifacts. Earlier restrictive notices inside those historical artifacts are superseded by this grant for Flow-owned material. The original release files and their published checksums remain unchanged.
 
 Third-party components retain their own licenses and rights; see [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md) and `vendor/`. This notice does not restrict rights granted by those licenses.
