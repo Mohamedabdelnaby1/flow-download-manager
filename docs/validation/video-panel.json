@@ -1,0 +1,23 @@
+{
+  "passed": 14,
+  "checks": [
+    "Electron Node runtime extracts the supplied YouTube URL",
+    "YouTube confirmation loads real quality choices",
+    "floating panel renders in isolated Shadow DOM",
+    "panel moves with its grip control and saves position",
+    "real mouse drag moves the grip and saves its position",
+    "video panel minimizes and persists its state",
+    "saved panel position stays within a smaller viewport",
+    "close control actually hides the panel",
+    "reset restores the panel and clears the saved position",
+    "media list has readable labels instead of raw tokens",
+    "Escape dismisses the floating list",
+    "clicking outside dismisses the list",
+    "hide on this site persists and actually hides the panel",
+    "reset can undo persistent site hiding"
+  ],
+  "video": {
+    "url": "https://www.youtube.com/shorts/ev48mQPRM38",
+    "formats": 36
+  }
+}

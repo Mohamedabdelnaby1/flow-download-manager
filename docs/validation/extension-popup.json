@@ -1,0 +1,17 @@
+{
+  "passed": 10,
+  "checks": [
+    "popup reports native connection and release",
+    "snooze button requests the actual 15 minute action",
+    "resume button clears temporary capture pause",
+    "site capture switch persists the exact site",
+    "manual media button remains available while site capture is disabled",
+    "global capture toggle persists independently",
+    "options button invokes extension options page",
+    "popup follows system dark colors",
+    "popup follows system light colors",
+    "popup controls fit the available width"
+  ],
+  "errors": [],
+  "environment": "Packaged Chromium with Chrome APIs mocked; not a live Chrome extension test"
+}

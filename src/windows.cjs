@@ -1,0 +1,28 @@
+const path=require('node:path');
+const {validateURL}=require('./network.cjs');
+const TOOLS=new Set(['settings','add','download-info','details','scheduler','batch','grabber','integration','logs','complete','about','smart','power','library']);
+class ToolWindows{
+  constructor({BrowserWindow,service,origin,main,screen}){Object.assign(this,{BrowserWindow,service,origin,main,screen});this.windows=new Map();this.closing=false;}
+  owns(contents){return [...this.windows.values()].some(w=>!w.isDestroyed()&&w.webContents===contents);}
+  async open(kind,data={}){
+    if(!TOOLS.has(kind))throw Error('نوع نافذة غير صالح');
+    if(['details','download-info','complete'].includes(kind)&&!this.service.store.find(data.id))throw Error('التحميل غير موجود');
+    if(data.url)validateURL(data.url);
+    const key=kind+(['details','download-info','complete'].includes(kind)?':'+data.id:'');
+    let window=this.windows.get(key);
+    if(window&&!window.isDestroyed()){if(window.isMinimized())window.restore();window.show();window.focus();if(kind==='library'&&data.tab)window.webContents.send('flow:tool-context',{tab:data.tab,id:data.id||''});return {key,id:window.id,reused:true};}
+    const area=this.screen.getDisplayMatching(this.main.getBounds()).workArea;
+    const wide=['settings','scheduler','integration','grabber','logs','smart','power','library'].includes(kind);
+    window=new this.BrowserWindow({width:Math.min(wide?850:660,area.width),height:Math.min(kind==='details'?650:wide?740:620,area.height),minWidth:420,minHeight:300,title:'Flow',autoHideMenuBar:true,backgroundColor:'#ffffff',minimizable:true,maximizable:true,resizable:true,show:false,icon:path.join(__dirname,'../ui/logo.png'),webPreferences:{preload:path.join(__dirname,'preload.cjs'),contextIsolation:true,nodeIntegration:false,sandbox:true}});
+    this.windows.set(key,window);window.setMenu(null);
+    window.webContents.setWindowOpenHandler(()=>({action:'deny'}));window.webContents.on('will-navigate',(e,url)=>{if(new URL(url).origin!==this.origin)e.preventDefault();});
+    window.webContents.session.setPermissionRequestHandler((_w,_p,done)=>done(false));
+    window.on('closed',()=>{this.windows.delete(key);if(kind==='download-info'&&!this.closing&&this.service.store.find(data.id)?.status==='pending')this.service.action('remove',{id:data.id}).catch(()=>{});});
+    const url=new URL(this.origin);url.searchParams.set('window',kind);for(const k of ['id','url','tab'])if(data[k])url.searchParams.set(k,String(data[k]));
+    try{await window.loadURL(url.href);window.webContents.setZoomFactor(Math.max(.8,Math.min(1.5,this.service.store.settings.textScale/100)));window.show();}catch(error){window.destroy();throw error;}
+    return {key,id:window.id,reused:false};
+  }
+  scale(value){for(const w of this.windows.values())if(!w.isDestroyed())w.webContents.setZoomFactor(value);}
+  closeAll(){this.closing=true;for(const w of this.windows.values())if(!w.isDestroyed())w.destroy();this.windows.clear();}
+}
+module.exports={ToolWindows,TOOLS};

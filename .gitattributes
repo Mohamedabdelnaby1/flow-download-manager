@@ -1,0 +1,6 @@
+* text=auto
+*.png binary
+*.ico binary
+*.exe binary
+*.zip binary
+vendor/*.txt -whitespace

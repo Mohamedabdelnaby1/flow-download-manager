@@ -1,0 +1,9 @@
+const {contextBridge,ipcRenderer}=require('electron');
+const allowed=new Set(['add','batch','probe','zip','start','pause','pauseAll','remove','clearComplete','redownload','update','settings','queue','queueStop','queueRemove','login','loginRemove','logs','diagnostics','export','import','grab','grabCancel','grabDownload','extensionRotate','open','folder','chooseDirectory','chooseSound','playSound','vpnConnect','vpnDisconnect','drop','dropClose','quit','browserInstall','browserFolder','browserExtensions','window','windowClose','windowMinimize','confirmDownload','browserFallback','authorProfile','videoInfo','libraryHealth','verifyFile','rescueLink','rulesImport','ruleSave','ruleDelete','ruleMove','rulePreview','trafficSave','linksInspect','linksCancel','linksCommit','priority','collectionInfo','collectionAdd','mediaStart','mediaCancel','mediaOpen','mediaFolder','folderSave','folderDelete','duplicateCheck','renamePreview','renameApply','renameUndo','tagFiles','viewSave','viewDelete','trashRestore','trashDelete','configExport','configImport','storageInfo']);
+contextBridge.exposeInMainWorld('desktopAPI',{
+  state:()=>ipcRenderer.invoke('flow:state'),
+  action:(type,data)=>{if(!allowed.has(type))return Promise.reject(Error('أمر غير مسموح'));return ipcRenderer.invoke('flow:action',type,data);},
+  onToolContext:fn=>{const handler=(_event,value)=>fn(value);ipcRenderer.on('flow:tool-context',handler);return()=>ipcRenderer.removeListener('flow:tool-context',handler);},
+  onComplete:fn=>{const handler=(_event,item)=>fn(item);ipcRenderer.on('flow:complete',handler);return()=>ipcRenderer.removeListener('flow:complete',handler);},
+  onClipboard:fn=>{const handler=(_event,url)=>fn(url);ipcRenderer.on('flow:clipboard',handler);return()=>ipcRenderer.removeListener('flow:clipboard',handler);}
+});

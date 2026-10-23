@@ -1,0 +1,13 @@
+node_modules/
+data/
+release/
+/validation/
+*.log
+.env
+.env.*
+*.realm*
+realm-key.*
+host-config.json
+SOURCE-MANIFEST.json
+.DS_Store
+Thumbs.db
