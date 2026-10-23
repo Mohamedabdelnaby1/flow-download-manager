@@ -2,6 +2,7 @@
  function sitePage(value){try{const u=new URL(value),host=u.hostname;return /(^|\.)(youtube\.com|youtu\.be|vimeo\.com|tiktok\.com|dailymotion\.com)$/i.test(host)||/(^|\.)instagram\.com$/i.test(host)&&/^\/(reels?|p)\//.test(u.pathname)||/(^|\.)(facebook\.com|fb\.watch)$/i.test(host)&&(/fb\.watch$/i.test(host)||/^\/(?:reels?|videos)\//.test(u.pathname)||/\/videos\/\d+/.test(u.pathname)||/^\/watch\/?$/.test(u.pathname)&&u.searchParams.has('v'));}catch{return false;}}
  function describe(item){try{
   const u=new URL(item.url);if(!/^https?:$/.test(u.protocol))return null;
+  if(/(^|[\/_-])(?:failure|no_input|success|open|notification|notify|beep|click|error|silence)\.(?:mp3|wav|ogg)$/i.test(u.pathname))return null;
   const type=String(item.type||'').split(';')[0],manifest=/mpegurl|dash\+xml/i.test(type)||/\.(m3u8|mpd)$/i.test(u.pathname);
   if(!manifest&&(/\.(m4s|cmfv|cmfa|ts)$/i.test(u.pathname)||/(?:^|[\/_.-])(?:seg(?:ment)?|chunk|fragment|init)[-_.\d\/]/i.test(u.pathname)||[...u.searchParams.keys()].some(k=>/^(bytestart|byteend|range|sq|segment|fragment|start_byte|end_byte)$/i.test(k))))return null;
   if(!manifest&&!/^(video|audio)\//i.test(type)&&!/^media$/i.test(type)&&! /\.(mp4|mkv|webm|mp3|m4a|aac|ogg|flac|wav)$/i.test(u.pathname))return null;

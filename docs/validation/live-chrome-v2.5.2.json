@@ -1,0 +1,15 @@
+{
+  "version": "2.5.2",
+  "connectedCompanion": "2.5.2",
+  "pendingVideoFormatsObserved": 29,
+  "originalLibraryRecordsRetained": 2,
+  "actualChromeProfileVerified": true,
+  "oldOverlayRemovedWithoutPageReload": true,
+  "menuUsesWatchPageInsteadOfUiSounds": true,
+  "sameButtonClosesMenu": true,
+  "closePanelWithoutPageReload": true,
+  "restoreFromToolbarWithoutPageReload": true,
+  "realMouseDragMovesPanel": true,
+  "nativeMessagingConnected": true,
+  "authenticatedFacebookDownloadVerified": false
+}

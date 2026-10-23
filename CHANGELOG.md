@@ -1,5 +1,14 @@
 # Changelog
 
+## 2.5.2 — 2026-10-23
+
+- Exclusive menus with outside, Escape, command and blur dismissal, plus keyboard navigation.
+- Independent confirmation/progress windows raised briefly above the browser, with a live progress title.
+- Removal of legacy panels during companion updates; lifecycle cleanup prevents repeated observers and listeners.
+- Filtered UI sounds, watch-page quality selection, actual connected build information and obsolete-desktop handoff rejection.
+- Existing-install maintenance choices with stable path/scope and preserved local data.
+- Real personal-Chrome handoff, 29 YouTube format choices, panel hide/reset/drag and same-version installed repair verified.
+
 ## 2.5.1 — 2026-10-23
 
 - English defaults for new profiles, preserving existing language choices.

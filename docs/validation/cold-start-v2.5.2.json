@@ -1,0 +1,9 @@
+{
+  "version": "2.5.2",
+  "packaged": true,
+  "mainHidden": true,
+  "confirmationVisible": true,
+  "separateWindow": true,
+  "topmost": false,
+  "taskStatus": "pending"
+}

@@ -1,0 +1,58 @@
+const fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict'),http=require('node:http');
+const {BrowserWindow}=require('electron');
+module.exports=async({app,win,service,toolsWindows})=>{
+ const root=process.env.FLOW_SMOKE_DIR,checks=[],errors=[],wait=ms=>new Promise(r=>setTimeout(r,ms));
+ const check=(name,v)=>{assert.ok(v,name);checks.push(name);};
+ const js=(w,s)=>w.webContents.executeJavaScript(s);
+ const until=async fn=>{for(let i=0;i<150;i++){try{if(await fn())return;}catch{}await wait(80);}throw Error('Condition timed out');};
+ const click=async(w,selector)=>{const r=await js(w,`(()=>{const r=document.querySelector(${JSON.stringify(selector)}).getBoundingClientRect();return {x:Math.round(r.x+r.width/2),y:Math.round(r.y+r.height/2)}})()`);w.webContents.sendInputEvent({type:'mouseDown',button:'left',clickCount:1,...r});w.webContents.sendInputEvent({type:'mouseUp',button:'left',clickCount:1,...r});await wait(70);};
+ let widget,fixture;const attention=new Set();app.on('browser-window-created',(_event,window)=>window.on('always-on-top-changed',(_event,on)=>{if(on)attention.add(window.id);}));
+ try{
+ await until(()=>js(win,'initialized&&!!state'));await service.action('settings',{language:'en',sounds:false,monitorClipboard:false,browserConfirm:true,showProgress:true,completionDialog:false,downloadDir:path.join(root,'Downloads')});await js(win,'refresh()');win.show();win.focus();
+ for(const language of ['en','ar']){
+  await service.action('settings',{language});await js(win,'refresh();renderShell()');
+  for(let i=1;i<=6;i++){await click(win,`.desktop-menu:nth-child(${i}) summary`);check(language+': only menu '+i+' is open',await js(win,`document.querySelectorAll('.desktop-menu[open]').length===1&&document.querySelector('.desktop-menu:nth-child(${i})').open`));}
+  await click(win,'.desktop-menu:nth-child(6) summary');check(language+': clicking active menu closes it',await js(win,"document.querySelectorAll('.desktop-menu[open]').length===0"));
+  await click(win,'.desktop-menu summary');win.webContents.sendInputEvent({type:'keyDown',keyCode:'ESC'});await wait(100);check(language+': Escape closes menus',await js(win,"document.querySelectorAll('.desktop-menu[open]').length===0"));
+  await click(win,'.desktop-menu summary');await click(win,'#main');check(language+': outside click closes menus',await js(win,"document.querySelectorAll('.desktop-menu[open]').length===0"));
+ }
+ await service.action('settings',{language:'en'});await js(win,'refresh();renderShell()');await click(win,'.desktop-menu summary');win.webContents.sendInputEvent({type:'keyDown',keyCode:'DOWN'});await wait(80);check('keyboard opens menu and focuses its first command',await js(win,"document.activeElement.matches('.menu-popup button')"));
+ await click(win,'.desktop-menu:last-child summary');await click(win,'.desktop-menu:last-child [data-action=about]');check('menu command closes all menus',await js(win,"document.querySelectorAll('.desktop-menu[open]').length===0"));toolsWindows.windows.get('about')?.close();
+ fixture=http.createServer((req,res)=>{const bytes=Buffer.alloc(1024*1024,0x5a);res.writeHead(200,{'content-length':bytes.length,'content-type':'application/octet-stream','content-disposition':'attachment; filename="Fixture.zip"'});res.end(bytes);});await new Promise(r=>fixture.listen(0,'127.0.0.1',r));
+ const url=`http://127.0.0.1:${fixture.address().port}/one.zip`;
+ win.hide();const item=await service.browserAdd({url,requestId:'hidden-main-download'}),confirmation=toolsWindows.windows.get('download-info:'+item.id);await until(()=>js(confirmation,'initialized&&!!document.querySelector("[name=url]")'));
+ check('hidden main stays hidden during browser handoff',!win.isVisible());check('confirmation is a separate visible desktop window',confirmation.isVisible()&&confirmation.getParentWindow()===null);check('confirmation requests foreground attention',attention.has(confirmation.id));
+ // Gallery images use a demonstration folder; restore the real fixture destination before downloading.
+ const fixtureDirectory=await js(confirmation,"document.querySelector('[name=directory]').value");
+ await js(confirmation,"document.querySelector('[name=directory]').value='C:\\Downloads\\Flow'");
+ fs.writeFileSync(path.join(root,'confirmation.png'),(await confirmation.webContents.capturePage()).toPNG());
+ await js(confirmation,`document.querySelector('[name=directory]').value=${JSON.stringify(fixtureDirectory)}`);
+ await js(confirmation,'handleAction("addNow",document.querySelector("[data-action=addNow]"))');await until(()=>toolsWindows.windows.has('details:'+item.id));const progress=toolsWindows.windows.get('details:'+item.id);await until(()=>progress.isVisible());check('starting a download opens independent progress over the desktop',progress.isVisible()&&!win.isVisible());
+ await until(()=>service.store.find(item.id)?.status==='complete');await js(progress,'refresh()');await until(()=>js(progress,"document.title.startsWith('100% ')"));check('progress title reaches 100% after completion',await js(progress,"document.title.startsWith('100% ')"));
+ progress.minimize();await toolsWindows.open('details',{id:item.id});check('reopening minimized progress restores it',!progress.isMinimized()&&progress.isVisible());await wait(2000);check('progress returns to normal stacking after attention interval',!progress.isAlwaysOnTop());
+ win.show();win.minimize();const second=await service.browserAdd({url:url.replace('one','two'),requestId:'minimized-main-download'});check('minimized main does not contain the confirmation',win.isMinimized()&&toolsWindows.windows.get('download-info:'+second.id).isVisible());
+ toolsWindows.windows.get('download-info:'+second.id).close();progress.close();win.restore();win.show();
+ // A real Chromium renderer runs the full content script; only Chrome APIs are fixtures.
+ widget=new BrowserWindow({width:900,height:650,show:true,webPreferences:{sandbox:true,contextIsolation:true,nodeIntegration:false}});
+ await widget.loadURL('data:text/html;charset=utf-8,'+encodeURIComponent('<!doctype html><title>Video controls</title><style>body{margin:30px;font:18px Segoe UI;background:#e8edf3}video{width:640px;height:360px;background:#142331;display:block}</style><h2>Flow Companion controls</h2><video></video><button class="flow-companion-panel">Old overlay</button><div class="flow-companion-menu">failure.mp3</div>'));
+ const sourceRoot=app.getAppPath();
+ await js(widget,`window.fakeStore={videoPanel:true,autoCapture:false,panelPositions:{}};window.listeners=new Set();window.messages=new Set();window.sent=[];window.chrome={storage:{local:{get:async()=>({...fakeStore}),set:async values=>{Object.assign(fakeStore,values);for(const fn of listeners)fn(Object.fromEntries(Object.entries(values).map(([k,v])=>[k,{newValue:v}])));}},onChanged:{addListener:fn=>listeners.add(fn),removeListener:fn=>listeners.delete(fn)}},runtime:{getManifest:()=>({version:'2.5.2'}),onMessage:{addListener:fn=>messages.add(fn),removeListener:fn=>messages.delete(fn)},sendMessage:async message=>{sent.push(message);return {result:{media:[{url:'https://site.test/sounds/failure.mp3',type:'audio/mp3'},{url:'https://site.test/Film.mp4',type:'video/mp4'}]}};}}};void 0;`);
+ for(const f of ['panel-model.js','media-model.js','content.js'])await js(widget,fs.readFileSync(path.join(sourceRoot,'extension',f),'utf8')+';void 0;');
+ await until(()=>js(widget,'!!document.querySelector(".flow-panel-host")'));
+ check('upgrade removes obsolete button and obsolete media list',await js(widget,'!document.querySelector(".flow-companion-panel,.flow-companion-menu")'));
+ const shadow='document.querySelector(".flow-panel-host").shadowRoot';
+ await js(widget,`${shadow}.querySelector('.main').click()`);await wait(100);check('notification sound files do not enter the media list',await js(widget,`${shadow}.querySelector('.menu').textContent.includes('Film')&&!${shadow}.querySelector('.menu').textContent.includes('failure.mp3')`));
+ await js(widget,`${shadow}.querySelector('.main').click()`);check('same panel button toggles the list closed',await js(widget,`${shadow}.querySelector('.menu').hidden`));
+ await js(widget,`${shadow}.querySelector('.main').click()`);await wait(60);await js(widget,"document.body.dispatchEvent(new PointerEvent('pointerdown',{bubbles:true,composed:true}))");check('outside pointer closes floating list',await js(widget,`${shadow}.querySelector('.menu').hidden`));
+ await js(widget,`${shadow}.querySelector('.main').click()`);await wait(50);widget.webContents.sendInputEvent({type:'keyDown',keyCode:'ESC'});await wait(70);check('Escape closes floating list',await js(widget,`${shadow}.querySelector('.menu').hidden`));
+ const grip=await js(widget,`(()=>{const p=document.querySelector('.flow-panel-host').getBoundingClientRect(),r=${shadow}.querySelector('.grip').getBoundingClientRect();return {x:Math.round(r.x+r.width/2),y:Math.round(r.y+r.height/2),left:p.left,top:p.top}})()`);
+ widget.webContents.sendInputEvent({type:'mouseDown',button:'left',clickCount:1,x:grip.x,y:grip.y});widget.webContents.sendInputEvent({type:'mouseMove',x:grip.x-80,y:grip.y+50});widget.webContents.sendInputEvent({type:'mouseUp',button:'left',clickCount:1,x:grip.x-80,y:grip.y+50});await wait(100);
+ check('real drag changes panel position and persists it',await js(widget,`document.querySelector('.flow-panel-host').getBoundingClientRect().left<${grip.left-50}&&Object.keys(fakeStore.panelPositions).length===1`));
+ await js(widget,`${shadow}.querySelector('[aria-label="Hide panel on this page"]').click()`);await js(widget,'document.body.append(document.createElement("div"))');await wait(100);check('close stays closed after page mutation',await js(widget,'getComputedStyle(document.querySelector(".flow-panel-host")).display==="none"'));
+ await js(widget,'for(const fn of messages)fn({type:"resetPanel"},{},()=>{})');await wait(100);check('extension reset restores a closed panel',await js(widget,'getComputedStyle(document.querySelector(".flow-panel-host")).display!=="none"'));
+ await js(widget,fs.readFileSync(path.join(sourceRoot,'extension/content.js'),'utf8')+';void 0;');await wait(100);check('reinjecting after upgrade leaves one panel and one listener',await js(widget,'document.querySelectorAll(".flow-panel-host").length===1&&listeners.size===1&&messages.size===1'));
+ widget.setSize(440,360);await wait(200);check('drag position is clamped after resize',await js(widget,'(()=>{const r=document.querySelector(".flow-panel-host").getBoundingClientRect();return r.left>=0&&r.top>=0&&r.right<=innerWidth+1&&r.bottom<=innerHeight+1})()'));
+ fs.writeFileSync(path.join(root,'panel.png'),(await widget.webContents.capturePage()).toPNG());
+ }catch(error){errors.push(error.stack);}finally{widget?.destroy();fixture?.closeAllConnections();fixture?.close();fs.writeFileSync(path.join(root,'interaction-qa.json'),JSON.stringify({version:app.getVersion(),packaged:app.isPackaged,passed:checks.length,checks,errors},null,2));}
+ if(errors.length)throw Error(errors.join('\n'));
+};

@@ -1,0 +1,19 @@
+{
+  "version": "2.5.2",
+  "actualChromeProfile": true,
+  "chromeRestartedWithUserApproval": true,
+  "existingTabsRestored": true,
+  "captureMode": "direct HTTP ZIP link through the content script and Native Messaging",
+  "bytes": 4320130,
+  "sha256": "4e1a06ec6c2f60505082e01594f25882626d1d30657d27ada15cc06665bc9be3",
+  "status": "complete",
+  "checksumMatches": true,
+  "cookieAndRefererRequiredByFixture": true,
+  "cookieAndRefererTransferred": true,
+  "mainWindowHidden": true,
+  "independentCompletionWindowVisible": true,
+  "extensionlessAttachmentCapture": "blocked by the pre-existing IDM native interceptor before Chrome hands the request to Flow",
+  "idmChromeExtensionDisabled": true,
+  "idmInterceptorStillActiveAfterChromeRestart": true,
+  "allWebsiteCompatibilityClaimed": false
+}

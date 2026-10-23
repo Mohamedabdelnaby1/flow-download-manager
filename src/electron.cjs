@@ -37,6 +37,7 @@ async function createWindow(){
   win.webContents.setWindowOpenHandler(()=>({action:'deny'}));
   win.webContents.on('will-navigate',(event,url)=>{if(new URL(url).origin!==web.origin)event.preventDefault();});
   win.webContents.session.setPermissionRequestHandler((_web,_permission,callback)=>callback(false));
+  win.on('blur',()=>win.webContents.executeJavaScript('typeof closeDesktopMenus===\"function\"&&closeDesktopMenus()').catch(()=>{}));
   win.on('close',event=>{if(!quitting&&!process.env.FLOW_SMOKE_TEST){event.preventDefault();win.hide();}});
   await win.loadURL(web.origin);win.webContents.setZoomFactor(Math.max(.8,Math.min(1.5,service.store.settings.textScale/100)));if(!process.argv.includes('--background'))win.show();
 }
@@ -45,7 +46,9 @@ async function createDrop(){
   drop=new BrowserWindow({width:220,height:125,frame:false,alwaysOnTop:true,resizable:false,skipTaskbar:true,backgroundColor:'#f2f8f5',webPreferences:{preload:path.join(__dirname,'preload.cjs'),contextIsolation:true,nodeIntegration:false,sandbox:true}});
   drop.webContents.setWindowOpenHandler(()=>({action:'deny'}));drop.webContents.on('will-navigate',e=>e.preventDefault());await drop.loadURL(web.origin+'/drop.html');
 }
-if(!app.requestSingleInstanceLock())app.quit();else{
+if(!app.requestSingleInstanceLock({version:app.getVersion()})){
+ app.whenReady().then(async()=>{let residentVersion;try{const response=await fetch('http://127.0.0.1:'+(Number(process.env.FLOW_PORT)||17863)+'/health',{signal:AbortSignal.timeout(2000)});residentVersion=(await response.json()).version;}catch{}if(!process.argv.includes('--background')&&residentVersion!==app.getVersion())dialog.showMessageBoxSync({type:'info',title:'Flow is already running',message:'Another Flow instance is already running.',detail:'Exit Flow using Tasks → Exit or the tray menu before opening this edition. An older running copy cannot apply a newer update. Your library is kept.',buttons:['OK']});app.quit();});
+}else{
   app.on('second-instance',(_event,args)=>{cli(args).catch(e=>dialog.showErrorBox('Flow',e.message));if(win&&!args.includes('--background')){if(win.isMinimized())win.restore();win.show();win.focus();}});
   app.whenReady().then(async()=>{
     const protectedStorage=safeStorage.isEncryptionAvailable()?{encrypt:v=>safeStorage.encryptString(v),decrypt:v=>safeStorage.decryptString(v)}:undefined;

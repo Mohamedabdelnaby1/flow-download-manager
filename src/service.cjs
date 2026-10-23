@@ -73,7 +73,7 @@ class Service{
     if(pending){this.store.update(item.id,{status:'pending',...(info?{size:info.size,resumable:info.resumable}:{})});try{await this.desktop.downloadInfo(item.id);}catch(error){await this.engine.remove(item.id);throw error;}}
     if(requestId)this.store.set('browserRequests',[...this.store.get('browserRequests',[]),{id:requestId,downloadId:item.id}].slice(-200));return this.store.find(item.id);
   }
-  browserSeen(client){this.store.set('browserLastSeen',{lastSeen:new Date().toISOString(),name:String(client||'Chromium').slice(0,50)});}
+  browserSeen(client,version){this.store.set('browserLastSeen',{lastSeen:new Date().toISOString(),name:String(client||'Chromium').slice(0,50),extensionVersion:/^\d+\.\d+\.\d+$/.test(String(version))?String(version):'legacy'});}
   async action(type,data={}){
     const s=this.store,e=this.engine;
     if(type==='remove'&&!data.deleteFile&&this.library.removing.has(data.id))return this.library.removing.get(data.id);

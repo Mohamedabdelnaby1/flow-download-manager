@@ -31,12 +31,12 @@ async function createServer(service,port=17863){
       if((url.pathname==='/api/action'||url.pathname==='/extension/add'||url.pathname==='/extension/ping')&&req.method==='POST'){
         let bytes=0;const chunks=[];for await(const chunk of req){bytes+=chunk.length;if(bytes>4*1024*1024){send(413,{error:'الطلب كبير جداً'});return;}chunks.push(chunk);}
         const body=JSON.parse(Buffer.concat(chunks).toString()||'{}');
-        if(url.pathname==='/extension/ping'){service.browserSeen(body.client);const {fileTypes,excludedSites,videoPanel,panelMode}=service.store.settings;send(200,{app:'Flow',version:require('../package.json').version,settings:{fileTypes,excludedSites,videoPanel,panelMode}});return;}
-        if(isExt){service.browserSeen(body.client);const item=await service.browserAdd(body);send(200,{result:{id:item.id,name:item.name,status:item.status}});return;}
+        if(url.pathname==='/extension/ping'){service.browserSeen(body.client,body.extensionVersion);const {fileTypes,excludedSites,videoPanel,panelMode}=service.store.settings;send(200,{app:'Flow',version:require('../package.json').version,settings:{fileTypes,excludedSites,videoPanel,panelMode}});return;}
+        if(isExt){service.browserSeen(body.client,body.extensionVersion);const item=await service.browserAdd(body);send(200,{result:{id:item.id,name:item.name,status:item.status}});return;}
         send(200,{result:await service.action(body.type,body.data)});return;
       }
       if(req.method!=='GET'){send(405,{error:'طريقة غير مسموحة'});return;}
-      if(url.pathname==='/health'){send(200,{app:'Flow',database:'Realm'});return;}
+      if(url.pathname==='/health'){send(200,{app:'Flow',version:require('../package.json').version,database:'Realm'});return;}
       const requested=url.pathname==='/'?'index.html':decodeURIComponent(url.pathname).replace(/^\//,'');
       const target=path.resolve(ui,requested);
       if(!target.startsWith(ui+path.sep)||!fs.existsSync(target)||!fs.statSync(target).isFile()){send(404,{error:'غير موجود'});return;}

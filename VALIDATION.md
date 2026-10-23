@@ -1,22 +1,22 @@
-# Validation — Flow 2.5.1
+# Validation — Flow 2.5.2
 
-Local checks dated 2026-10-23. These results cover the cases listed, not every website or computer.
+Checks dated 2026-10-23. These results cover the listed cases, not every website or Windows computer.
 
 | Check | Result | Evidence |
 | --- | --- | --- |
-| Engine, Realm, handoff, FTP, recovery, rules, media and preferences | **113 passed, 0 failed** | [Engine tests](docs/validation/engine-tests.txt) |
-| Packaged desktop English, theme and window workflows | **39 passed** | [Packaged workflows](docs/validation/desktop-workflows.json) |
-| Final portable executable, same workflow suite | **39 passed** | [Portable workflows](docs/validation/portable-workflows.json) |
-| Floating video panel and real YouTube quality inspection | **14 passed** | [Panel checks](docs/validation/video-panel.json) |
-| Extension popup, including system appearance | **10 passed** | [Popup checks](docs/validation/extension-popup.json) |
-| Source/runtime parity | **54 matching files** | [Parity](docs/validation/source-package-parity.json) |
-| Production dependencies | **0 known advisories** at check time | [Audit](docs/validation/dependency-audit.json) |
-| Installer archive integrity | **Passed**; expected NSIS trailing-data warning | [Archive check](docs/validation/installer-archive.json) |
+| Engine, Realm, handoff, FTP, recovery, rules, media and preferences | **116 passed, 0 failed** | [Engine tests](docs/validation/engine-tests-v2.5.2.txt) |
+| Reported menu, panel and desktop-window regressions against the final packaged app | **38 passed** | [Interaction checks](docs/validation/interaction-v2.5.2.json) |
+| English/system appearance suite against the final portable launcher | **39 passed** | [Portable appearance](docs/validation/appearance-portable-v2.5.2.json) |
+| Real native host starts a closed packaged desktop | **Passed**; main hidden, separate confirmation visible | [Cold start](docs/validation/cold-start-v2.5.2.json) |
+| Existing personal Chrome companion update and YouTube handoff | **Passed**; 29 video format choices, close/reset and real mouse dragging | [Live Chrome](docs/validation/live-chrome-v2.5.2.json) |
+| Real Chrome direct-file transfer with required cookie/referrer | **Completed; 4,320,130 bytes, SHA-256 matches** | [Live file](docs/validation/live-file-v2.5.2.json) |
+| Production package audit | **0 known advisories** at check time | [Dependency audit](docs/validation/dependency-audit-v2.5.2.json) |
+| Maintenance page branches using the production NSIS include and an isolated uninstaller fixture | **Repair, reinstall and uninstall routing passed** | [Maintenance fixture](docs/validation/maintenance-v2.5.2.json) |
+| Real same-version installed repair | **One registration before and after**, same path, library retained | [Installed repair](docs/validation/installed-repair-v2.5.2.json) |
+| Source/runtime parity | **48 matching runtime files**, matching native host | [Parity](docs/validation/source-runtime-parity-v2.5.2.json) |
 
-The 39 workflow checks are repeated against unpacked and portable execution; they are not 78 distinct features. They cover English defaults and errors, Arabic/English switching while preserving a form draft, system appearance across five open windows, explicit palette overrides, confirmation/minimize, scheduler, batch, About attribution, drop basket and 640×440 layout at 150% scaling.
+The 38 interaction checks include a real Chromium renderer with controlled Chrome API fixtures for panel lifecycle tests. The separate live-Chrome check uses the existing personal browser and the registered Native Messaging host. The cold-start test uses an isolated profile and a local HTTP file fixture. YouTube format inspection is not a fresh full-video transfer/decode test. Authenticated Facebook transfers and a fresh Chrome/Edge install remain unverified. The extensionless attachment test remains blocked by an existing IDM native interceptor, even with its Chrome extension disabled and after a browser restart; direct-link handoff completed successfully.
 
-The 24 browser UI checks run in packaged Chromium using controlled Chrome API fixtures. One supplied YouTube Shorts URL was inspected with the actual bundled extractor. A live extension installed in a personal Chrome/Edge profile and authenticated Facebook downloads remain unverified. Installer CRC checks do not replace a clean-machine install/uninstall test. Dependency audit is not a full security audit.
+Maintenance branch tests invoke a dummy uninstaller that only records its invocation. They do not prove real removal on a clean machine. The actual installed-repair check preserved the existing library; it did not uninstall the user's files.
 
-## Earlier evidence
-
-Release 2.5.0 had 109 automated tests, 92 desktop-tool workflow checks and successful download/audio-video decoding for two user-supplied YouTube examples. These historical counts are not presented as fresh 2.5.1 download or tool-suite runs. See [limitations](docs/LIMITATIONS.md).
+Executables remain unsigned. Earlier 2.5.1/2.5.0 evidence is retained in `docs/validation` and the changelog, with its original version; old results are not counted as new 2.5.2 runs. [Limitations](docs/LIMITATIONS.md).

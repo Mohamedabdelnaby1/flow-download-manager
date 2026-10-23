@@ -7,7 +7,7 @@
 **A Windows download manager with browser handoff, an encrypted local library, and tools for the whole download workflow.**
 
 ![Windows](https://img.shields.io/badge/Windows-x64-1975ca?style=flat-square)
-![Version](https://img.shields.io/badge/version-2.5.1-1975ca?style=flat-square)
+![Version](https://img.shields.io/badge/version-2.5.2-1975ca?style=flat-square)
 ![Electron](https://img.shields.io/badge/Electron-45-293744?style=flat-square)
 ![Realm](https://img.shields.io/badge/Realm-local%20%26%20encrypted-5f4bb6?style=flat-square)
 ![Languages](https://img.shields.io/badge/English%20%2F%20Arabic-293744?style=flat-square)
@@ -17,6 +17,10 @@
 </div>
 
 ![Flow desktop in English](docs/screenshots/desktop-light.png)
+
+## Reliability update in 2.5.2
+
+Menus now close consistently, browser handoff opens separate desktop windows, and the companion refreshes obsolete overlays. The installer offers repair/update, reinstall and uninstall for an existing copy. See [upgrade guidance](docs/UPGRADE.md) and [validation](VALIDATION.md).
 
 ## Built around the actual workflow
 
@@ -28,12 +32,12 @@ Created by **mohamed abdelnaby** — [Facebook](https://www.facebook.com/mohamed
 
 | Edition | Best for | Download |
 | :--- | :--- | :--- |
-| **Installer** | Shortcuts, Start menu and a standard uninstall entry | [Flow-2.5.1-Setup.exe](https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/download/v2.5.1/Flow-2.5.1-Setup.exe) |
-| **Portable launcher** | Launch without running the installer | [Flow-2.5.1-Portable.exe](https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/download/v2.5.1/Flow-2.5.1-Portable.exe) |
-| **Browser companion** | Chrome, Edge, Brave and Chromium | [Flow-Companion-2.5.1.zip](https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/download/v2.5.1/Flow-Companion-2.5.1.zip) |
-| **Source bundle** | Source, tests, docs and screenshots | [Flow-2.5.1-Source.zip](https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/download/v2.5.1/Flow-2.5.1-Source.zip) |
+| **Installer** | Shortcuts, Start menu and a standard uninstall entry | [Flow-2.5.2-Setup.exe](https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/download/v2.5.2/Flow-2.5.2-Setup.exe) |
+| **Portable launcher** | Launch without running the installer | [Flow-2.5.2-Portable.exe](https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/download/v2.5.2/Flow-2.5.2-Portable.exe) |
+| **Browser companion** | Chrome, Edge, Brave and Chromium | [Flow-Companion-2.5.2.zip](https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/download/v2.5.2/Flow-Companion-2.5.2.zip) |
+| **Source bundle** | Source, tests, docs and screenshots | [Flow-2.5.2-Source.zip](https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/download/v2.5.2/Flow-2.5.2-Source.zip) |
 
-Windows x64. Executables are unsigned. Portable skips installation but still stores data in your Windows profile; enabling native browser integration registers a host for your user. It is not a zero-footprint USB edition. Verify files using the release's [SHA256SUMS.txt](https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/download/v2.5.1/SHA256SUMS.txt).
+Windows x64. Executables are unsigned. Portable skips installation but still stores data in your Windows profile; enabling native browser integration registers a host for your user. It is not a zero-footprint USB edition. Verify files using the release's [SHA256SUMS.txt](https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/download/v2.5.2/SHA256SUMS.txt).
 
 ## What you can do
 
@@ -67,7 +71,7 @@ English by default, with optional Arabic RTL. **System, Light and Dark appearanc
 <tr><td><img src="docs/screenshots/productivity.png" alt="Productivity tools"><br><b>Rules and traffic</b><br>Organize repetitive work and bandwidth.</td><td><img src="docs/screenshots/smart-tools.png" alt="Library health"><br><b>Inspect and recover</b><br>File presence, integrity and failed downloads.</td></tr>
 </table>
 
-Real desktop captures with demonstration records. They do not prove universal website support or a live personal-browser installation. [Gallery →](docs/SCREENSHOTS.md)
+Real desktop captures with demonstration records. They do not prove universal website support or support for every browser profile. [Gallery →](docs/SCREENSHOTS.md)
 
 ## Get started
 

@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Flow Companion",
-  "version": "2.5.1",
+  "version": "2.5.2",
   "description": "Desktop downloads, context menus, media detection and authorized session handoff.",
   "permissions": [
     "contextMenus",
@@ -11,7 +11,8 @@
     "downloads",
     "cookies",
     "nativeMessaging",
-    "alarms"
+    "alarms",
+    "scripting"
   ],
   "host_permissions": [
     "http://*/*",

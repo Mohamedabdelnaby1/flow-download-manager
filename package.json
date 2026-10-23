@@ -1,6 +1,6 @@
 {
   "name": "flow-download-manager",
-  "version": "2.5.1",
+  "version": "2.5.2",
   "description": "Local-first download manager with Realm and an Electron shell",
   "main": "src/electron.cjs",
   "private": true,
@@ -78,7 +78,7 @@
       "artifactName": "Flow-${version}-Setup.${ext}",
       "oneClick": false,
       "perMachine": false,
-      "allowToChangeInstallationDirectory": true,
+      "allowToChangeInstallationDirectory": false,
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
       "include": "build/installer.nsh"

@@ -28,7 +28,7 @@ This is a locally loaded extension, not a Chrome Web Store listing. Keep the man
 
 ## Upgrading and troubleshooting
 
-Exit older Flow instances through their tray menu. Launch the new version, prepare integration if needed, reload the extension and refresh the video page. Previously configured integration is refreshed at app startup.
+Exit older Flow instances through their tray menu. Launch the new version, prepare integration if needed, reload the extension. Eligible open pages receive updated panel controls without a full page reload. See [upgrade and maintenance](docs/UPGRADE.md). Previously configured integration is refreshed at app startup.
 
 Chrome cancels only after Flow acknowledges a handoff. On failure the extension attempts to resume Chrome's copy. Check that integration is enabled and the native host is registered for the same Windows user. A successful ping does not prove that a website permits downloading.
 
