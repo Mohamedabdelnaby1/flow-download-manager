@@ -14,14 +14,25 @@ async function request(url, options = {}, redirects = 0) {
   const except=(settings.proxyExceptions||'').split(',').map(s=>s.trim()).filter(Boolean);
   const proxy=settings.proxy && !except.includes(u.hostname) ? settings.proxy : '';
   let req;
-  const response=await new Promise(async (resolve,reject)=>{
-    try {
-      const config={ method:options.method||'GET', headers, signal:options.signal, timeout:30000 };
-      if(proxy) { config.agent=new ProxyAgent({getProxyForUrl:()=>proxy}); req=(u.protocol==='https:'?https:http).request(u,config,resolve); }
-      else if(u.protocol==='https:') req=await h2.auto(u,{...config,agent:agents},resolve);
-      else req=http.request(u,{...config,agent:agents.http},resolve);
-      req.on('timeout',()=>req.destroy(Error('انتهت مهلة الاتصال'))); req.on('error',reject); req.end(options.body);
-    } catch(e){reject(e);}
+  const timeout=Math.max(1,Number(options.timeoutMs)||30000),controller=new AbortController();
+  const signal=options.signal?AbortSignal.any([options.signal,controller.signal]):controller.signal;
+  const response=await new Promise((resolve,reject)=>{
+    let settled=false;
+    const cleanup=()=>{clearTimeout(deadline);signal.removeEventListener('abort',aborted);};
+    const fail=e=>{if(settled)return;settled=true;cleanup();reject(e);};
+    const aborted=()=>{req?.destroy(signal.reason);fail(signal.reason||Error('تم إلغاء الاتصال'));};
+    const deadline=setTimeout(()=>controller.abort(Error('انتهت مهلة الاتصال بالخادم')),timeout);
+    signal.addEventListener('abort',aborted,{once:true});
+    if(signal.aborted){aborted();return;}
+    const receive=r=>{if(settled){r.destroy();return;}settled=true;cleanup();resolve(r);};
+    (async()=>{try {
+      const config={method:options.method||'GET',headers,signal,timeout};
+      if(proxy){config.agent=new ProxyAgent({getProxyForUrl:()=>proxy});req=(u.protocol==='https:'?https:http).request(u,config,receive);}
+      else if(u.protocol==='https:')req=await h2.auto(u,{...config,agent:agents},receive);
+      else req=http.request(u,{...config,agent:agents.http},receive);
+      req.on('error',fail);req.on('timeout',()=>req.destroy(Error('انتهت مهلة استجابة الخادم')));
+      if(signal.aborted){req.destroy(signal.reason);return;}req.end(options.body);
+    }catch(e){fail(e);}})();
   });
   response.on('error',()=>{});
   if([301,302,303,307,308].includes(response.statusCode)) {

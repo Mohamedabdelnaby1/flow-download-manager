@@ -18,23 +18,42 @@ class VideoResolver{
   }
   stop(child){return new Promise(done=>{if(!child.pid){done();return;}if(process.platform==='win32'){const killer=spawn('taskkill.exe',['/PID',String(child.pid),'/T','/F'],{windowsHide:true,stdio:'ignore'});killer.once('close',done);killer.once('error',()=>{child.kill();done();});}else{child.kill();done();}});}
   async close(){await Promise.all([...this.children].map(child=>this.stop(child)));}
-  async inspect(url,headers={}){
+  json(url,headers,args,{signal,timeout=90000,max=24*1024*1024}={}){
+    return new Promise((resolve,reject)=>{
+      if(signal?.aborted)return reject(signal.reason||Error('Cancelled'));
+      const p=this.command(url,headers,args);let output='',error='',settled=false;
+      const finish=(err,value)=>{if(settled)return;settled=true;clearTimeout(timer);signal?.removeEventListener('abort',abort);if(err){this.stop(p).catch(()=>{});reject(err);}else resolve(value);};
+      const abort=()=>finish(signal.reason||Error('Cancelled'));
+      const timer=setTimeout(()=>finish(Error('انتهت مهلة قراءة معلومات الموقع؛ جرّب مرة أخرى')),timeout);
+      signal?.addEventListener('abort',abort,{once:true});
+      p.stdout.on('data',b=>{if(settled)return;output+=b;if(Buffer.byteLength(output)>max)finish(Error('معلومات الموقع أكبر من حد الفحص'));});
+      p.stderr.on('data',b=>error=(error+b).slice(-3000));
+      p.once('error',e=>finish(e));p.once('close',code=>{if(settled)return;if(code!==0)return finish(Error(videoError(error)));try{finish(null,JSON.parse(output));}catch{finish(Error('تعذر قراءة معلومات الموقع'));}});
+    });
+  }
+  async inspect(url,headers={},options={}){
     const key=crypto.createHash('sha256').update(url+JSON.stringify(headers)).digest('hex'),cached=this.cache.get(key);if(cached&&Date.now()-cached.time<120000)return cached.value;
-    const data=await new Promise((resolve,reject)=>{const p=this.command(url,headers,['--skip-download','--dump-single-json','--no-warnings']);let output='',error='';const timer=setTimeout(()=>{this.stop(p).catch(()=>{});reject(Error('انتهت مهلة قراءة معلومات الفيديو؛ جرّب مرة أخرى'));},90000);p.stdout.on('data',b=>{output+=b;if(output.length>24*1024*1024){this.stop(p).catch(()=>{});reject(Error('معلومات الفيديو أكبر من حد الفحص'));}});p.stderr.on('data',b=>error=(error+b).slice(-3000));p.on('error',e=>{clearTimeout(timer);reject(e);});p.on('close',code=>{clearTimeout(timer);if(code!==0){reject(Error(videoError(error)));return;}try{resolve(JSON.parse(output));}catch{reject(Error('تعذر قراءة معلومات الفيديو'));}});});
+    const data=await this.json(url,headers,['--skip-download','--dump-single-json','--no-warnings'],options);
     if(data.is_drm)throw Error('الفيديو محمي ولا يمكن تنزيله');
     const formats=(data.formats||[]).filter(f=>f.vcodec&&!['none','images'].includes(f.vcodec)&&f.protocol!=='mhtml'&&!f.has_drm&&/^[a-z0-9_.-]{1,80}$/i.test(f.format_id)).map(f=>({id:f.format_id,height:f.height||0,fps:f.fps||0,ext:f.ext,codec:f.vcodec,size:f.filesize||f.filesize_approx||0,note:f.format_note||'',hasAudio:!!f.acodec&&f.acodec!=='none'}));
     const value={video:true,title:data.title||data.id,id:data.id,duration:data.duration||0,formats:formats.sort((a,b)=>b.height-a.height||b.fps-a.fps),extractor:data.extractor_key||data.extractor,type:'video/site',size:0,resumable:true};
     this.cache.set(key,{time:Date.now(),value});if(this.cache.size>50)this.cache.delete(this.cache.keys().next().value);return value;
   }
-  async collection(url,limit=100){
-    const u=validateURL(url,['https:']);if(!/^(www\.|m\.|music\.)?youtube\.com$/.test(u.hostname)||!u.searchParams.has('list'))throw Error('أدخل رابط قائمة YouTube يحتوي على list=');
-    limit=Math.min(200,Math.max(1,Math.trunc(limit)));
-    const data=await new Promise((resolve,reject)=>{const p=this.command(url,{},['--yes-playlist','--flat-playlist','--playlist-end',String(limit),'--dump-single-json','--no-warnings']);let output='',error='';const timer=setTimeout(()=>{this.stop(p).catch(()=>{});reject(Error('انتهت مهلة قراءة القائمة'));},90000);p.stdout.on('data',b=>{output+=b;if(output.length>12*1024*1024){this.stop(p).catch(()=>{});reject(Error('القائمة أكبر من حد الفحص'));}});p.stderr.on('data',b=>error=(error+b).slice(-2000));p.once('error',e=>{clearTimeout(timer);reject(e);});p.once('close',code=>{clearTimeout(timer);if(code!==0)return reject(Error(videoError(error)));try{resolve(JSON.parse(output));}catch{reject(Error('تعذر قراءة القائمة'));}});});
-    const seen=new Set(),items=[];for(const e of data.entries||[]){if(!/^[a-z0-9_-]{11}$/i.test(e.id||'')||seen.has(e.id)||['private','premium_only','subscriber_only','needs_auth'].includes(e.availability)||/^\[(Private|Deleted) video\]$/i.test(e.title||''))continue;seen.add(e.id);items.push({id:e.id,url:'https://www.youtube.com/watch?v='+e.id,title:String(e.title||e.id).slice(0,300),duration:Number(e.duration)||0});if(items.length>=limit)break;}
-    return {title:String(data.title||'YouTube playlist').slice(0,300),items,scanned:(data.entries||[]).length,limit};
+  async collection(url,limit=10000,options={}){
+    const u=validateURL(url,['https:']);if(!isPlaylist(u.href))throw Error('أدخل رابط قائمة YouTube يحتوي على list=');
+    limit=Math.min(10000,Math.max(1,Math.trunc(Number(limit)||10000)));
+    const canonical='https://www.youtube.com/playlist?list='+encodeURIComponent(u.searchParams.get('list'));
+    // Fetch one extra entry so large playlists never appear silently complete.
+    const data=await this.json(canonical,{},['--yes-playlist','--flat-playlist','--playlist-end',String(limit+1),'--dump-single-json','--no-warnings'],{...options,timeout:300000,max:48*1024*1024});
+    const entries=Array.isArray(data.entries)?data.entries:[],seen=new Set(),items=[];
+    for(const [i,e]of entries.slice(0,limit).entries()){
+      if(!e||!/^[a-z0-9_-]{11}$/i.test(e.id||'')||seen.has(e.id)||['private','premium_only','subscriber_only','needs_auth'].includes(e.availability)||/^\[(Private|Deleted) video\]$/i.test(e.title||''))continue;
+      seen.add(e.id);items.push({id:e.id,url:'https://www.youtube.com/watch?v='+e.id,title:String(e.title||e.id).slice(0,300),duration:Number(e.duration)||0,index:i+1});
+    }
+    return {title:String(data.title||'YouTube playlist').slice(0,300),items,scanned:Math.min(entries.length,limit),skipped:Math.min(entries.length,limit)-items.length,truncated:entries.length>limit,limit,url:canonical};
   }
   async download(ctx,engine,meta){
-    const headers=engine.authHeaders(ctx.item.url,meta),info=await this.inspect(ctx.item.url,headers);if(ctx.stopped)return;
+    const headers=engine.authHeaders(ctx.item.url,meta),controller=new AbortController();ctx.controllers.add(controller);let info;try{info=await this.inspect(ctx.item.url,headers,{signal:controller.signal});}finally{ctx.controllers.delete(controller);}if(ctx.stopped)return;
     const quality=meta.quality||'best';if(!/^(best|audio|[a-z0-9_.-]{1,80})$/i.test(quality))throw Error('جودة فيديو غير صالحة');
     const ffmpeg=require('ffmpeg-static').replace('app.asar'+path.sep,'app.asar.unpacked'+path.sep);
     const format=quality==='audio'?'bestaudio/best':/^max(480|720|1080)$/.test(quality)?`bv*[height<=${quality.slice(3)}][ext=mp4]+ba[ext=m4a]/b[height<=${quality.slice(3)}][ext=mp4]/b[height<=${quality.slice(3)}]`:quality==='best'?'bv*[ext=mp4]+ba[ext=m4a]/b[ext=mp4]/b':info.formats.find(f=>f.id===quality)?.hasAudio?quality:`${quality}+ba/${quality}`;
@@ -47,14 +66,14 @@ class VideoResolver{
     await new Promise((resolve,reject)=>{
       const p=this.command(ctx.item.url,headers,args);ctx.process=p;
       ctx.stopProcess=()=>this.stop(p);
-      let line='',error='',lastBytes=ctx.item.downloaded||0;const streams=new Map();
+      let line='',error='',lastBytes=ctx.item.downloaded||0,lastActivity=Date.now(),timedOut=false;const streams=new Map();const watchdog=setInterval(()=>{if(!ctx.stopped&&Date.now()-lastActivity>120000){timedOut=true;this.stop(p).catch(()=>{});}},1000);watchdog.unref();
       const consume=value=>{
         if(value.startsWith('FLOW_FILE:')){outputFile=value.slice(10).trim();return;}
         const match=/^FLOW_PROGRESS:([^:]+):(.*)$/.exec(value);if(!match)return;
-        try{const progress=JSON.parse(match[2]),old=streams.get(match[1])||{};streams.set(match[1],{bytes:Math.max(old.bytes||0,Number(progress.downloaded_bytes)||0),total:Number(progress.total_bytes||progress.total_bytes_estimate)||0});const downloaded=[...streams.values()].reduce((n,s)=>n+s.bytes,0),total=[...streams.values()].reduce((n,s)=>n+s.total,0);const delta=Math.max(0,downloaded-lastBytes);lastBytes=Math.max(lastBytes,downloaded);engine.usage.bytes+=delta;engine.usage.total+=delta;engine.store.update(ctx.id,{downloaded,size:Math.max(total,downloaded),speed:Number(progress.speed)||0});engine.store.set('usage',engine.usage);if(engine.quotaReached()&&!ctx.stopped)engine.pause(ctx.id,'limited').catch(()=>{});}catch{}
+        try{const progress=JSON.parse(match[2]),old=streams.get(match[1])||{};streams.set(match[1],{bytes:Math.max(old.bytes||0,Number(progress.downloaded_bytes)||0),total:Number(progress.total_bytes||progress.total_bytes_estimate)||0});const downloaded=[...streams.values()].reduce((n,s)=>n+s.bytes,0),total=[...streams.values()].reduce((n,s)=>n+s.total,0);const delta=Math.max(0,downloaded-lastBytes);if(delta>0||progress.status==='finished')lastActivity=Date.now();lastBytes=Math.max(lastBytes,downloaded);engine.usage.bytes+=delta;engine.usage.total+=delta;engine.store.update(ctx.id,{downloaded,size:Math.max(total,downloaded),speed:Number(progress.speed)||0});engine.store.set('usage',engine.usage);if(engine.quotaReached()&&!ctx.stopped)engine.pause(ctx.id,'limited').catch(()=>{});}catch{}
       };
       p.stdout.on('data',b=>{line+=b;let index;while((index=line.indexOf('\n'))>=0){consume(line.slice(0,index).trim());line=line.slice(index+1);}});p.stderr.on('data',b=>error=(error+b).slice(-4000));
-      p.on('error',reject);p.on('close',code=>{if(line)consume(line.trim());if(ctx.stopped||code===0)resolve();else reject(Error(videoError(error)));});
+      p.on('error',e=>{clearInterval(watchdog);reject(e);});p.on('close',code=>{clearInterval(watchdog);if(line)consume(line.trim());if(ctx.stopped)resolve();else if(timedOut)reject(Error('انتهت مهلة تنزيل الفيديو دون تقدم؛ أعد المحاولة أو حدّث الرابط'));else if(code===0)resolve();else reject(Error(videoError(error)));});
     });
     if(ctx.stopped)return;
     if(!outputFile||!path.resolve(outputFile).startsWith(path.resolve(engine.settings().tempDir)+path.sep)||!path.basename(outputFile).startsWith(ctx.id+'.')||!fs.existsSync(outputFile))throw Error('لم يُنتج محرك المواقع ملفًا صالحًا');
@@ -62,4 +81,5 @@ class VideoResolver{
   }
 }
 function videoError(value){const message=String(value||'').replace(/\x1b\[[0-9;]*m/g,'').trim().slice(-1400);return /sign in|not a bot|cookies|login required/i.test(message)?'الموقع طلب تسجيل دخول أو تحققًا من المتصفح. افتح الفيديو في كروم وأرسله من إضافة Flow؛ قد يظل تحقق الموقع مطلوبًا.\n'+message:/unavailable|private|removed|not available/i.test(message)?'الفيديو غير متاح لهذا الطلب أو محذوف أو خاص.\n'+message:'تعذر استخراج أو تنزيل الفيديو.\n'+message;}
-module.exports={VideoResolver,isVideoPage,videoError};
+function isPlaylist(value){try{const u=new URL(value);return /^(www\.|m\.|music\.)?youtube\.com$/.test(u.hostname)&&!!u.searchParams.get('list')&&(u.pathname==='/playlist'||!u.searchParams.get('v')&&u.pathname==='/watch');}catch{return false;}}
+module.exports={VideoResolver,isVideoPage,isPlaylist,videoError};

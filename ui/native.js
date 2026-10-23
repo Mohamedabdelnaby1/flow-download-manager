@@ -18,14 +18,15 @@ function renderNativeWindow(){
   switch(windowContext){
     case'settings':openSettings(windowArgs.get('tab')||'general');break;
     case'library':openLibrary(windowArgs.get('tab')||'folders');break;
-    case'power':openPower(windowArgs.get('tab')||'links');break;
+    case'power':openPower(windowArgs.get('tab')||'links',windowArgs.get('url')||'');break;
     case'smart':openSmart(windowArgs.get('tab')||'health',id||'');break;
-    case'add':case'download-info':openAdd(windowArgs.get('url')||state.downloads.find(d=>d.id===id)?.url||'');if(isSiteVideo($('#f-url')?.value))queueMicrotask(()=>handleAction('probeAdd',$('[data-action=probeAdd]')));break;
+    case'add':case'download-info':openAdd(windowArgs.get('url')||state.downloads.find(d=>d.id===id)?.url||'');if(isSiteVideo($('#f-url')?.value)||isPlaylistURL($('#f-url')?.value))queueMicrotask(()=>handleAction('probeAdd',$('[data-action=probeAdd]')));break;
     case'details':openDetail(id);break;case'complete':showComplete(id);break;
     case'scheduler':renderQueues();break;case'batch':openBatch();break;
     case'grabber':view='grabber';renderGrabber();document.title=t('ساحب المواقع','Site grabber')+' — Flow';document.body.classList.add('native-page');break;
     case'integration':view='integration';renderIntegration();document.title=t('تكامل المتصفح','Browser integration')+' — Flow';document.body.classList.add('native-page');break;
     case'logs':view='logs';renderLogs();document.title=t('سجل النشاط','Activity log')+' — Flow';document.body.classList.add('native-page');break;
+    case'updates':renderUpdates();break;
     case'about':handleAction('about',{dataset:{}});break;
   }return true;
 }

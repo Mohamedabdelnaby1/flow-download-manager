@@ -58,6 +58,8 @@ if(!app.requestSingleInstanceLock({version:app.getVersion()})){
       scale:value=>{win?.webContents.setZoomFactor(value);toolsWindows?.scale(value);},
       browserFallback:async url=>{validateURL(url,['http:','https:']);await shell.openExternal(url);return true;},
       wakeStatus:()=>syncWake(),
+      updateAvailable:async()=>{if(!quitting&&toolsWindows)await toolsWindows.open('updates');},
+      openUpdateRelease:async url=>{await shell.openExternal(url);return true;},
       authorProfile:async()=>{await shell.openExternal('https://www.facebook.com/mohamedabdelnaby190');return true;},
       quit:()=>{app.quit();return true;},
       browserExtensions:async()=>{let chrome;for(const base of [process.env.PROGRAMFILES,process.env['PROGRAMFILES(X86)'],process.env.LOCALAPPDATA].filter(Boolean)){const file=path.join(base,'Google/Chrome/Application/chrome.exe');if(fs.existsSync(file)){chrome=file;break;}}if(!chrome)throw Error('افتح chrome://extensions في كروم');const {spawn}=require('node:child_process');const child=spawn(chrome,['chrome://extensions'],{detached:true,stdio:'ignore',windowsHide:true});child.on('error',()=>{});child.unref();return true;},
@@ -102,6 +104,7 @@ if(!app.requestSingleInstanceLock({version:app.getVersion()})){
     let lastClip='';clipTimer=setInterval(()=>{if(!service.store.settings.monitorClipboard)return;const text=clipboard.readText().trim();if(text===lastClip)return;lastClip=text;
       try{const u=validateURL(text);const ext=u.pathname.split('.').pop().toUpperCase();if(service.store.settings.fileTypes.split(/[ ,]+/).includes(ext))win?.webContents.send('flow:clipboard',text);}catch{}
     },1500);
+    if(!process.env.FLOW_SMOKE_TEST&&!process.env.FLOW_QA_SCRIPT)service.updates.start();
     if(process.env.FLOW_QA_SCRIPT){try{await require(path.resolve(process.env.FLOW_QA_SCRIPT))({app,win,service,web,toolsWindows});app.quit();}catch(error){writeLog(error);smokeReport({stage:'error',error:error.stack});app.quit();}return;}
     if(process.env.FLOW_SMOKE_TEST){setTimeout(async()=>{
       try{if(process.env.FLOW_SMOKE_VIEW)await win.webContents.executeJavaScript(process.env.FLOW_SMOKE_VIEW);await new Promise(r=>setTimeout(r,500));const state=await win.webContents.executeJavaScript('({title:document.title,bridge:!!window.desktopAPI,connection:document.querySelector("#connection-state")?.textContent,bodyWidth:document.body.scrollWidth,viewport:innerWidth})');const report={stage:'complete',...state,database:service.store.realm.path,electron:process.versions.electron,sandbox:win.webContents.getLastWebPreferences().sandbox};console.log('ELECTRON_SMOKE_OK',JSON.stringify(report));smokeReport(report);if(process.env.FLOW_SMOKE_IMAGE){const capture=await win.webContents.capturePage();fs.writeFileSync(process.env.FLOW_SMOKE_IMAGE,capture.toPNG());}app.quit();}catch(e){console.error(e);smokeReport({stage:'error',error:e.message});app.quit();}

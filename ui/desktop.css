@@ -34,3 +34,19 @@ body:not(.native-window) #footer{padding:0;height:32px;min-height:32px;display:b
 .desktop-menu>summary{cursor:pointer;outline-offset:-3px}
 .desktop-menu>summary:focus-visible{outline:2px solid var(--primary)}
 .desktop-menu:nth-last-child(-n+2)>.menu-popup{inset-inline-start:auto;inset-inline-end:0}
+
+.update-dialog .modal-foot{flex-wrap:wrap;gap:8px}
+.update-body{display:flex;flex-direction:column;gap:16px}
+.update-hero{display:flex;gap:16px;align-items:center}
+.update-hero h2{font-size:20px;line-height:1.4;margin:0 0 5px}
+.update-hero p{color:var(--muted);margin:0;font-size:13px}
+.update-mark{display:grid;place-items:center;background:var(--hover);border:1px solid var(--line);width:52px;height:52px;border-radius:14px;flex:none;color:var(--primary)}
+.update-mark svg{width:26px;height:26px}
+.update-hero.available .update-mark{color:#48a786;background:rgba(72,167,134,.1);border-color:rgba(72,167,134,.3)}
+.update-notes h3{font-size:15px;margin:0 0 12px;overflow-wrap:anywhere}
+.update-release-notes{white-space:pre-wrap;overflow-wrap:anywhere;overflow:auto;max-height:190px;background:var(--hover);border:1px solid var(--line);padding:12px;border-radius:6px;font-size:13px;line-height:1.6;user-select:text}
+.update-preference{border-top:1px solid var(--line);padding-top:12px}
+.update-source{font-size:11px;overflow-wrap:anywhere;color:var(--muted)}
+.update-body .help{margin:0;line-height:1.5}
+
+[hidden]{display:none!important}

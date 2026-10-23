@@ -18,7 +18,7 @@ The floating video panel supports pointer dragging, keyboard positioning, per-ho
 
 ## Video and media
 
-Bundled yt-dlp selects website formats and merges audio/video with FFmpeg. Public YouTube playlist inspection is bounded to 200 items; selection to 100. Best, audio-only and maximum 480p/720p/1080p options are available. Direct unencrypted HLS/DASH streams can be assembled. Protected media is rejected.
+Bundled yt-dlp selects website formats and merges audio/video with FFmpeg. Public YouTube playlists can be inspected and imported up to 10,000 entries, with an explicit warning on truncation. All/individual selection, duplicate skipping, ordered filenames, playlist folders and queue start are supported. Best, audio-only and maximum 480p/720p/1080p options are available. Direct unencrypted HLS/DASH streams can be assembled. Protected media is rejected.
 
 The workshop converts completed local media to MP3, M4A, MP4 or WebM, trims time ranges and limits video height. It reports progress, supports cancellation and preserves originals. One job runs at a time.
 
@@ -40,3 +40,7 @@ Inspect up to 200 URLs with bounded concurrency, numeric expansion and deduplica
 English default, Arabic RTL, System/Light/Dark, 80–150% scaling, separate native windows, minimize, tray, floating drop basket and integrated creator signature. Optional keep-awake runs only while downloads are active. Selective backups omit secrets and restore related groups in one Realm transaction; imported schedules remain disabled until manually enabled.
 
 See [limitations](docs/LIMITATIONS.md) and [validation](VALIDATION.md) for exact scope.
+
+## Release notifications
+
+GitHub Release checks after startup and every six hours while running, independent native update popup, version/notes, trusted release-page download button, manual Help check, 24-hour reminder, skip version and automatic-check preference. [Details](docs/UPDATES.md).

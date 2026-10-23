@@ -1,0 +1,30 @@
+{
+  "version": "2.5.3",
+  "packaged": true,
+  "passed": 20,
+  "checks": [
+    "new release opens a visible independent update window",
+    "automatic update popup leaves hidden main window hidden",
+    "popup shows installed and latest version",
+    "untrusted release notes are displayed as text",
+    "download action has an English GitHub label",
+    "download button opens only the verified repository release",
+    "automatic checks do not repeat the same popup",
+    "Help menu can manually reopen update information",
+    "remind tomorrow is saved in Realm",
+    "snoozed update does not reopen automatically",
+    "automatic checkbox persists and suppresses network checks",
+    "manual check remains available with automatic checks disabled",
+    "skip this version is saved in Realm",
+    "a subsequent release can notify after an earlier version was skipped",
+    "update interface switches to Arabic RTL",
+    "update window follows system dark appearance",
+    "compact scaled update window has no horizontal document overflow",
+    "offline state offers retry without a download link",
+    "same version is shown as up to date",
+    "update checks do not create or modify download tasks"
+  ],
+  "errors": [],
+  "externalBrowserWasStubbed": true,
+  "releaseWasSimulated": true
+}

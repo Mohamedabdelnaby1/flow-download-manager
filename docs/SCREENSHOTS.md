@@ -23,3 +23,19 @@ The confirmation is a separate packaged desktop window with the main window hidd
 | --- | --- |
 | Independent confirmation | ![Confirmation](screenshots/confirmation-2.5.2.png) |
 | Updated movable panel | ![Panel fixture](screenshots/panel-2.5.2.png) |
+
+## Update notifications in 2.5.3
+
+These are real packaged update-window captures using simulated future release data; the version shown is a preview, not a published update.
+
+| English | Arabic / system dark |
+| --- | --- |
+| ![English updater](screenshots/updates-en-2.5.3.png) | ![Arabic updater](screenshots/updates-ar-dark-2.5.3.png) |
+
+### Playlist importer in 2.5.3
+
+| English | Arabic / compact layout |
+| --- | --- |
+| ![English playlist preview](screenshots/playlist-en-2.5.3.png) | ![Arabic playlist preview](screenshots/playlist-ar-2.5.3.png) |
+
+These are controlled playlist UI previews. Live inspection/download evidence is recorded separately.

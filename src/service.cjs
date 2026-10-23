@@ -44,11 +44,12 @@ class Service{
   constructor(dir,options={}){
     this.closed=false;this.browserControllers=new Set();this.browserPending=new Map();this.store=new Store(dir,options.protection);this.engine=new Engine(this.store,options);this.grabber=new Grabber(this.store,this.engine);this.desktop=options.desktop;
     this.extensionToken=this.store.get('extensionToken');if(!this.extensionToken){this.extensionToken=crypto.randomBytes(32).toString('hex');this.store.set('extensionToken',this.extensionToken);}
+    this.updates=new (require('./updates.cjs').UpdateChecker)({version:require('../package.json').version,store:this.store,fetch:options.updateFetch,openExternal:this.desktop?.openUpdateRelease,onAvailable:()=>this.desktop?.updateAvailable?.()});
     this.smart=new (require('./smart.cjs').SmartTools)(this);
     this.power=new (require('./power.cjs').Power)(this);this.library=new (require('./library.cjs').Library)(this);
     this.timer=setInterval(()=>{try{this.grabber.finalize();}catch(e){this.store.log('error',e.message);}},3000);this.timer.unref();
   }
-  snapshot(){const browser=this.store.get('browserLastSeen',{});return {browser:{...browser,...this.browserBridge?.info(),connected:!!browser.lastSeen&&Date.now()-new Date(browser.lastSeen).getTime()<90000},downloads:this.store.list().map(d=>({...d,meta:JSON.stringify((({headers,...rest})=>rest)(JSON.parse(d.meta)))})),power:this.power.snapshot(),library:this.library.snapshot(),settings:this.store.settings,queues:this.store.queues(),projects:this.store.projects(),usage:this.engine.usage,logins:this.store.logins(),database:{engine:'Realm',encrypted:true,path:path.join(this.store.dir,'flow.realm')},desktop:!!this.desktop,extensionToken:this.extensionToken};}
+  snapshot(){const browser=this.store.get('browserLastSeen',{});return {updates:this.updates.snapshot(),browser:{...browser,...this.browserBridge?.info(),connected:!!browser.lastSeen&&Date.now()-new Date(browser.lastSeen).getTime()<90000},downloads:this.store.list().map(d=>({...d,meta:JSON.stringify((({headers,...rest})=>rest)(JSON.parse(d.meta)))})),power:this.power.snapshot(),library:this.library.snapshot(),settings:this.store.settings,queues:this.store.queues(),projects:this.store.projects(),usage:this.engine.usage,logins:this.store.logins(),database:{engine:'Realm',encrypted:true,path:path.join(this.store.dir,'flow.realm')},desktop:!!this.desktop,extensionToken:this.extensionToken};}
   async browserAdd(data){
     if(this.closed)throw Error('البرنامج يغلق؛ أكمل التنزيل في المتصفح');
     const key=String(data.requestId||crypto.randomUUID());
@@ -81,6 +82,11 @@ class Service{
     if(require('./power.cjs').ACTIONS.has(type))return this.power.action(type,data);
     if(['start','remove','redownload','update','confirmDownload'].includes(type)&&e.maintenance.has(data.id))throw Error('انتظر انتهاء الفحص أو العملية الحالية');
     switch(type){
+      case'updatesCheck':if(!this.desktop)throw Error('Open updates from the desktop app.');return this.updates.check({manual:true});
+      case'updatesOpen':return this.updates.openRelease();
+      case'updatesPreferences':return this.updates.setEnabled(data.enabled);
+      case'updatesLater':return this.updates.snooze();
+      case'updatesSkip':return this.updates.skip();
       case'libraryHealth':return this.smart.run(()=>this.smart.library());
       case'verifyFile':return this.smart.verify(data.id,data.expected);
       case'rescueLink':return this.smart.rescue(data.id,data.url,cleanHeaders(data.headers));
@@ -166,6 +172,6 @@ class Service{
       default:throw Error('أمر غير معروف');
     }
   }
-  async close(){this.closed=true;clearInterval(this.timer);for(const c of this.browserControllers)c.abort();await Promise.allSettled([...this.browserPending.values()]);await Promise.allSettled([...this.library.removing.values()]);await this.power.close();await this.smart.close();for(const id of this.grabber.running)this.grabber.cancel(id);while(this.grabber.running.size)await new Promise(r=>setTimeout(r,50));await this.engine.close();this.store.close();}
+  async close(){this.closed=true;this.updates.stop();clearInterval(this.timer);for(const c of this.browserControllers)c.abort();await Promise.allSettled([...this.browserPending.values()]);await Promise.allSettled([...this.library.removing.values()]);await this.power.close();await this.smart.close();for(const id of this.grabber.running)this.grabber.cancel(id);while(this.grabber.running.size)await new Promise(r=>setTimeout(r,50));await this.engine.close();this.store.close();}
 }
 module.exports={Service,validateAdd,validateSettings};

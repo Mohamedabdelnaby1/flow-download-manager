@@ -20,4 +20,15 @@ test('configuration import ignores executable and credential settings injected i
 test('storage inspector reads actual disk capacity and known queued bytes',()=>fixture(async({s,url})=>{const d=await s.action('add',{url:url+'/file.bin',later:true});s.store.update(d.id,{size:123456,downloaded:3456});const info=await s.action('storageInfo');assert.equal(info.remaining,120000);assert.equal(info.folders.length,2);assert.ok(info.folders.every(f=>f.free>0&&f.total>=f.free));}));
 test('queue bandwidth cap is shared by concurrent files rather than applied separately',()=>fixture(async({s,url})=>{await s.action('queue',{id:'main',bandwidthKB:128});const a=await s.action('add',{url:url+'/a.bin',later:true}),b=await s.action('add',{url:url+'/b.bin',later:true}),start=Date.now();await Promise.all([s.engine.throttle({id:a.id,stopped:false,fileNext:0},65536),s.engine.throttle({id:b.id,stopped:false,fileNext:0},65536)]);assert.ok(Date.now()-start>=900);assert.equal(s.store.settings.speedLimit,0);}));
 test('concurrent remove requests share one recovery operation and never duplicate bin records',()=>fixture(async({s,url})=>{const d=await s.action('add',{url:url+'/a.pdf',later:true});await Promise.all([s.action('remove',{id:d.id}),s.action('remove',{id:d.id})]);assert.equal(s.snapshot().library.trash.length,1);assert.equal(s.engine.maintenance.has(d.id),false);await s.action('trashRestore',{id:d.id});assert.equal(s.store.list().length,1);}));
+test('incomplete legacy recovery entries cannot crash global state and remain unchanged in Realm',()=>fixture(async({s,url})=>{
+ const d=await s.action('add',{url:url+'/kept.pdf',headers:{cookie:'secret'},later:true});await s.action('remove',{id:d.id});
+ const valid=s.store.get('trash')[0],bad=[null,{}, {download:null},{download:{id:'bad',meta:'invalid'}},{download:{id:'bad2',meta:'null'}}];s.store.set('trash',[...bad,valid]);
+ const snapshot=s.snapshot();assert.equal(snapshot.library.unavailableTrashRecords,5);assert.equal(snapshot.library.trash.length,1);assert.equal(JSON.stringify(snapshot.library).includes('secret'),false);
+ assert.deepEqual(s.store.get('trash').slice(0,5),bad);await s.action('trashRestore',{id:d.id});assert.ok(s.store.find(d.id));assert.deepEqual(s.store.get('trash'),bad);
+ await s.action('remove',{id:d.id});await s.action('trashDelete',{id:d.id});assert.deepEqual(s.store.get('trash'),bad);assert.doesNotThrow(()=>s.snapshot());
+}));
+test('a task disappearing during pause never creates an incomplete recovery entry',()=>fixture(async({s,url})=>{
+ const d=await s.action('add',{url:url+'/gone.bin',later:true}),pause=s.engine.pause.bind(s.engine);s.engine.pause=async id=>{await pause(id);s.store.remove(id);};
+ await s.action('remove',{id:d.id});assert.deepEqual(s.store.get('trash',[]),[]);assert.doesNotThrow(()=>s.snapshot());await s.action('remove',{id:d.id});
+}));
 after(()=>require('realm').shutdown());

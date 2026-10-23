@@ -1,5 +1,19 @@
 # Changelog
 
+## 2.5.3 — 2026-10-23
+
+- Fixed incomplete legacy recovery records breaking the global state, tools and task deletion. Original malformed records remain retained in Realm.
+- Prevented incomplete recovery entries after a task disappears during asynchronous removal.
+- Added absolute HTTP connection/header deadlines, cancellable site inspection and a no-progress video watchdog. Connecting tasks show their actual state instead of an unexplained 0%.
+- Full YouTube playlist inspection and bulk import (up to 10,000 entries with an explicit truncation warning), select all/clear, duplicate skipping, original numbering, playlist folders, quality selection and immediate queue start.
+- Playlist-only URLs entered in Add Download open the playlist importer; legacy playlist.mp4 tasks fail with an actionable explanation.
+
+- Stable GitHub release checks at startup and every six hours while Flow is running.
+- Independent update popup with versions, escaped release notes and a verified GitHub download-page button.
+- Manual Help-menu check, 24-hour reminders, per-version skip and a persisted automatic-check preference.
+- English/Arabic and system appearance for update states, with quiet background network failures.
+- MIT license is included in new packaged editions; third-party licenses remain unchanged.
+
 ## 2.5.2 — 2026-10-23
 
 - Exclusive menus with outside, Escape, command and blur dismissal, plus keyboard navigation.

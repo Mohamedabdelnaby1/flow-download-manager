@@ -7,7 +7,7 @@
 **A Windows download manager with browser handoff, an encrypted local library, and tools for the whole download workflow.**
 
 ![Windows](https://img.shields.io/badge/Windows-x64-1975ca?style=flat-square)
-![Version](https://img.shields.io/badge/version-2.5.2-1975ca?style=flat-square)
+![Version](https://img.shields.io/badge/version-2.5.3-1975ca?style=flat-square)
 ![Electron](https://img.shields.io/badge/Electron-45-293744?style=flat-square)
 ![Realm](https://img.shields.io/badge/Realm-local%20%26%20encrypted-5f4bb6?style=flat-square)
 [![License: MIT](https://img.shields.io/badge/License-MIT-5f4bb6?style=flat-square)](LICENSE)
@@ -18,6 +18,10 @@
 </div>
 
 ![Flow desktop in English](docs/screenshots/desktop-light.png)
+
+## Update notifications in 2.5.3
+
+Flow checks published GitHub releases at startup and every six hours, with a separate update window and a download-page button. Use **Help → Check for updates**, defer a reminder, skip a version or turn automatic checks off. [How updates work](docs/UPDATES.md).
 
 ## Reliability update in 2.5.2
 
@@ -35,12 +39,12 @@ Created by **mohamed abdelnaby** — [Facebook](https://www.facebook.com/mohamed
 
 | Edition | Best for | Download |
 | :--- | :--- | :--- |
-| **Installer** | Shortcuts, Start menu and a standard uninstall entry | [Flow-2.5.2-Setup.exe](https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/download/v2.5.2/Flow-2.5.2-Setup.exe) |
-| **Portable launcher** | Launch without running the installer | [Flow-2.5.2-Portable.exe](https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/download/v2.5.2/Flow-2.5.2-Portable.exe) |
-| **Browser companion** | Chrome, Edge, Brave and Chromium | [Flow-Companion-2.5.2.zip](https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/download/v2.5.2/Flow-Companion-2.5.2.zip) |
-| **Source bundle** | Source, tests, docs and screenshots | [Flow-2.5.2-Source.zip](https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/download/v2.5.2/Flow-2.5.2-Source.zip) |
+| **Installer** | Shortcuts, Start menu and a standard uninstall entry | [Flow-2.5.3-Setup.exe](https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/download/v2.5.3/Flow-2.5.3-Setup.exe) |
+| **Portable launcher** | Launch without running the installer | [Flow-2.5.3-Portable.exe](https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/download/v2.5.3/Flow-2.5.3-Portable.exe) |
+| **Browser companion** | Chrome, Edge, Brave and Chromium | [Flow-Companion-2.5.3.zip](https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/download/v2.5.3/Flow-Companion-2.5.3.zip) |
+| **Source bundle** | Source, tests, docs and screenshots | [Flow-2.5.3-Source.zip](https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/download/v2.5.3/Flow-2.5.3-Source.zip) |
 
-Windows x64. Executables are unsigned. Portable skips installation but still stores data in your Windows profile; enabling native browser integration registers a host for your user. It is not a zero-footprint USB edition. Verify files using the release's [SHA256SUMS.txt](https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/download/v2.5.2/SHA256SUMS.txt).
+Windows x64. Executables are unsigned. Portable skips installation but still stores data in your Windows profile; enabling native browser integration registers a host for your user. It is not a zero-footprint USB edition. Verify files using the release's [SHA256SUMS.txt](https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/download/v2.5.3/SHA256SUMS.txt).
 
 ## What you can do
 
@@ -123,3 +127,7 @@ See [validation](VALIDATION.md) for current local results, earlier evidence and 
 Flow is independent. It contains no Tonec IDM binaries and claims no affiliation with IDM.
 
 <div align="center"><sub>Flow · Crafted by <a href="https://www.facebook.com/mohamedabdelnaby190">mohamed abdelnaby</a></sub></div>
+
+### Playlist downloads and recovery fixes in 2.5.3
+
+Import a complete YouTube playlist, choose a quality, skip existing videos, retain episode numbers and download selected items in one queue. [Playlist guide](docs/PLAYLISTS.md). Incomplete recovery records no longer break every tool window; failed links and connecting tasks now have bounded deadlines and cancellable inspection.

@@ -1,0 +1,21 @@
+{
+  "version": "2.5.3",
+  "publicPlaylistURL": "https://www.youtube.com/playlist?list=PLp22-4PivYmIFAnru_L7fnMhSV5YffLTZ",
+  "title": "كورس شامل لتعلم اللغة الانجليزية من الصفر للمبتدئين كورس كامل من البداية الى الاحتراف - المستوى الاول",
+  "inspected": 25,
+  "scanned": 25,
+  "skipped": 0,
+  "truncated": false,
+  "imported": 25,
+  "firstVideo": {
+    "status": "complete",
+    "error": "",
+    "bytes": 15376117,
+    "name": "001 - تعلم اللغة الإنجليزية من الصفر للمبتدئين بأفضل طريقة من أكبر قناة في العالم.mp4",
+    "elapsed": 22481,
+    "sha256": "a06a65ff3fe8571e750a81b8f2c6689de861e29c7f194c833b929b0a2aa7e978",
+    "decoded": true
+  },
+  "allVideosDownloaded": false,
+  "testProfile": "isolated"
+}

@@ -54,6 +54,7 @@ class Engine extends EventEmitter {
   }
   async run(ctx) {
     const item=ctx.item, meta=JSON.parse(item.meta);
+    if(require('./video.cjs').isPlaylist(item.url))throw Error('هذا رابط قائمة فيديوهات. افتح الأدوات ← قوائم الفيديو لإضافة القائمة كاملة.');
     fs.mkdirSync(this.settings().tempDir,{recursive:true});fs.mkdirSync(item.directory,{recursive:true});
     ctx.temp=path.join(this.settings().tempDir,item.id+'.part');
     if(meta.mode==='site')return this.video.download(ctx,this,meta);

@@ -1,0 +1,12 @@
+{
+  "version": "2.5.3",
+  "actualPublicGitHubApiVerified": true,
+  "testCurrentVersion": "2.5.1",
+  "observedLatestVersion": "2.5.2",
+  "status": "available",
+  "verifiedReleasePage": "https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/tag/v2.5.2",
+  "setupReady": true,
+  "portableReady": true,
+  "externalPageOpened": false,
+  "futureReleaseTestUsedFixtures": true
+}

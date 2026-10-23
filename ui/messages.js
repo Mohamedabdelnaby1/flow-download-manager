@@ -1,6 +1,19 @@
 /* English presentation of built-in service messages; original data remains unchanged. */
 (function(root){
  const entries=Object.entries({
+"بيانات سلة الاسترجاع تحتاج مراجعة": "Recovery bin data needs review",
+"هذا رابط قائمة فيديوهات. افتح الأدوات ← قوائم الفيديو لإضافة القائمة كاملة.": "This is a playlist URL. Open Tools > Video playlists to import the whole playlist.",
+"انتهت مهلة الاتصال بالخادم": "The connection to the server timed out",
+"انتهت مهلة استجابة الخادم": "The server response timed out",
+"تم إلغاء الاتصال": "Connection cancelled",
+"انتهت مهلة قراءة معلومات الموقع؛ جرّب مرة أخرى": "Reading site information timed out; try again",
+"معلومات الموقع أكبر من حد الفحص": "Site information exceeds the inspection size limit",
+"تعذر قراءة معلومات الموقع": "Could not read site information",
+"انتهت مهلة تنزيل الفيديو دون تقدم؛ أعد المحاولة أو حدّث الرابط": "Video download timed out without progress; retry or refresh the URL",
+"تم إلغاء قراءة القائمة": "Playlist reading cancelled",
+"بدأ فحص قائمة أخرى": "Another playlist inspection started",
+"حدد من 1 إلى 10000 فيديو": "Select between 1 and 10,000 videos",
+
 "يمكن استئناف هذا الملف أو مراجعة تفاصيله ومجلد الحفظ.": "Resume this file or review its details and save folder.",
   "أدخل بصمة SHA-256 من 64 رمزًا": "Enter a 64-character SHA-256 checksum",
   "أدخل بيانات الدخول في حقل الحساب، وليس داخل الرابط": "Enter credentials in the account fields, not in the URL",
