@@ -5,7 +5,7 @@ module.exports=async({app,win,service,toolsWindows})=>{
  const js=(w,s)=>w.webContents.executeJavaScript(s),until=async fn=>{for(let n=0;n<200;n++){try{if(await fn())return;}catch{}await wait(60);}throw Error('Update UI check timed out');};
  const check=(name,value)=>{assert.ok(value,name);checks.push(name);};
  const click=async(w,selector)=>{const point=await js(w,`(()=>{const r=document.querySelector(${JSON.stringify(selector)}).getBoundingClientRect();return {x:Math.round(r.x+r.width/2),y:Math.round(r.y+r.height/2)}})()`);w.webContents.sendInputEvent({type:'mouseDown',button:'left',clickCount:1,...point});w.webContents.sendInputEvent({type:'mouseUp',button:'left',clickCount:1,...point});await wait(100);};
- const repository='https://github.com/Mohamedabdelnaby1/flow-download-manager';let calls=0,next='2.5.4',includeUnsafe=true;
+ const repository='https://github.com/Mohamedabdelnaby1/flow-download-manager';let calls=0,next='2.5.5',includeUnsafe=true;
  const response=()=>Response.json({tag_name:'v'+next,name:'Flow '+next+' — Update preview',body:'QA preview: this release is simulated for the interface check.\n\n• Download and browser improvements\n• New tools and interface refinements'+(includeUnsafe?'\n\n<img data-untrusted src=x onerror="window.updateInjected=true">':''),draft:false,prerelease:false,html_url:repository+'/releases/tag/v'+next,assets:[{name:`Flow-${next}-Setup.exe`,state:'uploaded',size:123,browser_download_url:repository+`/releases/download/v${next}/Flow-${next}-Setup.exe`}]});
  const ready=async w=>{await until(()=>js(w,'initialized&&!!state'));await js(w,'refresh()');};
  try{
@@ -14,13 +14,13 @@ module.exports=async({app,win,service,toolsWindows})=>{
  win.hide();await service.updates.check();let popup=toolsWindows.windows.get('updates');await ready(popup);
  check('new release opens a visible independent update window',popup.isVisible()&&popup.getParentWindow()===null);
  check('automatic update popup leaves hidden main window hidden',!win.isVisible());
- check('popup shows installed and latest version',await js(popup,`document.body.textContent.includes('${app.getVersion()}')&&document.body.textContent.includes('2.5.4')`));
+ check('popup shows installed and latest version',await js(popup,`document.body.textContent.includes('${app.getVersion()}')&&document.body.textContent.includes('2.5.5')`));
  check('untrusted release notes are displayed as text',await js(popup,'!document.querySelector("[data-untrusted]")&&!window.updateInjected&&document.querySelector(".update-release-notes").textContent.includes("<img")'));
  check('download action has an English GitHub label',await js(popup,'document.querySelector("[data-action=updatesOpen]").textContent.includes("Download from GitHub")'));
  includeUnsafe=false;await service.updates.check({manual:true});await js(popup,'refresh()');
  fs.writeFileSync(path.join(root,'updates-en.png'),(await popup.webContents.capturePage()).toPNG());
  await click(popup,'[data-action=updatesOpen]');await until(()=>popup.isDestroyed());
- check('download button opens only the verified repository release',opened.length===1&&opened[0]===repository+'/releases/tag/v2.5.4');
+ check('download button opens only the verified repository release',opened.length===1&&opened[0]===repository+'/releases/tag/v2.5.5');
  await service.updates.check();check('automatic checks do not repeat the same popup',!toolsWindows.windows.has('updates'));
  win.show();win.focus();await js(win,'refresh()');await js(win,'renderShell()');await click(win,'.desktop-menu:last-child summary');await click(win,'[data-action=checkUpdates]');await until(()=>toolsWindows.windows.has('updates'));popup=toolsWindows.windows.get('updates');await ready(popup);
  check('Help menu can manually reopen update information',popup.isVisible());
@@ -30,9 +30,9 @@ module.exports=async({app,win,service,toolsWindows})=>{
  await click(popup,'[name=automaticUpdates]');await until(()=>service.store.get('updatePreferences').enabled===false);const before=calls;await service.updates.check();
  check('automatic checkbox persists and suppresses network checks',calls===before&&!service.updates.snapshot().enabled);
  await service.updates.check({manual:true});check('manual check remains available with automatic checks disabled',calls>before);
- await js(popup,'refresh()');await click(popup,'[data-action=updatesSkip]');await until(()=>popup.isDestroyed());check('skip this version is saved in Realm',service.store.get('updatePreferences').skippedVersion==='2.5.4');
- service.updates.setEnabled(true);service.updates.now=()=>Date.now()+25*60*60*1000;next='2.5.5';win.hide();await service.updates.check();popup=toolsWindows.windows.get('updates');await ready(popup);
- check('a subsequent release can notify after an earlier version was skipped',popup.isVisible()&&service.updates.snapshot().release.version==='2.5.5');
+ await js(popup,'refresh()');await click(popup,'[data-action=updatesSkip]');await until(()=>popup.isDestroyed());check('skip this version is saved in Realm',service.store.get('updatePreferences').skippedVersion==='2.5.5');
+ service.updates.setEnabled(true);service.updates.now=()=>Date.now()+25*60*60*1000;next='2.5.6';win.hide();await service.updates.check();popup=toolsWindows.windows.get('updates');await ready(popup);
+ check('a subsequent release can notify after an earlier version was skipped',popup.isVisible()&&service.updates.snapshot().release.version==='2.5.6');
  await service.action('settings',{language:'ar'});await js(popup,'refresh()');
  check('update interface switches to Arabic RTL',await js(popup,'document.documentElement.dir==="rtl"&&document.querySelector("[data-action=updatesOpen]").textContent.includes("التحميل")'));
  nativeTheme.themeSource='dark';await wait(100);await js(popup,'refresh()');check('update window follows system dark appearance',await js(popup,'document.body.classList.contains("dark")'));

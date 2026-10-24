@@ -2,11 +2,11 @@ const fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypt
 const {spawn}=require('node:child_process');
 const {validateURL}=require('./network.cjs');
 const isVideoPage=require('../extension/media-model.js').sitePage;
-function vendor(name){return path.join(__dirname,'../vendor',name).replace('app.asar'+path.sep,'app.asar.unpacked'+path.sep);}
+const {VideoTools}=require('./video-tools.cjs');
 class VideoResolver{
-  constructor(store){this.store=store;this.cache=new Map();this.children=new Set();}
-  command(url,headers={},extra=[]){
-    validateURL(url,['http:','https:']);const exe=vendor('yt-dlp.exe');if(!fs.existsSync(exe))throw Error('محرك المواقع غير موجود؛ استخدم حزمة البرنامج الكاملة');
+  constructor(store){this.store=store;this.cache=new Map();this.children=new Set();this.tools=new VideoTools(store.dir);}
+  async command(url,headers={},extra=[],options={}){
+    validateURL(url,['http:','https:']);const exe=await this.tools.ensure(options);
     const args=['--ignore-config','--no-playlist','--no-color','--socket-timeout','20','--retries','2','--extractor-retries','1','--no-js-runtimes','--js-runtimes','node:'+process.execPath,'--cache-dir',path.join(this.store.dir,'VideoCache')];
     if(headers['user-agent'])args.push('--user-agent',headers['user-agent']);if(headers.referer)args.push('--referer',headers.referer);
     const proxy=this.store.settings.proxy;if(proxy)args.push('--proxy',proxy);
@@ -17,11 +17,13 @@ class VideoResolver{
     this.children.add(child);child.once('close',()=>{this.children.delete(child);if(cookieFile)try{fs.unlinkSync(cookieFile);}catch{}});child.once('error',()=>{this.children.delete(child);if(cookieFile)try{fs.unlinkSync(cookieFile);}catch{}});return child;
   }
   stop(child){return new Promise(done=>{if(!child.pid){done();return;}if(process.platform==='win32'){const killer=spawn('taskkill.exe',['/PID',String(child.pid),'/T','/F'],{windowsHide:true,stdio:'ignore'});killer.once('close',done);killer.once('error',()=>{child.kill();done();});}else{child.kill();done();}});}
-  async close(){await Promise.all([...this.children].map(child=>this.stop(child)));}
-  json(url,headers,args,{signal,timeout=90000,max=24*1024*1024}={}){
+  async close(){this.tools.close();await Promise.all([...this.children].map(child=>this.stop(child)));}
+  async json(url,headers,args,{signal,timeout=90000,max=24*1024*1024}={}){
+    if(signal?.aborted)throw signal.reason||Error('Cancelled');
+    const p=await this.command(url,headers,args,{signal});
+    if(signal?.aborted){await this.stop(p);throw signal.reason||Error('Cancelled');}
     return new Promise((resolve,reject)=>{
-      if(signal?.aborted)return reject(signal.reason||Error('Cancelled'));
-      const p=this.command(url,headers,args);let output='',error='',settled=false;
+      let output='',error='',settled=false;
       const finish=(err,value)=>{if(settled)return;settled=true;clearTimeout(timer);signal?.removeEventListener('abort',abort);if(err){this.stop(p).catch(()=>{});reject(err);}else resolve(value);};
       const abort=()=>finish(signal.reason||Error('Cancelled'));
       const timer=setTimeout(()=>finish(Error('انتهت مهلة قراءة معلومات الموقع؛ جرّب مرة أخرى')),timeout);
@@ -62,10 +64,9 @@ class VideoResolver{
     const rate=meta.speedLimit||engine.settings().speedLimit;if(rate)args.push('--limit-rate',rate+'K');
     const title=require('./engine.cjs').fileName(info.title);if(meta.autoName)engine.store.update(ctx.id,{name:title+(quality==='audio'?'.mp3':'.'+(meta.format==='mkv'?'mkv':'mp4'))});
     engine.store.update(ctx.id,{status:'downloading',resumable:true,meta:JSON.stringify({...meta,videoTitle:info.title,videoDuration:info.duration})});
-    let outputFile;
+    let outputFile;const p=await this.command(ctx.item.url,headers,args);ctx.process=p;ctx.stopProcess=()=>this.stop(p);
+    if(ctx.stopped){await this.stop(p);return;}
     await new Promise((resolve,reject)=>{
-      const p=this.command(ctx.item.url,headers,args);ctx.process=p;
-      ctx.stopProcess=()=>this.stop(p);
       let line='',error='',lastBytes=ctx.item.downloaded||0,lastActivity=Date.now(),timedOut=false;const streams=new Map();const watchdog=setInterval(()=>{if(!ctx.stopped&&Date.now()-lastActivity>120000){timedOut=true;this.stop(p).catch(()=>{});}},1000);watchdog.unref();
       const consume=value=>{
         if(value.startsWith('FLOW_FILE:')){outputFile=value.slice(10).trim();return;}

@@ -28,8 +28,8 @@ async function request(url, options = {}, redirects = 0) {
     (async()=>{try {
       const config={method:options.method||'GET',headers,signal,timeout};
       if(proxy){config.agent=new ProxyAgent({getProxyForUrl:()=>proxy});req=(u.protocol==='https:'?https:http).request(u,config,receive);}
-      else if(u.protocol==='https:')req=await h2.auto(u,{...config,agent:agents},receive);
-      else req=http.request(u,{...config,agent:agents.http},receive);
+      else if(u.protocol==='https:'&&!options.http1)req=await h2.auto(u,{...config,agent:agents},receive);
+      else req=(u.protocol==='https:'?https:http).request(u,{...config,agent:u.protocol==='https:'?agents.https:agents.http},receive);
       req.on('error',fail);req.on('timeout',()=>req.destroy(Error('انتهت مهلة استجابة الخادم')));
       if(signal.aborted){req.destroy(signal.reason);return;}req.end(options.body);
     }catch(e){fail(e);}})();

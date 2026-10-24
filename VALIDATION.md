@@ -1,23 +1,30 @@
-# Validation — Flow 2.5.3
+# Validation أ¢â‚¬â€‌ Flow 2.5.4
 
-Checks dated 2026-10-23. These results cover the listed cases, not every website or Windows computer.
+Checks dated 2026-10-24. These results cover the listed cases, not every website or Windows computer.
 
 | Check | Result | Evidence |
 | --- | --- | --- |
-| Engine, Realm, network, recovery, playlist, handoff, media and update logic | **141 passed, 0 failed** | [Engine tests](docs/validation/engine-tests-v2.5.3.txt) |
-| Corrupt recovery state, all tool windows, zero-byte removal, connection cancellation and full playlist UI | **30 passed**, final packaged app | [Reliability UI](docs/validation/reliability-v2.5.3.json) |
-| Independent update window, Help command, trusted link, reminders, preferences, language and offline states | **20 passed**, final packaged app | [Update UI](docs/validation/updates-v2.5.3.json) |
-| Menu exclusivity/dismissal, desktop windows and browser panel lifecycle | **38 passed**, final packaged app | [Interaction checks](docs/validation/interaction-v2.5.3.json) |
-| Final portable English/system appearance and scale | **39 passed** | [Portable appearance](docs/validation/appearance-portable-v2.5.3.json) |
-| Real installed-profile upgrade | State restored; existing download and preferences preserved; automatic GitHub check ran | [Installed upgrade](docs/validation/installed-upgrade-v2.5.3.json) |
-| Runtime source/package parity | **50 matching runtime files**, matching metadata/native bridge | [Parity](docs/validation/source-runtime-parity-v2.5.3.json) |
-| Live YouTube playlist | **25 inspected and imported; first MP4 completed and decoded**, 15,376,117 bytes | [Live playlist](docs/validation/live-playlist-v2.5.3.json) |
-| Live GitHub API release discovery | Published stable release and ready Windows assets validated | [Live GitHub](docs/validation/live-github-updates-v2.5.3.json) |
+| Engine, Realm, network, recovery, playlist, media, updates, cancellation, sounds and extractor repair | **170 passed, 0 failed** | [Source tests](docs/validation/engine-tests-v2.5.4.txt) |
+| Recovery state, tool windows, zero-byte removal and playlist UI | **30 passed**, packaged | [Reliability](docs/validation/reliability-v2.5.4.json) |
+| Update window, trusted link, reminders, preferences and offline state | **20 passed**, packaged | [Updates](docs/validation/updates-v2.5.4.json) |
+| English/Arabic menus, desktop handoff and companion panel lifecycle | **38 passed**, packaged | [Interactions](docs/validation/interaction-v2.5.4.json) |
+| Exact user YouTube video, bundled extractor, verified official restoration, full MP4 decode and built-in sound playback | **13 passed**, packaged | [Live package tools](docs/validation/video-package-v2.5.4.json) |
+| Full Material interface, English/Arabic, system light/dark and compact 150% scale | **43 passed**, packaged | [Appearance](docs/validation/appearance-v2.5.4.json) |
+| Final Portable launcher, themes, scale and bundled-sound settings | **45 passed** | [Portable appearance](docs/validation/appearance-portable-v2.5.4.json) |
+| Installed upgrade and quiet startup | Healthy 2.5.4; preferences retained; stable startup path repaired | [Installed upgrade](docs/validation/installed-upgrade-v2.5.4.json) |
+| Runtime and native bridge parity | **60 matching runtime files** | [Parity](docs/validation/source-runtime-parity-v2.5.4.json) |
+| Quiet startup, tray restoration, native visibility, real transfer through focus/minimize/crash/hang, cancellation, 2,000-record pagination and 10-minute idle soak | **35 passed**, packaged | [Lifecycle](docs/validation/lifecycle-v2.5.4.json) |
 
-The new recovery regression fixtures retain malformed raw records while exposing usable entries safely. Tests include a task disappearing during asynchronous removal, a 404 at zero bytes, a server holding the connection open, and cancelling YouTube extraction during deletion. Playlist tests cover 250 entries, original numbering, duplicates, cancellation and explicit truncation rather than silently applying the former 100/200 limits.
+Lifecycle checks use an 8 MiB local HTTP fixture and compare the final SHA-256 after deliberately terminating and hanging renderers. Both the exact minimized transfer window and the main window can be restored. Closing all windows keeps the service resident; destroying the main window is recoverable through the tray. The idle soak lasted 600 seconds; this does not prove days of uptime or all driver compatibility.
 
-The 25-video playlist was completely inspected and imported in an isolated library. The first video was fully downloaded and decoded with FFmpeg; the remaining 24 were not fully downloaded. UI playlist previews use controlled data. Update UI tests simulate later versions and stub the external browser action; the live API test separately uses the public GitHub endpoint. Notifications for a future published release cannot be claimed as an observed event before that release exists.
+Source tests exercise temporary 429/503 overload, repeated productive disconnections, wrong range metadata, cancellation during inspection, safe shutdown, direct sound playback configuration, and recovery of a missing/corrupt extractor with checksum rejection. Repair requests use a pinned official GitHub release URL, no browser cookies or saved authorization headers. The exact user video (488 seconds) downloaded as a 48,947,231-byte MP4 and fully decoded with FFmpeg. The missing-extractor case downloaded its pinned official release, checked the SHA-256 and installed it in the isolated profile. All three packaged WAV sounds played through the Windows helper; this confirms successful playback execution, not subjective loudness on every output device. Final installer/portable checks are recorded separately in release verification.
 
-Interaction checks use a real Chromium renderer and controlled Chrome API fixtures for panel lifecycle. Existing personal-Chrome handoff, cold native-host startup and maintenance repair were validated in 2.5.2; those reports remain under their original version and are not counted as new 2.5.3 live runs. The previous native IDM interceptor still blocks extensionless attachments on this machine; direct-file handoff succeeded. Authenticated Facebook downloads and a fresh Chrome/Edge install remain unverified.
+The Material-inspired UI is checked using the complete production stylesheet order, English/Arabic layouts, live system themes and compact windows at 150% text scale. Demonstration screenshot records are not claims that example URLs were transferred.
 
-Executables remain unsigned. [Limitations](docs/LIMITATIONS.md). Further final distribution/installed-profile checks are recorded in the release verification file.
+The user's earlier 25-video playlist was completely inspected/imported in 2.5.3; only the first MP4 was fully downloaded and decoded. That historical evidence remains [here](docs/validation/live-playlist-v2.5.3.json). The current update preserves those features; it does not claim a new full 25-video transfer.
+
+Interaction tests use real Chromium and controlled Chrome API fixtures. Personal Chrome handoff, native cold start and maintenance results from 2.5.2 remain historical. Existing IDM interception can still prevent extensionless attachment capture. Authenticated Facebook downloads and a clean-machine install/uninstall remain unverified.
+
+No controlled comparison against IDM was performed. Local throughput tests measure fixture overhead only; internet performance depends on the server, connection and site. Executables remain unsigned. [Limitations](docs/LIMITATIONS.md).
+
+The actual user library was empty at the final installed upgrade (0 records before and after). No active transfers were interrupted. The encrypted profile was backed up locally before installation. This proves that upgrade path and preference/startup checks; existing-record preservation is covered by the isolated recovery tests and the historical 2.5.3 upgrade. Windows was not rebooted.

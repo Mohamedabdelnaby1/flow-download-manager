@@ -49,7 +49,7 @@ class Service{
     this.power=new (require('./power.cjs').Power)(this);this.library=new (require('./library.cjs').Library)(this);
     this.timer=setInterval(()=>{try{this.grabber.finalize();}catch(e){this.store.log('error',e.message);}},3000);this.timer.unref();
   }
-  snapshot(){const browser=this.store.get('browserLastSeen',{});return {updates:this.updates.snapshot(),browser:{...browser,...this.browserBridge?.info(),connected:!!browser.lastSeen&&Date.now()-new Date(browser.lastSeen).getTime()<90000},downloads:this.store.list().map(d=>({...d,meta:JSON.stringify((({headers,...rest})=>rest)(JSON.parse(d.meta)))})),power:this.power.snapshot(),library:this.library.snapshot(),settings:this.store.settings,queues:this.store.queues(),projects:this.store.projects(),usage:this.engine.usage,logins:this.store.logins(),database:{engine:'Realm',encrypted:true,path:path.join(this.store.dir,'flow.realm')},desktop:!!this.desktop,extensionToken:this.extensionToken};}
+  snapshot(){const browser=this.store.get('browserLastSeen',{});return {runtime:this.desktop?.runtimeStatus?.()||null,updates:this.updates.snapshot(),browser:{...browser,...this.browserBridge?.info(),connected:!!browser.lastSeen&&Date.now()-new Date(browser.lastSeen).getTime()<90000},downloads:this.store.list().map(d=>({...d,meta:JSON.stringify((({headers,...rest})=>rest)(JSON.parse(d.meta)))})),power:this.power.snapshot(),library:this.library.snapshot(),settings:this.store.settings,queues:this.store.queues(),projects:this.store.projects(),usage:this.engine.usage,logins:this.store.logins(),database:{engine:'Realm',encrypted:true,path:path.join(this.store.dir,'flow.realm')},desktop:!!this.desktop,extensionToken:this.extensionToken};}
   async browserAdd(data){
     if(this.closed)throw Error('البرنامج يغلق؛ أكمل التنزيل في المتصفح');
     const key=String(data.requestId||crypto.randomUUID());
@@ -76,6 +76,7 @@ class Service{
   }
   browserSeen(client,version){this.store.set('browserLastSeen',{lastSeen:new Date().toISOString(),name:String(client||'Chromium').slice(0,50),extensionVersion:/^\d+\.\d+\.\d+$/.test(String(version))?String(version):'legacy'});}
   async action(type,data={}){
+    if(this.closed)throw Error('البرنامج يغلق؛ انتظر انتهاء الإغلاق');
     const s=this.store,e=this.engine;
     if(type==='remove'&&!data.deleteFile&&this.library.removing.has(data.id))return this.library.removing.get(data.id);
     if(require('./library.cjs').ACTIONS.has(type))return this.library.action(type,data);
@@ -124,7 +125,7 @@ class Service{
       case'settings':{
         if((e.active.size||e.maintenance.size)&&(['tempDir','downloadDir'].some(k=>data[k]!==undefined&&data[k]!==s.settings[k])))throw Error('أوقف التحميلات وانتظر انتهاء الفحص قبل تغيير مجلدات الحفظ');
         if(data.tempDir&&data.tempDir!==s.settings.tempDir&&s.list().some(d=>d.downloaded>0&&d.status!=='complete'))throw Error('لا يمكن تغيير مجلد الأجزاء قبل إكمال أو إزالة التحميلات غير المكتملة');
-        const patch=validateSettings(data);if(patch.startAtLogin!==undefined){if(!this.desktop&&patch.startAtLogin)throw Error('التشغيل مع النظام متاح داخل Electron');this.desktop?.startup(patch.startAtLogin);}
+        const patch=validateSettings(data);if(patch.startAtLogin!==undefined){if(!this.desktop&&patch.startAtLogin)throw Error('التشغيل مع النظام متاح داخل Electron');await this.desktop?.startup(patch.startAtLogin);}
         const result=s.saveSettings(patch);if(patch.textScale!==undefined)this.desktop?.scale?.(Math.max(.8,Math.min(1.5,patch.textScale/100)));return result;
       }
       case'queue':{
@@ -166,12 +167,14 @@ class Service{
       }
       case'chooseDirectory':if(!this.desktop)throw Error('اكتب مسار المجلد في نسخة المتصفح');return this.desktop.chooseDirectory();
       case'chooseSound':if(!this.desktop)throw Error('اكتب مسار WAV في نسخة المتصفح');return this.desktop.chooseSound();
-      case'playSound':if(!this.desktop)throw Error('معاينة ملف صوتي محلي تحتاج Electron');return this.desktop.playSound(String(data.path));
+      case'playSound':if(!this.desktop)throw Error('معاينة ملف صوتي محلي تحتاج Electron');return this.desktop.playSound(String(data.path||''),data.event||'complete');
+      case'cancel':if(!s.find(data.id))return true;if(e.maintenance.has(data.id))throw Error('انتظر انتهاء الفحص أو العملية الحالية');await e.remove(data.id,false);return true;
       case'vpnConnect':if(!this.desktop)throw Error('هذه الوظيفة تحتاج نسخة ويندوز Electron');return this.desktop.vpnConnect(s.settings.vpnName);
       case'vpnDisconnect':if(!this.desktop)throw Error('هذه الوظيفة تحتاج نسخة ويندوز Electron');return this.desktop.vpnDisconnect(s.settings.vpnName);
       default:throw Error('أمر غير معروف');
     }
   }
-  async close(){this.closed=true;this.updates.stop();clearInterval(this.timer);for(const c of this.browserControllers)c.abort();await Promise.allSettled([...this.browserPending.values()]);await Promise.allSettled([...this.library.removing.values()]);await this.power.close();await this.smart.close();for(const id of this.grabber.running)this.grabber.cancel(id);while(this.grabber.running.size)await new Promise(r=>setTimeout(r,50));await this.engine.close();this.store.close();}
+  close(){if(this.closePromise)return this.closePromise;this.closed=true;this.closePromise=this.closeOnce();return this.closePromise;}
+  async closeOnce(){this.updates.stop();clearInterval(this.timer);for(const c of this.browserControllers)c.abort();await Promise.allSettled([...this.browserPending.values()]);await Promise.allSettled([...this.library.removing.values()]);await this.power.close();await this.smart.close();for(const id of this.grabber.running)this.grabber.cancel(id);while(this.grabber.running.size)await new Promise(r=>setTimeout(r,50));await this.engine.close();this.store.close();}
 }
 module.exports={Service,validateAdd,validateSettings};

@@ -44,3 +44,11 @@ See [limitations](docs/LIMITATIONS.md) and [validation](VALIDATION.md) for exact
 ## Release notifications
 
 GitHub Release checks after startup and every six hours while running, independent native update popup, version/notes, trusted release-page download button, manual Help check, 24-hour reminder, skip version and automatic-check preference. [Details](docs/UPDATES.md).
+
+## Calm interface and background operation (2.5.4)
+
+- Unified light/dark Material-inspired surfaces, muted category colors, slimmer progress tracks and contextual toolbar commands.
+- Compact transfer and completion windows; technical connections and paths expand on demand.
+- Close/minimize to the tray, quiet Windows startup, transfer sizes and speed in the tray tooltip.
+- Renderer recovery, hidden-window polling suspension and 200-row library pagination.
+- Transient HTTP reconnects, adaptive per-host concurrency and validated resume fallback.

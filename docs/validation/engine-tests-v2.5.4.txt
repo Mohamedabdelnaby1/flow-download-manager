@@ -1,0 +1,869 @@
+
+> flow-download-manager@2.5.4 test
+> node --test --test-concurrency=1 test/*.test.cjs
+
+TAP version 13
+# Subtest: English and system appearance are defaults; preferences survive reopening Realm
+ok 1 - English and system appearance are defaults; preferences survive reopening Realm
+  ---
+  duration_ms: 39.4703
+  ...
+# Subtest: invalid appearance is rejected before settings or configuration import can mutate it
+ok 2 - invalid appearance is rejected before settings or configuration import can mutate it
+  ---
+  duration_ms: 0.4122
+  ...
+# Subtest: open windows follow OS changes in system mode and retain explicit light/dark overrides
+ok 3 - open windows follow OS changes in system mode and retain explicit light/dark overrides
+  ---
+  duration_ms: 1.2722
+  ...
+# Subtest: English service messages retain error codes and keep server text intact
+ok 4 - English service messages retain error codes and keep server text intact
+  ---
+  duration_ms: 0.3372
+  ...
+# Subtest: simultaneous retries of one browser handoff create one task and one confirmation
+ok 5 - simultaneous retries of one browser handoff create one task and one confirmation
+  ---
+  duration_ms: 80.52
+  ...
+# Subtest: a server changing ETag after the initial probe is refused before bytes are combined
+ok 6 - a server changing ETag after the initial probe is refused before bytes are combined
+  ---
+  duration_ms: 55.3795
+  ...
+# Subtest: a shorter non-range response cannot silently replace a known-size file
+ok 7 - a shorter non-range response cannot silently replace a known-size file
+  ---
+  duration_ms: 44.776
+  ...
+# Subtest: pausing during final processing retains the partial and removes the uncommitted copy
+ok 8 - pausing during final processing retains the partial and removes the uncommitted copy
+  ---
+  duration_ms: 54.4523
+  ...
+# Subtest: a server supplied filename selects the matching category folder unless a folder was chosen
+ok 9 - a server supplied filename selects the matching category folder unless a folder was chosen
+  ---
+  duration_ms: 86.1096
+  ...
+# Subtest: invalid numeric inputs and schedules fail before they mutate tasks or queues
+ok 10 - invalid numeric inputs and schedules fail before they mutate tasks or queues
+  ---
+  duration_ms: 18.6338
+  ...
+# Subtest: priority rejects a string id list instead of iterating characters
+ok 11 - priority rejects a string id list instead of iterating characters
+  ---
+  duration_ms: 16.7999
+  ...
+# Subtest: bad percent escapes in a site do not prevent discovery of later links
+ok 12 - bad percent escapes in a site do not prevent discovery of later links
+  ---
+  duration_ms: 38.4093
+  ...
+# Subtest: an unreachable starting page is reported as an error rather than an empty ready project
+ok 13 - an unreachable starting page is reported as an error rather than an empty ready project
+  ---
+  duration_ms: 24.57
+  ...
+# Subtest: redirects to a different origin do not forward credentials or Origin
+ok 14 - redirects to a different origin do not forward credentials or Origin
+  ---
+  duration_ms: 3.8609
+  ...
+# Subtest: diagnostic exports contain useful counts without private URLs, file names or session credentials
+ok 15 - diagnostic exports contain useful counts without private URLs, file names or session credentials
+  ---
+  duration_ms: 37.5753
+  ...
+# Subtest: closing the service cancels browser preflight and safely rejects new handoffs
+ok 16 - closing the service cancels browser preflight and safely rejects new handoffs
+  ---
+  duration_ms: 34.7745
+  ...
+# Subtest: pause interrupts a long retry backoff promptly
+ok 17 - pause interrupts a long retry backoff promptly
+  ---
+  duration_ms: 140.2362
+  ...
+# Subtest: Chrome captures Content-Disposition filename, transfers cookies, and cancels only after acknowledgement
+ok 18 - Chrome captures Content-Disposition filename, transfers cookies, and cancels only after acknowledgement
+  ---
+  duration_ms: 3.095
+  ...
+# Subtest: Chrome resumes its own download if Flow is unavailable or does not acknowledge
+ok 19 - Chrome resumes its own download if Flow is unavailable or does not acknowledge
+  ---
+  duration_ms: 2.0609
+  ...
+# Subtest: Chrome keeps POST, incognito, excluded hosts, unknown extensions and blob downloads
+ok 20 - Chrome keeps POST, incognito, excluded hosts, unknown extensions and blob downloads
+  ---
+  duration_ms: 2.9336
+  ...
+# Subtest: Alt bypass is temporary and respects the exact URL
+ok 21 - Alt bypass is temporary and respects the exact URL
+  ---
+  duration_ms: 0.7878
+  ...
+# Subtest: capture waits for desktop acknowledgement before cancelling Chrome
+ok 22 - capture waits for desktop acknowledgement before cancelling Chrome
+  ---
+  duration_ms: 3.8199
+  ...
+# Subtest: real Windows native host protects token, verifies origin, and downloads an authenticated file
+ok 23 - real Windows native host protects token, verifies origin, and downloads an authenticated file
+  ---
+  duration_ms: 693.4564
+  ...
+# Subtest: native host starts the closed desktop service and completes its handshake
+ok 24 - native host starts the closed desktop service and completes its handshake
+  ---
+  duration_ms: 2914.1317
+  ...
+# Subtest: a successful connection check preserves the last file failure for diagnostics
+ok 25 - a successful connection check preserves the last file failure for diagnostics
+  ---
+  duration_ms: 0.9298
+  ...
+# Subtest: media discovery deduplicates signed CDN URLs and drops byte-range fragments
+ok 26 - media discovery deduplicates signed CDN URLs and drops byte-range fragments
+  ---
+  duration_ms: 2.7244
+  ...
+# Subtest: clearing media pauses discovery until explicitly resumed
+ok 27 - clearing media pauses discovery until explicitly resumed
+  ---
+  duration_ms: 1.0899
+  ...
+# Subtest: connection checks retain browser preferences and still synchronize untouched desktop defaults
+ok 28 - connection checks retain browser preferences and still synchronize untouched desktop defaults
+  ---
+  duration_ms: 1.0696
+  ...
+# Subtest: temporary capture snooze leaves Chrome in charge and manual send still works
+ok 29 - temporary capture snooze leaves Chrome in charge and manual send still works
+  ---
+  duration_ms: 1.0649
+  ...
+# Subtest: site capture exclusion also covers a file served by a different CDN host
+ok 30 - site capture exclusion also covers a file served by a different CDN host
+  ---
+  duration_ms: 0.5449
+  ...
+# Subtest: old resident desktop cannot acknowledge a new companion download
+ok 31 - old resident desktop cannot acknowledge a new companion download
+  ---
+  duration_ms: 0.7858
+  ...
+# Subtest: handoff carries the actual companion build version
+ok 32 - handoff carries the actual companion build version
+  ---
+  duration_ms: 0.6601
+  ...
+# Subtest: FTP PASV downloads and resumes at the local byte offset
+ok 33 - FTP PASV downloads and resumes at the local byte offset
+  ---
+  duration_ms: 1458.1024
+  ...
+# Subtest: Realm persists encrypted data, settings, and encrypted site credentials
+ok 34 - Realm persists encrypted data, settings, and encrypted site credentials
+  ---
+  duration_ms: 35.2746
+  ...
+# Subtest: dynamic range splitting produces a byte-identical file and SHA-256
+ok 35 - dynamic range splitting produces a byte-identical file and SHA-256
+  ---
+  duration_ms: 499.9243
+  ...
+# Subtest: pause, close Realm, restart and resume use saved byte offsets
+ok 36 - pause, close Realm, restart and resume use saved byte offsets
+  ---
+  duration_ms: 1323.0199
+  ...
+# Subtest: changed ETag is refused during resume without destroying partial progress
+ok 37 - changed ETag is refused during resume without destroying partial progress
+  ---
+  duration_ms: 700.1272
+  ...
+# Subtest: servers without ranges and unknown content length finish correctly
+ok 38 - servers without ranges and unknown content length finish correctly
+  ---
+  duration_ms: 3284.7015
+  ...
+# Subtest: invalid Content-Range is refused rather than corrupting a file
+ok 39 - invalid Content-Range is refused rather than corrupting a file
+  ---
+  duration_ms: 907.7686
+  ...
+# Subtest: a dropped connection retries remaining bytes and completes correctly
+ok 40 - a dropped connection retries remaining bytes and completes correctly
+  ---
+  duration_ms: 463.28
+  ...
+# Subtest: quota pauses transfers and resumes the queue in the next window
+ok 41 - quota pauses transfers and resumes the queue in the next window
+  ---
+  duration_ms: 979.4716
+  ...
+# Subtest: speed limiter applies a real aggregate file delay
+ok 42 - speed limiter applies a real aggregate file delay
+  ---
+  duration_ms: 565.8979
+  ...
+# Subtest: queue remains stopped until started and honors simultaneous=1
+ok 43 - queue remains stopped until started and honors simultaneous=1
+  ---
+  duration_ms: 2399.3185
+  ...
+# Subtest: a manually paused file stays paused while its queue is running
+ok 44 - a manually paused file stays paused while its queue is running
+  ---
+  duration_ms: 2305.4889
+  ...
+# Subtest: external scanner receives a filename without a shell
+ok 45 - external scanner receives a filename without a shell
+  ---
+  duration_ms: 109.1207
+  ...
+# Subtest: schedule triggers in local time without duplicate runs
+ok 46 - schedule triggers in local time without duplicate runs
+  ---
+  duration_ms: 1022.0938
+  ...
+# Subtest: batch validation is atomic, exports omit credentials, import validates URLs
+ok 47 - batch validation is atomic, exports omit credentials, import validates URLs
+  ---
+  duration_ms: 405.0556
+  ...
+# Subtest: ZIP preview reads central directory through HTTP ranges
+ok 48 - ZIP preview reads central directory through HTTP ranges
+  ---
+  duration_ms: 3.8724
+  ...
+# Subtest: probe follows redirects and returns real resume metadata
+ok 49 - probe follows redirects and returns real resume metadata
+  ---
+  duration_ms: 1.4091
+  ...
+# Subtest: grabber discovers, downloads and rewrites HTML into local links
+ok 50 - grabber discovers, downloads and rewrites HTML into local links
+  ---
+  duration_ms: 1076.5635
+  ...
+# Subtest: HTTP server isolates sessions, rejects CSRF and authenticates the extension
+ok 51 - HTTP server isolates sessions, rejects CSRF and authenticates the extension
+  ---
+  duration_ms: 40.0814
+  ...
+# Subtest: file names and numeric settings cannot escape their bounds
+ok 52 - file names and numeric settings cannot escape their bounds
+  ---
+  duration_ms: 13.495
+  ...
+# Subtest: Content-Disposition names Unicode files and preserves an explicit category
+ok 53 - Content-Disposition names Unicode files and preserves an explicit category
+  ---
+  duration_ms: 955.2594
+  ...
+# Subtest: untrusted imports cannot inject categories, headers, paths, or queue markup
+ok 54 - untrusted imports cannot inject categories, headers, paths, or queue markup
+  ---
+  duration_ms: 15.6638
+  ...
+# Subtest: FFmpeg downloads unencrypted HLS and rejects encrypted manifests
+ok 55 - FFmpeg downloads unencrypted HLS and rejects encrypted manifests
+  ---
+  duration_ms: 406.2414
+  ...
+# Subtest: favorites validate paths, deduplicate folders and expose recent manually used folders
+ok 56 - favorites validate paths, deduplicate folders and expose recent manually used folders
+  ---
+  duration_ms: 77.8221
+  ...
+# Subtest: batch rename previews without mutation and changes real downloaded filenames
+ok 57 - batch rename previews without mutation and changes real downloaded filenames
+  ---
+  duration_ms: 61.4484
+  ...
+# Subtest: batch rename validates every task and collision before changing names
+ok 58 - batch rename validates every task and collision before changing names
+  ---
+  duration_ms: 36.8094
+  ...
+# Subtest: last rename can be undone and conflicting edits prevent unsafe undo
+ok 59 - last rename can be undone and conflicting edits prevent unsafe undo
+  ---
+  duration_ms: 29.3158
+  ...
+# Subtest: tags and structured search combine Arabic text, host, extension, sizes, queue and state
+ok 60 - tags and structured search combine Arabic text, host, extension, sizes, queue and state
+  ---
+  duration_ms: 22.777
+  ...
+# Subtest: saved views persist their query in Realm and can be removed independently
+ok 61 - saved views persist their query in Realm and can be removed independently
+  ---
+  duration_ms: 19.5814
+  ...
+# Subtest: removing and restoring a completed task keeps its original file and metadata
+ok 62 - removing and restoring a completed task keeps its original file and metadata
+  ---
+  duration_ms: 46.766
+  ...
+# Subtest: recovery bin keeps real partial bytes and restores a byte-identical resumable task
+ok 63 - recovery bin keeps real partial bytes and restores a byte-identical resumable task
+  ---
+  duration_ms: 665.4013
+  ...
+# Subtest: permanent bin removal clears only owned partials and keeps completed files
+ok 64 - permanent bin removal clears only owned partials and keeps completed files
+  ---
+  duration_ms: 42.9436
+  ...
+# Subtest: browser duplicate guard reopens the existing task without creating another
+ok 65 - browser duplicate guard reopens the existing task without creating another
+  ---
+  duration_ms: 21.7909
+  ...
+# Subtest: duplicate reuse is explicit for manual adds and missing completed files do not block a new download
+ok 66 - duplicate reuse is explicit for manual adds and missing completed files do not block a new download
+  ---
+  duration_ms: 45.2544
+  ...
+# Subtest: configuration backup excludes credentials and restores selected groups with real schedules and references
+ok 67 - configuration backup excludes credentials and restores selected groups with real schedules and references
+  ---
+  duration_ms: 30.0433
+  ...
+# Subtest: configuration restore validates everything before any database mutation
+ok 68 - configuration restore validates everything before any database mutation
+  ---
+  duration_ms: 14.3118
+  ...
+# Subtest: configuration import ignores executable and credential settings injected into a backup
+ok 69 - configuration import ignores executable and credential settings injected into a backup
+  ---
+  duration_ms: 15.8159
+  ...
+# Subtest: storage inspector reads actual disk capacity and known queued bytes
+ok 70 - storage inspector reads actual disk capacity and known queued bytes
+  ---
+  duration_ms: 20.3813
+  ...
+# Subtest: queue bandwidth cap is shared by concurrent files rather than applied separately
+ok 71 - queue bandwidth cap is shared by concurrent files rather than applied separately
+  ---
+  duration_ms: 1038.347
+  ...
+# Subtest: concurrent remove requests share one recovery operation and never duplicate bin records
+ok 72 - concurrent remove requests share one recovery operation and never duplicate bin records
+  ---
+  duration_ms: 26.4833
+  ...
+# Subtest: incomplete legacy recovery entries cannot crash global state and remain unchanged in Realm
+ok 73 - incomplete legacy recovery entries cannot crash global state and remain unchanged in Realm
+  ---
+  duration_ms: 36.3388
+  ...
+# Subtest: a task disappearing during pause never creates an incomplete recovery entry
+ok 74 - a task disappearing during pause never creates an incomplete recovery entry
+  ---
+  duration_ms: 22.9489
+  ...
+# Subtest: startup uses the permanent portable launcher and explicit background argument
+ok 75 - startup uses the permanent portable launcher and explicit background argument
+  ---
+  duration_ms: 1.0869
+  ...
+# Subtest: installed startup overwrites the legacy key and verifies registration before success
+ok 76 - installed startup overwrites the legacy key and verifies registration before success
+  ---
+  duration_ms: 1.7044
+  ...
+# Subtest: startup reconciliation respects Windows Startup apps being explicitly disabled
+ok 77 - startup reconciliation respects Windows Startup apps being explicitly disabled
+  ---
+  duration_ms: 0.1734
+  ...
+# Subtest: crashed renderer reloads only its own trusted URL and never closes the service
+ok 78 - crashed renderer reloads only its own trusted URL and never closes the service
+  ---
+  duration_ms: 23.0967
+  ...
+# Subtest: unresponsive recovery is delayed, cancelled on responsiveness and forces a fresh renderer
+ok 79 - unresponsive recovery is delayed, cancelled on responsiveness and forces a fresh renderer
+  ---
+  duration_ms: 58.0811
+  ...
+# Subtest: recovery budget displays a fallback instead of an infinite reload loop; manual retry works
+ok 80 - recovery budget displays a fallback instead of an infinite reload loop; manual retry works
+  ---
+  duration_ms: 0.4345
+  ...
+# Subtest: renderer recovery does not resurrect closed windows or interfere with explicit quit
+ok 81 - renderer recovery does not resurrect closed windows or interfere with explicit quit
+  ---
+  duration_ms: 25.7083
+  ...
+# Subtest: native sends tolerate destroyed or crashed renderer processes
+ok 82 - native sends tolerate destroyed or crashed renderer processes
+  ---
+  duration_ms: 0.4119
+  ...
+# Subtest: idle diagnostic logs rotate at a bounded size rather than growing without limit
+ok 83 - idle diagnostic logs rotate at a bounded size rather than growing without limit
+  ---
+  duration_ms: 19.5582
+  ...
+# Subtest: fragment URLs are never listed as complete videos
+ok 84 - fragment URLs are never listed as complete videos
+  ---
+  duration_ms: 1.5577
+  ...
+# Subtest: full HLS/DASH manifests remain available for assembly
+ok 85 - full HLS/DASH manifests remain available for assembly
+  ---
+  duration_ms: 0.7472
+  ...
+# Subtest: signed CDN variants collapse without modifying the actual download URL
+ok 86 - signed CDN variants collapse without modifying the actual download URL
+  ---
+  duration_ms: 0.447
+  ...
+# Subtest: quality identifiers stay distinct while opaque labels are made readable
+ok 87 - quality identifiers stay distinct while opaque labels are made readable
+  ---
+  duration_ms: 0.3867
+  ...
+# Subtest: range responses use the total file size rather than fragment length
+ok 88 - range responses use the total file size rather than fragment length
+  ---
+  duration_ms: 0.2185
+  ...
+# Subtest: discovery lists are bounded and old cached fragments are filtered
+ok 89 - discovery lists are bounded and old cached fragments are filtered
+  ---
+  duration_ms: 0.7644
+  ...
+# Subtest: Facebook video pages are sent to the site extractor, without lookalike domains
+ok 90 - Facebook video pages are sent to the site extractor, without lookalike domains
+  ---
+  duration_ms: 0.5803
+  ...
+# Subtest: site notification sounds are filtered from video discovery
+ok 91 - site notification sounds are filtered from video discovery
+  ---
+  duration_ms: 0.1339
+  ...
+# Subtest: automation rules match real hosts, preserve manual choices and affect all add paths
+ok 92 - automation rules match real hosts, preserve manual choices and affect all add paths
+  ---
+  duration_ms: 60.4159
+  ...
+# Subtest: browser confirmation retains automatic speed and priority selections
+ok 93 - browser confirmation retains automatic speed and priority selections
+  ---
+  duration_ms: 29.6943
+  ...
+# Subtest: rule preview is nonmutating and invalid imports are atomic
+ok 94 - rule preview is nonmutating and invalid imports are atomic
+  ---
+  duration_ms: 18.535
+  ...
+# Subtest: numeric URL batches are bounded and exact duplicates are removed
+ok 95 - numeric URL batches are bounded and exact duplicates are removed
+  ---
+  duration_ms: 0.5074
+  ...
+# Subtest: link workbench probes real files, excludes HTML/errors and commits only chosen rows once
+ok 96 - link workbench probes real files, excludes HTML/errors and commits only chosen rows once
+  ---
+  duration_ms: 50.312
+  ...
+# Subtest: cancelling link inspection prevents automatic commit and preserves existing tasks
+ok 97 - cancelling link inspection prevents automatic commit and preserves existing tasks
+  ---
+  duration_ms: 16.9461
+  ...
+# Subtest: bandwidth calendar handles overnight days, end exclusivity and existing caps
+ok 98 - bandwidth calendar handles overnight days, end exclusivity and existing caps
+  ---
+  duration_ms: 20.5814
+  ...
+# Subtest: traffic mode produces a real HTTP transfer delay without changing original settings
+ok 99 - traffic mode produces a real HTTP transfer delay without changing original settings
+  ---
+  duration_ms: 1024.0574
+  ...
+# Subtest: queued task priority changes actual request order and persists in Realm metadata
+ok 100 - queued task priority changes actual request order and persists in Realm metadata
+  ---
+  duration_ms: 1049.7465
+  ...
+# Subtest: playlist metadata is bounded, skips private/duplicate entries and keeps safe canonical URLs
+ok 101 - playlist metadata is bounded, skips private/duplicate entries and keeps safe canonical URLs
+  ---
+  duration_ms: 16.385
+  ...
+# Subtest: playlist selection validates all items before enqueueing and applies selected audio mode
+ok 102 - playlist selection validates all items before enqueueing and applies selected audio mode
+  ---
+  duration_ms: 18.4181
+  ...
+# Subtest: media workshop creates a real trimmed MP3, decodes it and preserves the original
+ok 103 - media workshop creates a real trimmed MP3, decodes it and preserves the original
+  ---
+  duration_ms: 170.8981
+  ...
+# Subtest: media cancellation removes only its reserved output and rejects invalid trim ranges
+ok 104 - media cancellation removes only its reserved output and rejects invalid trim ranges
+  ---
+  duration_ms: 105.4981
+  ...
+# Subtest: media workshop makes decodable MP4 without enlarging a smaller source
+ok 105 - media workshop makes decodable MP4 without enlarging a smaller source
+  ---
+  duration_ms: 286.6835
+  ...
+# Subtest: empty out-of-duration media clips fail rather than reporting an empty file complete
+ok 106 - empty out-of-duration media clips fail rather than reporting an empty file complete
+  ---
+  duration_ms: 135.4015
+  ...
+# Subtest: interrupted media jobs clean owned temporary files and preserve nonempty output
+ok 107 - interrupted media jobs clean owned temporary files and preserve nonempty output
+  ---
+  duration_ms: 28.2706
+  ...
+# Subtest: playlist filenames are numbered in their own safe collection folder
+ok 108 - playlist filenames are numbered in their own safe collection folder
+  ---
+  duration_ms: 23.3337
+  ...
+# Subtest: a converted output changed externally is preserved on failure
+ok 109 - a converted output changed externally is preserved on failure
+  ---
+  duration_ms: 172.6412
+  ...
+# Subtest: numeric expansion stops at the global URL limit
+ok 110 - numeric expansion stops at the global URL limit
+  ---
+  duration_ms: 0.6641
+  ...
+# Subtest: HTTP headers have an absolute deadline even if the server keeps its socket open
+ok 111 - HTTP headers have an absolute deadline even if the server keeps its socket open
+  ---
+  duration_ms: 120.0873
+  ...
+# Subtest: wrong URLs produce terminal failed tasks and can be removed at zero bytes
+ok 112 - wrong URLs produce terminal failed tasks and can be removed at zero bytes
+  ---
+  duration_ms: 70.8186
+  ...
+# Subtest: remove during a hanging HTTP probe aborts promptly and never reappears
+ok 113 - remove during a hanging HTTP probe aborts promptly and never reappears
+  ---
+  duration_ms: 161.5157
+  ...
+# Subtest: cancel aborts a zero-byte transfer and removes temporary parts without deleting completed files
+ok 114 - cancel aborts a zero-byte transfer and removes temporary parts without deleting completed files
+  ---
+  duration_ms: 41.8
+  ...
+# Subtest: remove during site extraction kills extraction instead of waiting ninety seconds
+ok 115 - remove during site extraction kills extraction instead of waiting ninety seconds
+  ---
+  duration_ms: 32.3388
+  ...
+# Subtest: playlist URLs never run as one phantom playlist.mp4 download
+ok 116 - playlist URLs never run as one phantom playlist.mp4 download
+  ---
+  duration_ms: 45.8191
+  ...
+# Subtest: full playlist has no old 100/200 cutoff, preserves numbering and skips existing tasks
+ok 117 - full playlist has no old 100/200 cutoff, preserves numbering and skips existing tasks
+  ---
+  duration_ms: 1701.4681
+  ...
+# Subtest: playlist cap is explicit, malformed entries are skipped and cancellation is prompt
+ok 118 - playlist cap is explicit, malformed entries are skipped and cancellation is prompt
+  ---
+  duration_ms: 26.0426
+  ...
+# Subtest: signed endpoints that reject Range still download as normal GET
+ok 119 - signed endpoints that reject Range still download as normal GET
+  ---
+  duration_ms: 107.3973
+  ...
+# Subtest: browser handoff requires confirmation and cannot be started by queue pump
+ok 120 - browser handoff requires confirmation and cannot be started by queue pump
+  ---
+  duration_ms: 770.6055
+  ...
+# Subtest: a login page is rejected before cancelling the browser copy
+ok 121 - a login page is rejected before cancelling the browser copy
+  ---
+  duration_ms: 24.9857
+  ...
+# Subtest: changing download origin drops old session credentials
+ok 122 - changing download origin drops old session credentials
+  ---
+  duration_ms: 35.3415
+  ...
+# Subtest: a no-extension HLS manifest is still checked for encryption
+ok 123 - a no-extension HLS manifest is still checked for encryption
+  ---
+  duration_ms: 54.7538
+  ...
+# Subtest: YouTube pages select the site engine; lookalike hosts do not
+ok 124 - YouTube pages select the site engine; lookalike hosts do not
+  ---
+  duration_ms: 0.2047
+  ...
+# Subtest: video panel positions stay in bounds when resized and persist as fractions
+ok 125 - video panel positions stay in bounds when resized and persist as fractions
+  ---
+  duration_ms: 0.3752
+  ...
+# Subtest: manual PDF and audio downloads reject login HTML instead of reporting a corrupted file complete
+ok 126 - manual PDF and audio downloads reject login HTML instead of reporting a corrupted file complete
+  ---
+  duration_ms: 105.3977
+  ...
+# Subtest: explicit HTML downloads remain available for offline pages
+ok 127 - explicit HTML downloads remain available for offline pages
+  ---
+  duration_ms: 57.8516
+  ...
+# Subtest: library reports missing and resized files, and stored-hash duplicate candidates
+ok 128 - library reports missing and resized files, and stored-hash duplicate candidates
+  ---
+  duration_ms: 77.6548
+  ...
+# Subtest: integrity reads actual disk bytes and detects same-size tampering
+ok 129 - integrity reads actual disk bytes and detects same-size tampering
+  ---
+  duration_ms: 43.2272
+  ...
+# Subtest: rescue preserves all segments, verifies remote samples, then resumes byte-identically
+ok 130 - rescue preserves all segments, verifies remote samples, then resumes byte-identically
+  ---
+  duration_ms: 80.5114
+  ...
+# Subtest: rescue rejects different bytes without mutating the task or partial file
+ok 131 - rescue rejects different bytes without mutating the task or partial file
+  ---
+  duration_ms: 32.67
+  ...
+# Subtest: rescue rejects a changed server validator
+ok 132 - rescue rejects a changed server validator
+  ---
+  duration_ms: 36.352
+  ...
+# Subtest: rescue never sends old-origin cookies to a new origin
+ok 133 - rescue never sends old-origin cookies to a new origin
+  ---
+  duration_ms: 66.983
+  ...
+# Subtest: queue and mutations cannot race an in-progress rescue
+ok 134 - queue and mutations cannot race an in-progress rescue
+  ---
+  duration_ms: 382.6093
+  ...
+# Subtest: diagnosis separates session failures, protected media and confirmation
+ok 135 - diagnosis separates session failures, protected media and confirmation
+  ---
+  duration_ms: 0.3093
+  ...
+# Subtest: three bundled event sounds contain valid uncompressed WAV audio
+ok 136 - three bundled event sounds contain valid uncompressed WAV audio
+  ---
+  duration_ms: 2.5448
+  ...
+# Subtest: sound preview plays directly with a hidden bounded player and safely encoded path
+ok 137 - sound preview plays directly with a hidden bounded player and safely encoded path
+  ---
+  duration_ms: 0.5605
+  ...
+# Subtest: missing custom sounds and unknown events give actionable errors before launching
+ok 138 - missing custom sounds and unknown events give actionable errors before launching
+  ---
+  duration_ms: 0.3894
+  ...
+# Subtest: temporary 429 overload lowers connections, retries automatically and preserves exact bytes
+ok 139 - temporary 429 overload lowers connections, retries automatically and preserves exact bytes
+  ---
+  duration_ms: 680.7769
+  ...
+# Subtest: productive interrupted ranges do not exhaust retries accumulated across the whole file
+ok 140 - productive interrupted ranges do not exhaust retries accumulated across the whole file
+  ---
+  duration_ms: 7408.5239
+  ...
+# Subtest: an ignored range retries conservatively once before accepting only valid ranges
+ok 141 - an ignored range retries conservatively once before accepting only valid ranges
+  ---
+  duration_ms: 593.7478
+  ...
+# Subtest: temporary wrong-range metadata is retried without accepting any mismatched bytes
+ok 142 - temporary wrong-range metadata is retried without accepting any mismatched bytes
+  ---
+  duration_ms: 685.5396
+  ...
+# Subtest: intentional bandwidth limiting does not trigger the receive-idle watchdog
+ok 143 - intentional bandwidth limiting does not trigger the receive-idle watchdog
+  ---
+  duration_ms: 1058.5644
+  ...
+# Subtest: completion notifications failing cannot turn a completed file into a failed task
+ok 144 - completion notifications failing cannot turn a completed file into a failed task
+  ---
+  duration_ms: 59.2383
+  ...
+# Subtest: queue timer does not enter an asynchronous pump twice
+ok 145 - queue timer does not enter an asynchronous pump twice
+  ---
+  duration_ms: 68.2995
+  ...
+# Subtest: startup registration failure is surfaced without falsely persisting enabled startup
+ok 146 - startup registration failure is surfaced without falsely persisting enabled startup
+  ---
+  duration_ms: 14.5286
+  ...
+# Subtest: closing the service twice shares shutdown and rejects new work
+ok 147 - closing the service twice shares shutdown and rejects new work
+  ---
+  duration_ms: 15.7582
+  ...
+# Subtest: update versions use numeric stable semantic versions
+ok 148 - update versions use numeric stable semantic versions
+  ---
+  duration_ms: 0.7431
+  ...
+# Subtest: new ready GitHub release requests one popup and exposes verified page
+ok 149 - new ready GitHub release requests one popup and exposes verified page
+  ---
+  duration_ms: 14.8344
+  ...
+# Subtest: same and older releases do not request a popup or permit a download action
+ok 150 - same and older releases do not request a popup or permit a download action
+  ---
+  duration_ms: 0.844
+  ...
+# Subtest: drafts, prereleases and nonversion tags never become update offers
+ok 151 - drafts, prereleases and nonversion tags never become update offers
+  ---
+  duration_ms: 0.9077
+  ...
+# Subtest: source-only releases and unfinished executable uploads are not offered
+ok 152 - source-only releases and unfinished executable uploads are not offered
+  ---
+  duration_ms: 1.232
+  ...
+# Subtest: portable-only ready releases are supported
+ok 153 - portable-only ready releases are supported
+  ---
+  duration_ms: 0.095
+  ...
+# Subtest: foreign pages, credentials and altered release URLs are rejected
+ok 154 - foreign pages, credentials and altered release URLs are rejected
+  ---
+  duration_ms: 0.4482
+  ...
+# Subtest: untrusted asset URLs cannot make a release ready
+ok 155 - untrusted asset URLs cannot make a release ready
+  ---
+  duration_ms: 0.1296
+  ...
+# Subtest: manual checks do not create automatic popups, and disabled checks remain manually accessible
+ok 156 - manual checks do not create automatic popups, and disabled checks remain manually accessible
+  ---
+  duration_ms: 0.4476
+  ...
+# Subtest: skipping survives restart and allows a subsequent newer version
+ok 157 - skipping survives restart and allows a subsequent newer version
+  ---
+  duration_ms: 0.7518
+  ...
+# Subtest: remind tomorrow is persisted and suppresses automatic popups for 24 hours
+ok 158 - remind tomorrow is persisted and suppresses automatic popups for 24 hours
+  ---
+  duration_ms: 0.5529
+  ...
+# Subtest: parallel checks share one request and one notification
+ok 159 - parallel checks share one request and one notification
+  ---
+  duration_ms: 0.238
+  ...
+# Subtest: conditional GitHub requests reuse a validated cached release
+ok 160 - conditional GitHub requests reuse a validated cached release
+  ---
+  duration_ms: 0.6889
+  ...
+# Subtest: offline and API failures stay quiet and report specific recoverable states
+ok 161 - offline and API failures stay quiet and report specific recoverable states
+  ---
+  duration_ms: 0.5041
+  ...
+# Subtest: malformed and oversized responses are not processed as updates
+ok 162 - malformed and oversized responses are not processed as updates
+  ---
+  duration_ms: 0.8439
+  ...
+# Subtest: shutdown aborts a pending check without writing to a closed store
+ok 163 - shutdown aborts a pending check without writing to a closed store
+  ---
+  duration_ms: 0.1383
+  ...
+# Subtest: extractor paths resolve forward and backward ASAR separators
+ok 164 - extractor paths resolve forward and backward ASAR separators
+  ---
+  duration_ms: 1.0513
+  ...
+# Subtest: missing extractor restores once from the official release and verifies bytes without session headers
+ok 165 - missing extractor restores once from the official release and verifies bytes without session headers
+  ---
+  duration_ms: 15.5977
+  ...
+# Subtest: wrong extractor checksum never installs or executes the response
+ok 166 - wrong extractor checksum never installs or executes the response
+  ---
+  duration_ms: 2.1996
+  ...
+# Subtest: valid local extractor is preferred with no network request
+ok 167 - valid local extractor is preferred with no network request
+  ---
+  duration_ms: 1.2143
+  ...
+# Subtest: invalid cached extractor is replaced only with verified official bytes
+ok 168 - invalid cached extractor is replaced only with verified official bytes
+  ---
+  duration_ms: 3.1063
+  ...
+# Subtest: cancelling a waiting task returns promptly and shutdown cancels the shared repair
+ok 169 - cancelling a waiting task returns promptly and shutdown cancels the shared repair
+  ---
+  duration_ms: 1.1294
+  ...
+# Subtest: unexpected repair URLs are rejected before requesting a file
+ok 170 - unexpected repair URLs are rejected before requesting a file
+  ---
+  duration_ms: 0.5211
+  ...
+1..170
+# tests 170
+# suites 0
+# pass 170
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 47397.6882
+npm notice
+npm notice New major version of npm available! 10.9.2 -> 12.2.1
+npm notice Changelog: https://github.com/npm/cli/releases/tag/v12.2.1
+npm notice To update run: npm install -g npm@12.2.1
+npm notice

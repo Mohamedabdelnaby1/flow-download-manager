@@ -14,7 +14,7 @@ const DEFAULTS = {
   soundComplete: '', soundError: '', soundQueue: '',
   vpnName: '', vpnRetries: 3, vpnDelay: 10,
   scanner: '', scannerArgs: '[File]', integration: false,
-  showCategories: true, textScale: 100, preventDuplicates: true, preventSleep: false
+  showCategories: true, textScale: 100, preventDuplicates: true, preventSleep: false, closeToTray:true, minimizeToTray:true
 };
 const Segment = { name: 'Segment', embedded: true, properties: {
   id: 'int', start: 'double', current: 'double', end: 'double', state: 'string'

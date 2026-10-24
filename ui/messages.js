@@ -1,6 +1,11 @@
 /* English presentation of built-in service messages; original data remains unchanged. */
 (function(root){
  const entries=Object.entries({
+"الخادم يطلب تقليل الاتصالات والمحاولة لاحقًا": "The server requested fewer connections and a later retry",
+"الخادم رفض طلب التحميل": "The server refused the download request",
+"انتهت مهلة استقبال البيانات من الخادم": "Timed out waiting for data from the server",
+"البرنامج يغلق؛ انتظر انتهاء الإغلاق": "Flow is shutting down; wait for it to finish",
+
 "بيانات سلة الاسترجاع تحتاج مراجعة": "Recovery bin data needs review",
 "هذا رابط قائمة فيديوهات. افتح الأدوات ← قوائم الفيديو لإضافة القائمة كاملة.": "This is a playlist URL. Open Tools > Video playlists to import the whole playlist.",
 "انتهت مهلة الاتصال بالخادم": "The connection to the server timed out",

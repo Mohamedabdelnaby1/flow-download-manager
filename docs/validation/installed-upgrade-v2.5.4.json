@@ -1,0 +1,15 @@
+{
+  "version": "2.5.4",
+  "date": "2026-10-24",
+  "installerExitCode": 0,
+  "healthy": true,
+  "downloadCountBefore": 0,
+  "downloadCountAfter": 0,
+  "downloadFieldsPreserved": true,
+  "preferencesPreserved": true,
+  "startupEnabled": true,
+  "startupStableLauncherAndQuietArguments": true,
+  "trayResident": true,
+  "privateBackupRetainedLocally": true,
+  "rebootPerformed": false
+}

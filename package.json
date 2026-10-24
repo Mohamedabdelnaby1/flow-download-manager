@@ -1,6 +1,6 @@
 {
   "name": "flow-download-manager",
-  "version": "2.5.3",
+  "version": "2.5.4",
   "description": "Local-first download manager with Realm and an Electron shell",
   "main": "src/electron.cjs",
   "private": true,
@@ -39,7 +39,8 @@
       "node_modules/realm/**",
       "node_modules/ffmpeg-static/**",
       "native/**",
-      "vendor/**"
+      "vendor/**",
+      "ui/sounds/**"
     ],
     "directories": {
       "output": "release"

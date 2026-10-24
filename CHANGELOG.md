@@ -1,5 +1,20 @@
 # Changelog
 
+## 2.5.4 — 2026-10-24
+
+- Restore a missing/corrupt video extractor from the pinned official release after SHA-256 verification; add packaged real-video checks.
+- Include three built-in event WAV sounds with direct playback and custom-path reset/fallback.
+- Add explicit transfer cancellation with confirmation and preserve completed disk files.
+- Tray clicks reopen the last minimized transfer; add actual speed history and differentiated metric surfaces.
+- Fixed Windows startup pointing to a deleted portable extraction executable. Use the permanent launcher and `--background`, with verified registration and an explicit startup toggle.
+- Close/minimize to tray options, live tray size/rate tooltip, per-download tray entries and native taskbar progress. Explicit Exit still stops the app.
+- Renderer crash/hang recovery, trusted recovery page with bounded retries, destroyed-main restoration from the tray, rotating diagnostic logs and software rendering compatibility.
+- Main/transfer minimization and focus changes leave the native download engine running. Hidden renderers stop polling using explicit native visibility events; unchanged snapshots retain their DOM.
+- Paginated large download libraries, cached limiter settings and serialized asynchronous queue pumping.
+- Adaptive HTTP connection reduction, `Retry-After` handling, conservative HTTP/1 fallback, bounded range-confirmation retries, progress-aware reconnect budgets and a receive watchdog that excludes intentional throttling.
+- Completed files cannot become failed because a notification/callback throws; duplicate shutdown is safe.
+- Compact transfer/completion material surfaces, collapsed connection details, readable size/rate/progress, tray action and Arabic/English/system appearance.
+
 ## 2.5.3 — 2026-10-23
 
 - Fixed incomplete legacy recovery records breaking the global state, tools and task deletion. Original malformed records remain retained in Realm.

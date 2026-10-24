@@ -44,6 +44,7 @@ function repaintNativeLanguage(){
 const nativeHandleAction=handleAction;
 handleAction=async(name,el)=>{
   if(name==='authorProfile'){if(window.desktopAPI)await api('authorProfile');else window.open('https://www.facebook.com/mohamedabdelnaby190','_blank','noopener');return;}
+  if(name==='windowHide')return api('windowHide');
   if(name==='windowMinimize')return api('windowMinimize');
   if(name==='nativeClose')return api('windowClose');
   if(name==='browserFallback'){await api('browserFallback',{id:el.dataset.id});return;}

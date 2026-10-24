@@ -1,11 +1,17 @@
 # Screenshots
 
-Actual Flow 2.5.2 portable desktop captures with demonstration records and example names. No private browsing session or token is shown. Demonstration entries do not imply their example URLs were downloaded.
+Actual Flow 2.5.4 packaged desktop captures with demonstration records and example names. No private browsing session or token is shown. Demonstration entries do not imply their example URLs were downloaded.
 
 | View | Capture |
 | --- | --- |
 | English desktop, light | ![Light](screenshots/desktop-light.png) |
 | English desktop, dark | ![Dark](screenshots/desktop-dark.png) |
+| Arabic desktop, dark | ![Arabic dark](screenshots/desktop-ar-dark.png) |
+| Transfer, light | ![Transfer](screenshots/transfer-en-2.5.4.png) |
+| Transfer, Arabic dark | ![Arabic transfer](screenshots/transfer-ar-2.5.4.png) |
+| Completion, light | ![Completion](screenshots/complete-en-2.5.4.png) |
+| Completion, Arabic dark | ![Arabic completion](screenshots/complete-ar-2.5.4.png) |
+| Included sound controls, final Portable | ![Sounds](screenshots/sounds.png) |
 | Settings | ![Settings](screenshots/settings.png) |
 | Favorites and capacity | ![Library](screenshots/library.png) |
 | Batch rename | ![Rename](screenshots/rename.png) |
@@ -13,7 +19,7 @@ Actual Flow 2.5.2 portable desktop captures with demonstration records and examp
 | Smart tools | ![Smart](screenshots/smart-tools.png) |
 | Compact layout | ![Compact](screenshots/compact.png) |
 
-The app UI is real. Browser API fixture captures are labeled separately in validation and do not prove personal Chrome/Edge installation.
+Transfer captures use a local 8 MiB controlled fixture for reliability tests. The app UI is real. Browser API fixture captures are labeled separately in validation and do not prove personal Chrome/Edge installation.
 
 ## Reported-problem regression captures
 

@@ -17,7 +17,7 @@ function category(name) {
 }
 class Engine extends EventEmitter {
   constructor(store, options={}) {
-    super();this.store=store;this.active=new Map();this.maintenance=new Set();this.globalNext=0;this.queueNext=new Map();this.closing=false;this.completedQueues=new Set();this.onComplete=options.onComplete;this.video=new (require('./video.cjs').VideoResolver)(store);
+    super();this.store=store;this.active=new Map();this.maintenance=new Set();this.globalNext=0;this.queueNext=new Map();this.closing=false;this.completedQueues=new Set();this.onComplete=options.onComplete;this.idleTimeout=options.transferIdleTimeout||30000;this.hostHints=store.get('transferHostHints',{});this.video=new (require('./video.cjs').VideoResolver)(store);
     this.usage=store.get('usage',{start:Date.now(),bytes:0,total:0});
     this.tick=setInterval(()=>this.pump().catch(e=>this.store.log('error',e.message)),500);this.tick.unref();
   }
@@ -41,12 +41,13 @@ class Engine extends EventEmitter {
     this.store.log('added',name,item.id); if(!data.later) this.start(item.id).catch(()=>{});return item;
   }
   async start(id) {
-    if(this.active.has(id)||this.maintenance.has(id))return;
+    if(this.closing||this.active.has(id)||this.maintenance.has(id))return;
     const item=this.store.find(id);if(!item||item.status==='complete')return;
     if(this.quotaReached()){this.store.update(id,{status:'limited',error:'تم بلوغ حصة التحميل؛ الاستئناف تلقائي في الدورة التالية'});return;}
     if(this.active.size>=this.settings().simultaneous){this.store.update(id,{status:'queued'});this.store.putQueue({...this.store.queues().find(q=>q.id===item.queueId),running:true});return;}
-    const ctx={id,item,controllers:new Set(),stopped:false,segments:item.segments.map(s=>({...s})),speed:0,received:0,lastBytes:0,lastTime:Date.now(),checkpoint:Date.now(),fileNext:0,fd:null};
-    this.active.set(id,ctx);this.store.update(id,{status:'probing',error:'',speed:0});
+    const host=new URL(item.url).hostname,hint=this.hostHints[host];
+    const ctx={id,item,host,http1:!!hint?.http1&&Date.now()-hint.time<86400000,retryAttempts:new Map(),controllers:new Set(),stopped:false,segments:item.segments.map(s=>({...s})),speed:0,received:0,lastBytes:0,lastTime:Date.now(),checkpoint:Date.now(),fileNext:0,fd:null};
+    this.active.set(id,ctx);const startMeta=JSON.parse(item.meta);delete startMeta.transfer;this.store.update(id,{status:'probing',error:'',speed:0,meta:JSON.stringify(startMeta)});
     ctx.promise=this.run(ctx).catch(e=>{
       if(!ctx.stopped){this.checkpoint(ctx);this.store.update(id,{status:'error',speed:0,error:e.message});this.store.log('error',e.message,id);this.emit('failure',this.store.find(id));}
     }).finally(()=>{if(ctx.fd!==null){try{fs.fsyncSync(ctx.fd);fs.closeSync(ctx.fd);}catch{}ctx.fd=null;}this.active.delete(id);if(!this.active.size)this.globalNext=0;this.emit('change');});
@@ -62,7 +63,7 @@ class Engine extends EventEmitter {
     if(/^ftps?:/i.test(item.url))return this.ftp(ctx,meta);
     const controller=new AbortController();ctx.controllers.add(controller);
     const headers=this.authHeaders(item.url,meta);
-    const info=await probe(item.url,{headers,settings:this.settings(),signal:controller.signal});ctx.controllers.delete(controller);
+    const info=await probe(item.url,{headers,settings:this.settings(),signal:controller.signal,http1:ctx.http1});ctx.controllers.delete(controller);
     if(ctx.stopped)return;
     if(meta.autoName&&info.disposition&&!item.downloaded){
       const utf8=/filename\*\s*=\s*UTF-8''([^;]+)/i.exec(info.disposition),plain=/filename\s*=\s*"([^"]+)"|filename\s*=\s*([^;]+)/i.exec(info.disposition);
@@ -79,7 +80,7 @@ class Engine extends EventEmitter {
     if(!ctx.segments.length)ctx.segments=[{id:1,start:0,current:0,end:info.size||Number.MAX_SAFE_INTEGER,state:'waiting'}];
     for(const s of ctx.segments)s.state=s.current>=s.end?'complete':'waiting';
     this.store.update(item.id,{...{size:info.size,resumable:info.resumable,etag:info.etag,modified:info.modified},status:'downloading',segments:ctx.segments});
-    const limit=info.resumable?Math.min(32,this.settings().serverConnections?.[new URL(item.url).hostname]||this.settings().connections):1;
+    const configured=info.resumable?Math.min(32,this.settings().serverConnections?.[ctx.host]||this.settings().connections):1,hint=this.hostHints[ctx.host];ctx.connectionLimit=Math.min(configured,hint&&Number.isInteger(hint.connections)&&hint.connections>=1&&hint.connections<=32&&Date.now()-hint.time<86400000?hint.connections:configured);ctx.retryAt=0;
     let fatal;
     const workers=new Set();
     const launch=s=>{
@@ -87,7 +88,7 @@ class Engine extends EventEmitter {
       const p=this.worker(ctx,s,headers).catch(e=>{if(!ctx.stopped){fatal=e;ctx.stopped=true;for(const c of ctx.controllers)c.abort();}}).finally(()=>workers.delete(p));workers.add(p);
     };
     while(!ctx.stopped){
-      while(workers.size<limit){
+      while(workers.size<ctx.connectionLimit&&Date.now()>=(ctx.retryAt||0)){
         let s=ctx.segments.find(s=>s.state==='waiting'&&s.current<s.end);
         if(!s&&info.resumable){
           const biggest=[...ctx.segments].filter(s=>s.state==='active').sort((a,b)=>(b.end-b.current)-(a.end-a.current))[0];
@@ -98,7 +99,7 @@ class Engine extends EventEmitter {
         }
         if(!s)break;launch(s);
       }
-      if(!workers.size)break;
+      if(!workers.size){if(ctx.segments.some(s=>s.current<s.end&&s.state==='waiting')){await delay(100);continue;}break;}
       await Promise.race([...workers,delay(100)]);
       this.measure(ctx);
     }
@@ -112,27 +113,30 @@ class Engine extends EventEmitter {
     await this.finish(ctx);
   }
   async worker(ctx,s,baseHeaders){
-    let attempts=0;
+    let attempts=ctx.retryAttempts.get(s.id)||0;
     while(s.current<s.end&&!ctx.stopped){
-      const ac=new AbortController();ctx.controllers.add(ac);let response;
+      const ac=new AbortController();ctx.controllers.add(ac);let response,dataTimer,throttling=false,lastData=Date.now(),attemptStart=s.current;const usedHTTP1=ctx.http1;
       try{
         const headers={...baseHeaders};if(ctx.resumable){headers.range=`bytes=${s.current}-${s.end-1}`;if(ctx.etag&&!ctx.etag.startsWith('W/'))headers['if-range']=ctx.etag;else if(ctx.modified)headers['if-range']=ctx.modified;}
-        response=await request(ctx.item.url,{headers,signal:ac.signal,settings:this.settings()});
+        response=await request(ctx.item.url,{headers,signal:ac.signal,settings:this.settings(),http1:usedHTTP1});
+        if(response.statusCode>=400){const error=Error(`HTTP ${response.statusCode} — ${response.statusCode===429?'الخادم يطلب تقليل الاتصالات والمحاولة لاحقًا':'الخادم رفض طلب التحميل'}`);error.status=response.statusCode;error.retryAfter=response.headers['retry-after'];throw error;}
         if(ctx.resumable){
           const cr=/bytes (\d+)-(\d+)\/(\d+)/.exec(response.headers['content-range']||'');
-          if(response.statusCode!==206||!cr||Number(cr[1])!==s.current||Number(cr[3])!==ctx.size)throw Error('الخادم لم يؤكد نطاق الاستئناف؛ تم إيقاف التحميل لمنع تلف الملف');
+          if(response.statusCode!==206||!cr||Number(cr[1])!==s.current||Number(cr[3])!==ctx.size){const error=Error(`HTTP ${response.statusCode} — الخادم لم يؤكد نطاق الاستئناف؛ تم إيقاف التحميل لمنع تلف الملف`);error.invalidRange=true;error.status=response.statusCode;throw error;}
           if(response.headers['content-encoding']&&response.headers['content-encoding']!=='identity')throw Error('لا يمكن تقسيم استجابة مضغوطة');
         }else if(response.statusCode!==200)throw Error(`HTTP ${response.statusCode}`);
         if(ctx.etag&&response.headers.etag&&ctx.etag!==response.headers.etag||!this.settings().ignoreModified&&ctx.modified&&response.headers['last-modified']&&ctx.modified!==response.headers['last-modified'])throw Error('تغير الملف أثناء التحميل؛ تم إيقافه لمنع دمج نسخ مختلفة');
         if(!ctx.resumable&&ctx.size&&response.headers['content-length']!==undefined&&Number(response.headers['content-length'])!==ctx.size)throw Error('تغير حجم الملف بين الفحص وبدء التحميل');
+        response.setTimeout?.(0);lastData=Date.now();dataTimer=setInterval(()=>{if(!ctx.stopped&&!throttling&&Date.now()-lastData>this.idleTimeout)response.destroy(Error('انتهت مهلة استقبال البيانات من الخادم'));},Math.min(1000,this.idleTimeout));dataTimer.unref();
         for await(const chunk of response){
+          lastData=Date.now();
           if(ctx.stopped)break;
           const n=Math.min(chunk.length,s.end-s.current);if(n<=0)break;
-          await this.throttle(ctx,n);
+          throttling=true;try{await this.throttle(ctx,n);}finally{throttling=false;lastData=Date.now();}
           if(ctx.stopped)break;
           // End offsets may have changed while this worker waited for the limiter.
           const count=Math.min(n,s.end-s.current);if(count<=0)break;
-          fs.writeSync(ctx.fd,chunk,0,count,s.current);s.current+=count;ctx.received+=count;this.usage.bytes+=count;this.usage.total+=count;
+          fs.writeSync(ctx.fd,chunk,0,count,s.current);s.current+=count;ctx.retryAttempts.delete(s.id);if(ctx.retryNotice){ctx.retryNotice=false;const latest=this.store.find(ctx.id);if(latest)this.store.update(ctx.id,{meta:JSON.stringify({...JSON.parse(latest.meta),transfer:{connections:ctx.connectionLimit,http1:ctx.http1}})});}ctx.received+=count;this.usage.bytes+=count;this.usage.total+=count;
           if(Date.now()-ctx.checkpoint>1000)this.checkpoint(ctx);
           if(this.quotaReached()){this.pause(ctx.id,'limited');break;}
           if(s.current>=s.end)break;
@@ -142,23 +146,27 @@ class Engine extends EventEmitter {
         if(!ctx.stopped)throw Error('انقطع الاتصال قبل اكتمال الجزء');
       }catch(e){
         if(ctx.stopped)return;
+        if(e.invalidRange){if(!usedHTTP1){ctx.http1=true;this.reduceConnections(ctx,1);ctx.retryAt=Date.now()+500;s.state='waiting';return;}if(attempts<this.settings().retries){ctx.retryAttempts.set(s.id,++attempts);ctx.retryAt=Date.now()+Math.min(10000,this.settings().retryDelay*1000*attempts);s.state='waiting';this.store.log('retry',`Range confirmation retry ${attempts}; HTTP ${e.status}`,ctx.id);return;}throw e;}
+        if(e.status&&![408,425,429,500,502,503,504].includes(e.status))throw e;
+        if(s.current>attemptStart)attempts=0;
+        if(/HTTP2|GOAWAY|http2/i.test(e.code||e.message))ctx.http1=true;
         if(!ctx.resumable&&s.current>0){s.current=0;ctx.received=0;}
-        if(++attempts>this.settings().retries)throw e;
+        if(++attempts>this.settings().retries)throw e;ctx.retryAttempts.set(s.id,attempts);
+        if(e.status===429||e.status===503||attempts>=2){this.reduceConnections(ctx,Math.max(1,Math.floor(ctx.connectionLimit/2)));const seconds=Number(e.retryAfter),date=Date.parse(e.retryAfter||'');const serverDelay=Number.isFinite(seconds)?seconds*1000:Number.isFinite(date)?date-Date.now():0;ctx.retryAt=Date.now()+Math.max(500,Math.min(120000,Math.max(serverDelay,this.settings().retryDelay*1000*2**(attempts-1))));ctx.retryNotice=true;const latest=this.store.find(ctx.id);if(latest)this.store.update(ctx.id,{speed:0,meta:JSON.stringify({...JSON.parse(latest.meta),transfer:{connections:ctx.connectionLimit,retryAt:ctx.retryAt,attempt:attempts,httpStatus:e.status||null}})});s.state='waiting';this.store.log('retry',`HTTP ${e.status||'network'}; connections=${ctx.connectionLimit}; attempt=${attempts}`,ctx.id);return;}
         this.store.log('retry',`المحاولة ${attempts}: ${e.message}`,ctx.id);
         const retryAt=Date.now()+Math.min(10000,this.settings().retryDelay*1000*attempts);while(!ctx.stopped&&Date.now()<retryAt)await delay(Math.min(100,retryAt-Date.now()));
-      }finally{response?.destroy();ctx.controllers.delete(ac);}
+      }finally{clearInterval(dataTimer);response?.destroy();ctx.controllers.delete(ac);}
     }
   }
+  reduceConnections(ctx,limit){ctx.connectionLimit=Math.max(1,Math.min(ctx.connectionLimit,limit));this.hostHints[ctx.host]={connections:ctx.connectionLimit,http1:ctx.http1,time:Date.now()};this.hostHints=Object.fromEntries(Object.entries(this.hostHints).sort((a,b)=>b[1].time-a[1].time).slice(0,200));this.store.set('transferHostHints',this.hostHints);}
   async throttle(ctx,n){
-    const global=Number(this.settings().speedLimit)*1024,file=Number(JSON.parse(this.store.find(ctx.id)?.meta||'{}').speedLimit)*1024;
-    const queue=this.store.find(ctx.id)?.queueId||'main',q=this.store.queues().find(q=>q.id===queue),queueLimit=Number(JSON.parse(q?.schedule||'{}').bandwidthKB||0)*1024;
-    const now=Date.now();let waitUntil=now;
+    const now=Date.now();if(!ctx.limits||now-ctx.limits.time>=500){const item=this.store.find(ctx.id),queue=item?.queueId||'main',q=this.store.queues().find(q=>q.id===queue);ctx.limits={time:now,global:Number(this.settings().speedLimit)*1024,file:Number(JSON.parse(item?.meta||'{}').speedLimit)*1024,queue,queueLimit:Number(JSON.parse(q?.schedule||'{}').bandwidthKB||0)*1024};}const {global,file,queue,queueLimit}=ctx.limits;let waitUntil=now;
     if(queueLimit>0){const next=Math.max(now,this.queueNext.get(queue)||0)+n/queueLimit*1000;this.queueNext.set(queue,next);waitUntil=Math.max(waitUntil,next);}
     if(global>0){this.globalNext=Math.max(now,this.globalNext)+n/global*1000;waitUntil=Math.max(waitUntil,this.globalNext);}
     if(file>0){ctx.fileNext=Math.max(now,ctx.fileNext)+n/file*1000;waitUntil=Math.max(waitUntil,ctx.fileNext);}
     while(!ctx.stopped&&Date.now()<waitUntil)await delay(Math.min(100,waitUntil-Date.now()));
   }
-  measure(ctx){const now=Date.now();if(now-ctx.lastTime<450)return;ctx.speed=(ctx.received-ctx.lastBytes)/((now-ctx.lastTime)/1000);ctx.lastBytes=ctx.received;ctx.lastTime=now;this.store.update(ctx.id,{speed:ctx.speed,downloaded:ctx.segments.reduce((n,s)=>n+s.current-s.start,0),segments:ctx.segments});}
+  measure(ctx){const now=Date.now();if(now-ctx.lastTime<450)return;if(!ctx.speedSamples)ctx.speedSamples=[{time:ctx.lastTime,bytes:ctx.lastBytes}];ctx.speedSamples.push({time:now,bytes:ctx.received});while(ctx.speedSamples.length>2&&ctx.speedSamples[1].time<=now-3000)ctx.speedSamples.shift();const first=ctx.speedSamples[0];ctx.speed=Math.max(0,(ctx.received-first.bytes)/Math.max(.001,(now-first.time)/1000));ctx.lastBytes=ctx.received;ctx.lastTime=now;this.store.update(ctx.id,{speed:ctx.speed,downloaded:ctx.segments.reduce((n,s)=>n+s.current-s.start,0),segments:ctx.segments});}
   checkpoint(ctx){
     if(ctx.fd!==null){try{fs.fsyncSync(ctx.fd);}catch{}}
     if(ctx.segments.length)this.store.update(ctx.id,{downloaded:ctx.segments.reduce((n,s)=>n+s.current-s.start,0),segments:ctx.segments});
@@ -173,7 +181,8 @@ class Engine extends EventEmitter {
     const s=this.settings();if(Date.now()-this.usage.start>=s.quotaHours*3600000){this.usage.start=Date.now();this.usage.bytes=0;}
     return s.quotaMB>0&&this.usage.bytes>=s.quotaMB*1024*1024;
   }
-  async pump(){
+  pump(){if(this.closing)return Promise.resolve();if(this.pumpPromise)return this.pumpPromise;this.pumpPromise=this.pumpOnce().finally(()=>this.pumpPromise=null);return this.pumpPromise;}
+  async pumpOnce(){
     if(this.closing)return;
     const limited=this.quotaReached(),now=new Date();
     if(!limited)for(const d of this.store.list().filter(d=>d.status==='limited'&&!this.active.has(d.id))){this.store.update(d.id,{status:'queued',error:''});this.start(d.id).catch(()=>{});}
@@ -213,7 +222,7 @@ class Engine extends EventEmitter {
     fs.unlinkSync(ctx.temp);
     this.store.update(ctx.id,{status:'complete',size:fs.statSync(dest).size,downloaded:fs.statSync(dest).size,speed:0,name:path.basename(dest),error:'',meta:JSON.stringify(meta)});
     if(meta.mode==='media'){this.usage.total+=fs.statSync(dest).size;this.usage.bytes+=fs.statSync(dest).size;this.store.set('usage',this.usage);}
-    this.store.log('complete',path.basename(dest),ctx.id);await this.onComplete?.(dest);this.emit('complete',this.store.find(ctx.id));
+    this.store.log('complete',path.basename(dest),ctx.id);try{await this.onComplete?.(dest);}catch(error){this.store.log('notice','Completion callback: '+error.message,ctx.id);}try{this.emit('complete',this.store.find(ctx.id));}catch(error){this.store.log('notice','Completion notification: '+error.message,ctx.id);}
     }finally{if(copied&&this.store.find(ctx.id)?.status!=='complete')try{await fs.promises.unlink(dest);}catch{}}
   }
   async ftp(ctx,meta){
@@ -269,6 +278,6 @@ class Engine extends EventEmitter {
     this.store.remove(id);
   }
   async redownload(id){await this.pause(id);const d=this.store.find(id);if(!d)return;if(fs.existsSync(this.settings().tempDir))for(const name of fs.readdirSync(this.settings().tempDir).filter(n=>n.startsWith(id+'.'))){const p=path.join(this.settings().tempDir,name);if(fs.statSync(p).isFile())fs.unlinkSync(p);}this.store.update(id,{segments:[],downloaded:0,size:0,etag:'',modified:'',status:'queued'});this.start(id).catch(()=>{});}
-  async close(){this.closing=true;clearInterval(this.tick);await this.pauseAll();await this.video.close();this.store.set('usage',this.usage);}
+  async close(){this.closing=true;clearInterval(this.tick);await this.pumpPromise;await this.pauseAll();await this.video.close();this.store.set('usage',this.usage);}
 }
 module.exports={Engine,fileName,category,ACTIVE};
