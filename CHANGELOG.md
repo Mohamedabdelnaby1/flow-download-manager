@@ -1,5 +1,14 @@
 # Changelog
 
+## 2.6.1
+
+- Shared Arabic/English error assistant for service, renderer, download, background and companion failures. Technical details stay collapsed; local problem reports redact credentials. Browser failures offer an explicit repair action.
+- Configure the Windows native bridge with CurrentUser DPAPI through the built-in absolute Windows system utility, without spawning the native host merely to save its configuration. Bounded child-process handling includes synchronous spawn failure and broken stdin.
+- Installer and portable startup reject Windows 7/8/8.1 with a clear Windows 10/11 requirement. This is a compatibility guard, not legacy Windows support.
+- Automatic expired-link renewal for a saved source page only after strong ETag, size, range and saved-byte checks; weak or mismatching identities remain for manual review.
+- A simple connection-health view reports actual transfer progress, source wait, server responses, adaptive connection count and temporary-drive space.
+- The larger independent-engine/update/media/watch/sync roadmap remains in development and is not claimed as part of 2.6.1.
+
 ## 2.6.0
 
 - Reuse fresh in-memory video inspection for transfer, share concurrent inspections, and cancel obsolete URL inspections.

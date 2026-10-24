@@ -4,7 +4,7 @@ const path = require('node:path');
 const crypto = require('node:crypto');
 
 const DEFAULTS = {
-  language: 'en', theme: 'system', connections: 8, simultaneous: 3,
+  autoRescue:true, language: 'en', theme: 'system', connections: 8, simultaneous: 3,
   retries: 3, retryDelay: 2, speedLimit: 0, quotaMB: 0, quotaHours: 4,
   userAgent: 'Flow/1.0', proxy: '', proxyExceptions: 'localhost,127.0.0.1',
   fileTypes: 'ZIP RAR 7Z TAR GZ PDF DOC DOCX XLSX PPTX MP3 WAV OGG FLAC MP4 MKV MOV WEBM EXE MSI ISO APK',

@@ -1,3 +1,15 @@
+# Validation - Flow 2.6.1 foundation update
+
+Source checks: **231 passed, 0 failed** ([report](docs/validation/engine-tests-v2.6.1.txt)). Real desktop error-assistant checks: **12 passed**, covering visible English/Arabic cards, collapsed diagnostics, explicit browser repair, local redacted reports, renderer rejection handling, and simple connection-health/rescue controls ([report](docs/validation/errors-v2.6.1.json)). Existing source desktop tools flow: **25 passed** ([report](docs/validation/tools-source-v2.6.1.json)). Packaged release verification is recorded in the accompanying release verification asset.
+
+The real Windows native host consumed configuration protected by the new built-in DPAPI configuration path, validated the extension origin, and completed an authorized local fixture download. Automatic link rescue completed from saved bytes, rejected weak identity, rejected different bytes despite a forged same size/ETag, and cancelled when the task was removed.
+
+Windows 7, 8 and 8.1 cannot run this Electron 45 edition. Installer and portable guards are compiled into the Windows release. No Windows 7 virtual-machine run was performed; the guard is not a claim of Windows 7 compatibility. [Electron support boundary](https://www.electronjs.org/blog/windows-7-to-8-1-deprecation-notice).
+
+New independent-engine, full in-app update, richer media/bundle/watch/subscription/sync features are separate ongoing work. Linux packages remain deferred.
+
+---
+
 # Validation - Flow 2.6.0
 
 Checks dated 24 October 2026. Windows x64 is the release target. These results cover the cases below; they do not prove universal website or hardware compatibility. Linux packages are deferred.

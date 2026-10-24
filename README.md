@@ -7,7 +7,7 @@
 **A Windows download manager with browser handoff, an encrypted local library, and tools for the whole download workflow.**
 
 ![Windows](https://img.shields.io/badge/Windows-x64-1975ca?style=flat-square)
-![Version](https://img.shields.io/badge/version-2.6.0-1975ca?style=flat-square)
+![Version](https://img.shields.io/badge/version-2.6.1-1975ca?style=flat-square)
 ![Electron](https://img.shields.io/badge/Electron-45-293744?style=flat-square)
 ![Realm](https://img.shields.io/badge/Realm-local%20%26%20encrypted-5f4bb6?style=flat-square)
 [![License: MIT](https://img.shields.io/badge/License-MIT-5f4bb6?style=flat-square)](LICENSE)
@@ -163,3 +163,7 @@ Three short original WAV sounds are included for completion, failure and queue c
 ![Readable video download button](docs/screenshots/video-button-v2.6.0.png)
 
 Drag the Download button to move it. Its options menu offers compact mode, page/site hiding and position reset. A visible video is required before the button appears.
+
+### Understand and resolve problems
+
+Open **Tools > Troubleshoot a problem** for local issue reports, or **Connection health & link rescue** for actual transfer observations. Errors use readable Arabic/English guidance, with technical details and a copyable, redacted report underneath. [2.6.1 checks](docs/validation/errors-v2.6.1.json).

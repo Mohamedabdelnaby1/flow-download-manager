@@ -1,3 +1,12 @@
+; Reject unsupported systems before copying files or creating shortcuts.
+!macro customInit
+  ${IfNot} ${AtLeastWin10}
+    MessageBox MB_OK|MB_ICONSTOP "Flow Download Manager requires Windows 10 or Windows 11 (64-bit). Windows 7, 8 and 8.1 are not supported. No application files have been installed." /SD IDOK
+    SetErrorLevel 1633
+    Quit
+  ${EndIf}
+!macroend
+
 ; Author credit is shown on the installer welcome, wizard footer and finish page.
 !macro customWelcomePage
   !include nsDialogs.nsh

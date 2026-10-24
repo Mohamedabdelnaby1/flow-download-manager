@@ -1,0 +1,20 @@
+{
+  "version": "2.6.1",
+  "packaged": false,
+  "passed": 12,
+  "checks": [
+    "native setup failure is explained without raw UNKNOWN in the visible toast",
+    "browser failures offer a safe explicit Repair connection button",
+    "technical details are collapsed by default",
+    "expanded details contain correlation and original diagnostic",
+    "error toast is visible inside the actual viewport",
+    "Arabic error and actionable disk guidance follow UI language",
+    "error card fits a narrow RTL window",
+    "unhandled renderer rejection becomes a local issue and the app stays responsive",
+    "local support records redact session credentials",
+    "Tools exposes readable local issue history",
+    "connection health exposes the simple automatic rescue switch",
+    "automatic rescue can be disabled without technical configuration"
+  ],
+  "errors": []
+}

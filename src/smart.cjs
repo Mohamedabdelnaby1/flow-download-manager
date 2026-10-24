@@ -39,17 +39,17 @@ class SmartTools{
    return result;
   }finally{this.controllers.delete(controller);}
  });}
- rescue(id,url,headers){return this.run(async()=>{
+ rescue(id,url,headers,rescueOptions={}){return this.run(async()=>{
   net.validateURL(url,['http:','https:']);const {store,engine}=this.service;
   if(engine.maintenance.has(id))throw Error('هذا الملف قيد الفحص');
   const d=store.find(id);if(!d||['complete','pending'].includes(d.status)||JSON.parse(d.meta).mode!=='file'||!/^https?:/.test(d.url))throw Error('الإنقاذ متاح لملف HTTP غير مكتمل فقط');
   if(engine.active.has(id))throw Error('أوقف الملف أولًا قبل إنقاذ الرابط');
-  engine.maintenance.add(id);const controller=new AbortController();this.controllers.add(controller);const timeout=setTimeout(()=>controller.abort(),120000);timeout.unref();
+  engine.maintenance.add(id);const controller=new AbortController();this.controllers.add(controller);const timeout=setTimeout(()=>controller.abort(),120000);timeout.unref();const externalAbort=()=>controller.abort(rescueOptions.signal?.reason);rescueOptions.signal?.addEventListener('abort',externalAbort,{once:true});if(rescueOptions.signal?.aborted)externalAbort();
   try{
    const oldMeta=JSON.parse(d.meta),sameOrigin=new URL(url).origin===new URL(d.url).origin;
    const nextHeaders={...(sameOrigin?oldMeta.headers:{}),...headers};
    const auth=engine.authHeaders(url,{headers:nextHeaders}),options={headers:auth,settings:store.settings,signal:controller.signal};
-   const info=await net.probe(url,options);if(/text\/html/i.test(info.type))throw Error('الرابط يعرض صفحة ويب؛ اختر رابط الملف المباشر');
+   const info=await net.probe(url,options);if(rescueOptions.requireStrong&&(!d.etag||d.etag.startsWith('W/')||info.etag!==d.etag||!info.resumable||info.size!==d.size))throw Error('The refreshed link did not prove the same file identity');if(/text\/html/i.test(info.type))throw Error('الرابط يعرض صفحة ويب؛ اختر رابط الملف المباشر');
    let samples=0;
    if(d.downloaded){
     if(!info.resumable||!d.size||info.size!==d.size)throw Error('الحجم مختلف أو الخادم لا يدعم الاستئناف؛ الأجزاء القديمة محفوظة');
@@ -70,7 +70,7 @@ class SmartTools{
    const latest=store.find(id);if(!latest||latest.url!==d.url||latest.meta!==d.meta||latest.downloaded!==d.downloaded||JSON.stringify(latest.segments)!==JSON.stringify(d.segments))throw Error('تغيرت المهمة أثناء الفحص؛ أعد المحاولة');
    const result={samples,checkedAt:new Date().toISOString(),preservedBytes:d.downloaded};
    store.update(id,{url,name:d.name,status:'paused',error:'',meta:JSON.stringify({...oldMeta,headers:nextHeaders,rescue:result})});store.log('rescue','تم تحديث الرابط بعد فحص الهوية والأجزاء',id);return result;
-  }finally{clearTimeout(timeout);this.controllers.delete(controller);engine.maintenance.delete(id);}
+  }finally{clearTimeout(timeout);rescueOptions.signal?.removeEventListener('abort',externalAbort);this.controllers.delete(controller);engine.maintenance.delete(id);}
  });}
  async close(){this.closed=true;for(const c of this.controllers)c.abort();await Promise.allSettled([...this.jobs]);}
 }

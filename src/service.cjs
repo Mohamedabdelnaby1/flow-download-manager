@@ -42,17 +42,17 @@ function validateSettings(patch){
 }
 class Service{
   constructor(dir,options={}){
-    this.closed=false;this.probeJobs=new Map();this.browserControllers=new Set();this.browserPending=new Map();this.store=new Store(dir,options.protection);this.engine=new Engine(this.store,options);this.grabber=new Grabber(this.store,this.engine);this.desktop=options.desktop;
+    this.closed=false;this.probeJobs=new Map();this.browserControllers=new Set();this.browserPending=new Map();this.store=new Store(dir,options.protection);this.engine=new Engine(this.store,options);this.grabber=new Grabber(this.store,this.engine);this.desktop=options.desktop;this.engine.on('failure',item=>{try{this.store.update(item.id,{error:this.describeError(Error(item.error),'download').message});}catch{}});
     this.extensionToken=this.store.get('extensionToken');if(!this.extensionToken){this.extensionToken=crypto.randomBytes(32).toString('hex');this.store.set('extensionToken',this.extensionToken);}
     this.updates=new (require('./updates.cjs').UpdateChecker)({version:require('../package.json').version,store:this.store,fetch:options.updateFetch,openExternal:this.desktop?.openUpdateRelease,onAvailable:()=>this.desktop?.updateAvailable?.()});
     this.remote=new (require('./remote.cjs').RemoteControl)(this);
     this.peers=new (require('./peers.cjs').PeerDownloads)(this);
     this.downloadTools=new (require('./download-tools.cjs').DownloadTools)(this);
-    this.smart=new (require('./smart.cjs').SmartTools)(this);
+    this.smart=new (require('./smart.cjs').SmartTools)(this);this.connectionHealth=new (require('./connection-health.cjs').ConnectionHealth)(this);
     this.power=new (require('./power.cjs').Power)(this);this.library=new (require('./library.cjs').Library)(this);
     this.timer=setInterval(()=>{try{this.grabber.finalize();}catch(e){this.store.log('error',e.message);}},3000);this.timer.unref();
   }
-  snapshot(){const browser=this.store.get('browserLastSeen',{});return {runtime:this.desktop?.runtimeStatus?.()||null,updates:this.updates.snapshot(),browser:{...browser,...this.browserBridge?.info(),connected:!!browser.lastSeen&&Date.now()-new Date(browser.lastSeen).getTime()<90000},downloads:this.store.list().map(d=>({...d,meta:JSON.stringify((({headers,...rest})=>rest)(JSON.parse(d.meta)))})),remote:this.remote.snapshot(),peers:this.peers.snapshot(),downloadTools:this.downloadTools.snapshot(),power:this.power.snapshot(),library:this.library.snapshot(),settings:this.store.settings,queues:this.store.queues(),projects:this.store.projects(),usage:this.engine.usage,logins:this.store.logins(),database:{engine:'Realm',encrypted:true,path:path.join(this.store.dir,'flow.realm')},desktop:!!this.desktop,extensionToken:this.extensionToken};}
+  snapshot(){const browser=this.store.get('browserLastSeen',{});return {connectionHealth:this.connectionHealth.snapshot(),runtime:this.desktop?.runtimeStatus?.()||null,updates:this.updates.snapshot(),browser:{...browser,...this.browserBridge?.info(),connected:!!browser.lastSeen&&Date.now()-new Date(browser.lastSeen).getTime()<90000},downloads:this.store.list().map(d=>({...d,meta:JSON.stringify((({headers,...rest})=>rest)(JSON.parse(d.meta)))})),remote:this.remote.snapshot(),peers:this.peers.snapshot(),downloadTools:this.downloadTools.snapshot(),power:this.power.snapshot(),library:this.library.snapshot(),settings:this.store.settings,queues:this.store.queues(),projects:this.store.projects(),usage:this.engine.usage,logins:this.store.logins(),database:{engine:'Realm',encrypted:true,path:path.join(this.store.dir,'flow.realm')},desktop:!!this.desktop,extensionToken:this.extensionToken};}
   async browserAdd(data){
     if(this.closed)throw Error('البرنامج يغلق؛ أكمل التنزيل في المتصفح');
     const key=String(data.requestId||crypto.randomUUID());
@@ -79,9 +79,16 @@ class Service{
     if(requestId)this.store.set('browserRequests',[...this.store.get('browserRequests',[]),{id:requestId,downloadId:item.id}].slice(-200));return this.store.find(item.id);
   }
   browserSeen(client,version){this.store.set('browserLastSeen',{lastSeen:new Date().toISOString(),name:String(client||'Chromium').slice(0,50),extensionVersion:/^\d+\.\d+\.\d+$/.test(String(version))?String(version):'legacy'});}
-  async action(type,data={}){
+  describeError(error,operation=''){
+    const model=require('../ui/error-model.js');if(model.isError(error)&&model.unpack(error).incident)return error;
+    const id='F-'+crypto.randomBytes(4).toString('hex').toUpperCase(),packet=model.encode(error,operation,id),info=model.describe(packet);
+    if(!info.cancelled&&!this.closed){try{const records=this.store.get('errorReports',[]);records.push({id,createdAt:new Date().toISOString(),operation,code:info.code,error:packet});this.store.set('errorReports',records.slice(-40));this.store.log('error',info.message+' ['+id+']');}catch{}}
+    return Error(packet);
+  }
+  async action(type,data={}){try{return await this.actionOnce(type,data);}catch(error){throw this.describeError(error,type);}}
+  async actionOnce(type,data={}){
     if(this.closed)throw Error('البرنامج يغلق؛ انتظر انتهاء الإغلاق');
-    const s=this.store,e=this.engine;
+    const s=this.store,e=this.engine;if(['remove','cancel','redownload'].includes(type))await this.connectionHealth.cancel(data.id);
     if(type==='remove'&&!data.deleteFile&&this.library.removing.has(data.id))return this.library.removing.get(data.id);
     if(require('./remote.cjs').ACTIONS.has(type))return this.remote.action(type,data);
     if(require('./peers.cjs').ACTIONS.has(type))return this.peers.action(type,data);
@@ -90,6 +97,9 @@ class Service{
     if(require('./power.cjs').ACTIONS.has(type))return this.power.action(type,data);
     if(['start','remove','redownload','update','confirmDownload'].includes(type)&&e.maintenance.has(data.id))throw Error('انتظر انتهاء الفحص أو العملية الحالية');
     switch(type){
+      case'connectionHealth':return this.connectionHealth.snapshot();
+      case'errorRecord':return this.describeError(Error(String(data.message||'Unexpected interface error').slice(0,12000)),'interface').message;
+      case'errorReports':return this.store.get('errorReports',[]).slice().reverse();
       case'updatesCheck':if(!this.desktop)throw Error('Open updates from the desktop app.');return this.updates.check({manual:true});
       case'updatesOpen':return this.updates.openRelease();
       case'updatesPreferences':return this.updates.setEnabled(data.enabled);
@@ -183,6 +193,6 @@ class Service{
     }
   }
   close(){if(this.closePromise)return this.closePromise;this.closed=true;this.closePromise=this.closeOnce();return this.closePromise;}
-  async closeOnce(){for(const c of this.probeJobs.values())c.abort();this.updates.stop();clearInterval(this.timer);for(const c of this.browserControllers)c.abort();await Promise.allSettled([...this.browserPending.values()]);await Promise.allSettled([...this.library.removing.values()]);await this.remote.close();await this.peers.close();await this.downloadTools.close();await this.power.close();await this.smart.close();for(const id of this.grabber.running)this.grabber.cancel(id);while(this.grabber.running.size)await new Promise(r=>setTimeout(r,50));await this.engine.close();this.store.close();}
+  async closeOnce(){await this.connectionHealth.close();for(const c of this.probeJobs.values())c.abort();this.updates.stop();clearInterval(this.timer);for(const c of this.browserControllers)c.abort();await Promise.allSettled([...this.browserPending.values()]);await Promise.allSettled([...this.library.removing.values()]);await this.remote.close();await this.peers.close();await this.downloadTools.close();await this.power.close();await this.smart.close();for(const id of this.grabber.running)this.grabber.cancel(id);while(this.grabber.running.size)await new Promise(r=>setTimeout(r,50));await this.engine.close();this.store.close();}
 }
 module.exports={Service,validateAdd,validateSettings};

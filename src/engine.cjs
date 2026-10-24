@@ -49,7 +49,7 @@ class Engine extends EventEmitter {
     const ctx={id,item,host,http1:!!hint?.http1&&Date.now()-hint.time<86400000,retryAttempts:new Map(),controllers:new Set(),stopped:false,segments:item.segments.map(s=>({...s})),speed:0,received:0,lastBytes:0,lastTime:Date.now(),checkpoint:Date.now(),fileNext:0,fd:null};
     this.active.set(id,ctx);const startMeta=JSON.parse(item.meta);delete startMeta.transfer;this.store.update(id,{status:'probing',error:'',speed:0,meta:JSON.stringify(startMeta)});
     ctx.promise=this.run(ctx).catch(e=>{
-      if(!ctx.stopped){this.checkpoint(ctx);this.store.update(id,{status:'error',speed:0,error:e.message});this.store.log('error',e.message,id);this.emit('failure',this.store.find(id));}
+      if(!ctx.stopped){this.checkpoint(ctx);this.store.update(id,{status:'error',speed:0,error:require('../ui/error-model.js').encode(e,'download')});this.store.log('error',require('../ui/error-model.js').redact(e.message),id);this.emit('failure',this.store.find(id));}
     }).finally(()=>{if(ctx.fd!==null){try{fs.fsyncSync(ctx.fd);fs.closeSync(ctx.fd);}catch{}ctx.fd=null;}this.active.delete(id);if(!this.active.size)this.globalNext=0;this.emit('change');});
     this.emit('started',this.store.find(id));return ctx.promise;
   }

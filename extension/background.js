@@ -1,5 +1,5 @@
-importScripts('media-model.js','messages.js');
-const localMessage=value=>typeof englishMessage==='function'?englishMessage(value):value;
+importScripts('media-model.js','messages.js','error-model.js');
+const localMessage=value=>typeof FlowErrors!=='undefined'?(()=>{const e=FlowErrors.describe(value,'en');return e.message+' '+e.action;})():typeof englishMessage==='function'?englishMessage(value):value;
 /* Manifest V3: native handoff and authenticated HTTP fallback. */
 const HOST='local.flow.companion',media=new Map(),requests=new Map(),inFlight=new Set(),pausedDiscovery=new Set();
 chrome.storage.session.get(null).then(cache=>{for(const key of Object.keys(cache))if(key.startsWith('mediaPaused:')&&cache[key])pausedDiscovery.add(Number(key.slice(12)));});
@@ -89,5 +89,5 @@ chrome.runtime.onMessage.addListener((message,sender,respond)=>{
     if(message.type==='batch'){if(!Array.isArray(message.urls)||message.urls.length>100)throw Error('Select up to 100 URLs');for(const url of [...new Set(message.urls)])await sendDownload({url,sourcePage:tab?.url,later:true});return {count:message.urls.length};}
     if(message.type==='capture'){if(!message.force&&(!c.autoCapture||capturePaused(c,message.url,tab?.url)))return {skip:true};if(excluded(message.url,c)||!message.force&&!fileMatch(message.url,'',c))return {skip:true};}
     const tabId=message.tabId??tab?.id,list=media.get(tabId)||(await chrome.storage.session.get('media:'+tabId))['media:'+tabId]||[],entry=list.find(m=>m.url===message.url);return sendDownload({url:message.url,name:message.name||entry?.fileName,sourcePage:sender.url||tab?.url,mode:message.mode||(/mpegurl|dash\+xml/i.test(entry?.type||'')?'media':undefined)});
-  })().then(result=>respond({result})).catch(e=>respond({error:e.message}));return true;
+  })().then(result=>respond({result})).catch(e=>respond({error:localMessage(e.message)}));return true;
 });

@@ -5,7 +5,7 @@ on:
       releaseTag:
         description: Existing draft release tag
         required: true
-        default: v2.6.0
+        default: v2.6.1
 permissions:
   contents: read
 jobs:

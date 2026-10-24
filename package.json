@@ -1,6 +1,6 @@
 {
   "name": "flow-download-manager",
-  "version": "2.6.0",
+  "version": "2.6.1",
   "description": "Local-first download manager with Realm and an Electron shell",
   "main": "src/electron.cjs",
   "private": true,
@@ -140,7 +140,8 @@
         "pulseaudio-utils",
         "aria2"
       ]
-    }
+    },
+    "afterPack": "./scripts/prepare-windows-build.cjs"
   },
   "author": {
     "name": "mohamed abdelnaby",

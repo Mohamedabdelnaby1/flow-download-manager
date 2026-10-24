@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Flow Companion",
-  "version": "2.6.0",
+  "version": "2.6.1",
   "description": "Desktop downloads, context menus, media detection and authorized session handoff.",
   "permissions": [
     "contextMenus",
