@@ -1,0 +1,8 @@
+{
+  "version": "2.6.0",
+  "files": 70,
+  "allMatch": true,
+  "textComparison": "CRLF/LF normalized; binary resources compared byte for byte",
+  "remoteWorkflow": "https://github.com/Mohamedabdelnaby1/flow-download-manager/actions/runs/40110481341",
+  "bundledToolsAndNativeBridgeMatch": true
+}

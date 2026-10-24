@@ -25,7 +25,7 @@ A real Chromium renderer runs the complete companion content script with fixture
 
 The supplied public YouTube URL `https://www.youtube.com/watch?v=peIksHiel34` was fully downloaded at the chosen test quality (48,947,231 bytes), decoded with FFmpeg, and hashed. Bundled extractor recovery and all three packaged event sounds completed. This is a media-path test, not proof of every YouTube video or a repeated full-playlist transfer.
 
-The installed user library contained zero tasks before and after the upgrade. Existing language, theme, text scale, connection count and folder preferences were preserved, and the stable startup launcher/tray were checked after initialization. This does not independently prove migration of a populated personal library; separate recovery fixtures cover those data operations. Windows was not rebooted.
+The final GitHub-built installer preserved one completed task in the user library across the upgrade. Existing language, theme, text scale, connection count and folder preferences were preserved, and the stable startup launcher/tray were checked after initialization. Separate recovery fixtures cover malformed and interrupted task data. Windows was not rebooted.
 
 ## Limits and release verification
 
@@ -48,3 +48,9 @@ Fresh public-session tests of the exact supplied YouTube video and the Facebook 
 The updated button retains a readable label in both sizes, has only two visible controls, and keeps movement/hide/reset in its options menu. A desktop UI regression specifically verifies that editing the URL cancels an obsolete metadata job through the real desktop bridge.
 
 The final rebuilt package also completed the two exact video URLs while minimized, with one extraction per video and full-file decoding: [Packaged video evidence](docs/validation/video-flow-v2.6.0.json). Its interface/recovery/update/appearance regression checks were repeated after these changes. The ten-minute lifecycle/repair-and-sound reports above describe the earlier 2.6.0 candidate; those specific subsystems were unchanged by this follow-up.
+
+## GitHub-built release binaries
+
+Both Windows editions were built and uploaded by the [successful Windows workflow](https://github.com/Mohamedabdelnaby1/flow-download-manager/actions/runs/40110481341), after **198 source tests passed** on the Windows runner. The exact uploaded files were downloaded and matched the workflow SHA-256 receipt. The final portable passed Tools (25), interactions (38), and appearance (45) checks locally. The exact uploaded installer upgraded the user installation with its one completed task, preferences, stable startup and tray preserved. Both exact supplied public videos completed and fully decoded using the downloaded build.
+
+[Remote package/source comparison](docs/validation/remote-runtime-parity-v2.6.0.json) checks all 70 production source/UI/extension files with CRLF/LF normalization, and compares the bundled tools/native bridge byte for byte. [Build provenance](docs/validation/windows-build-provenance-v2.6.0.json) records the build commit; later documentation/evidence-only commits do not change production code.
