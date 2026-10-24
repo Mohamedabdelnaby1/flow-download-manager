@@ -6,17 +6,6 @@ on:
         description: 'Optional existing draft release tag for uploading verified Linux packages'
         required: false
         default: ''
-  push:
-    branches: [main]
-    paths:
-      - '.github/workflows/linux.yml'
-      - 'src/**'
-      - 'native/flow-native-host.cjs'
-      - 'extension/**'
-      - 'ui/**'
-      - 'scripts/**'
-      - 'test/**'
-      - 'package*.json'
 permissions:
   contents: read
 jobs:

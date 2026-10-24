@@ -1,16 +1,16 @@
 # Screenshots
 
-Actual Flow 2.5.4 packaged desktop captures with demonstration records and example names. No private browsing session or token is shown. Demonstration entries do not imply their example URLs were downloaded.
+Main/library captures refreshed from the Flow 2.6.0 packaged desktop. Transfer/completion captures are also from 2.6.0. All are actual captures with demonstration records and example names. No private browsing session or token is shown. Demonstration entries do not imply their example URLs were downloaded.
 
 | View | Capture |
 | --- | --- |
 | English desktop, light | ![Light](screenshots/desktop-light.png) |
 | English desktop, dark | ![Dark](screenshots/desktop-dark.png) |
 | Arabic desktop, dark | ![Arabic dark](screenshots/desktop-ar-dark.png) |
-| Transfer, light | ![Transfer](screenshots/transfer-en-2.5.4.png) |
-| Transfer, Arabic dark | ![Arabic transfer](screenshots/transfer-ar-2.5.4.png) |
-| Completion, light | ![Completion](screenshots/complete-en-2.5.4.png) |
-| Completion, Arabic dark | ![Arabic completion](screenshots/complete-ar-2.5.4.png) |
+| Transfer, light | ![Transfer](screenshots/transfer-en-2.6.0.png) |
+| Transfer, Arabic dark | ![Arabic transfer](screenshots/transfer-ar-2.6.0.png) |
+| Completion, light | ![Completion](screenshots/complete-en-2.6.0.png) |
+| Completion, Arabic dark | ![Arabic completion](screenshots/complete-ar-2.6.0.png) |
 | Included sound controls, final Portable | ![Sounds](screenshots/sounds.png) |
 | Settings | ![Settings](screenshots/settings.png) |
 | Favorites and capacity | ![Library](screenshots/library.png) |
@@ -45,3 +45,7 @@ These are real packaged update-window captures using simulated future release da
 | ![English playlist preview](screenshots/playlist-en-2.5.3.png) | ![Arabic playlist preview](screenshots/playlist-ar-2.5.3.png) |
 
 These are controlled playlist UI previews. Live inspection/download evidence is recorded separately.
+
+| Searchable tools | ![Tools](screenshots/tools-hub.png) |
+| Arabic tool preferences | ![Arabic tools](screenshots/tools-ar-dark.png) |
+| Phone control | ![Phone](screenshots/phone-control.png) |

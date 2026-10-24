@@ -1,0 +1,31 @@
+{
+  "version": "2.6.0",
+  "packaged": true,
+  "checks": [
+    "distribution contains the bundled extractor",
+    "bundled extractor has the pinned SHA-256",
+    "exact user video metadata and quality options are extracted",
+    "exact user video fully downloads as a nonempty MP4",
+    "downloaded MP4 fully decodes with FFmpeg",
+    "missing extractor restores to the profile from the official release",
+    "restored extractor matches the pinned SHA-256",
+    "packaged complete sound exists outside ASAR",
+    "packaged complete sound playback completes",
+    "packaged error sound exists outside ASAR",
+    "packaged error sound playback completes",
+    "packaged queue sound exists outside ASAR",
+    "packaged queue sound playback completes"
+  ],
+  "errors": [],
+  "video": {
+    "url": "https://www.youtube.com/watch?v=peIksHiel34",
+    "title": "تطبيق بيخلي وحوش يوجي يو تخرج من الكروت! | \"!Yu-Gi-Oh\"",
+    "durationSeconds": 488,
+    "formatCount": 32,
+    "status": "complete",
+    "elapsedMs": 68889,
+    "bytes": 48947231,
+    "sha256": "5a38fda59888be7269037c15b7eb843368cc6a1e969a0577e15ae5d94329d7a5"
+  },
+  "passed": 13
+}

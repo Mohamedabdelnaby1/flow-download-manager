@@ -11,7 +11,7 @@
 - Optional slow-download queue yielding, independent of window focus.
 - Successful queue completion can request computer shutdown after a cancellable countdown; Flow product branding replaces the Electron label.
 - Compact draggable browser button, visible-player gating, child-frame sources and open shadow-root discovery.
-- Linux x64 AppImage, DEB and RPM build/test pipeline, XDG autostart, per-user native browser bridge and platform-correct media tools.
+- Preparatory Linux build workflow, XDG autostart and native bridge retained for future work. Linux packages are deferred and are not part of this release.
 - See docs/FDM-FEATURE-AUDIT.md for every reviewed FDM voting item and explicit platform boundaries.
 
 

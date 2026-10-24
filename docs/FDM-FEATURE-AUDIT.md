@@ -16,12 +16,12 @@ Reviewed on 24 October 2026 against the [official FDM features](https://www.free
 | Android file-based URL import | Desktop equivalent present | Batch URLs and link workbench; no Android application. |
 | Duplicate-task cleanup | Added in 2.6 | Preview, keep the completed/most advanced copy, move selected repeats to recovery. |
 | Case-insensitive sorting | Added in 2.6 | Natural name sorting groups mixed case and numbered names. |
-| Linux Flatpak/RPM | Partly covered | RPM, DEB and AppImage builds. A Flatpak sandbox/portal integration is not shipped. |
+| Linux Flatpak/RPM | Deferred | Preparation for RPM, DEB and AppImage retained; no Linux packages released. A Flatpak sandbox/portal integration is not shipped. |
 | Apple Silicon | Outside this release | No macOS binary is advertised. |
 | Independent Add window | Already present | Desktop download confirmation stays independent of the main library. |
 | Rename existing tasks | Extended in 2.6 | Queued batch rename already present; completed files now rename on disk. Pause active transfers first. |
 | Fonts | Added in 2.6 | Tools → Personalize; installed-font choices plus existing 80–150% scaling. Missing fonts use a system fallback. |
-| Raspberry Pi / ARM | Not shipped | Linux x64 only. No untested ARM package. |
+| Raspberry Pi / ARM | Not shipped | Linux packages are deferred, including ARM. |
 | History retention | Added in 2.6 | Optional 7/30/90-day cleanup to recovery, disabled by default. Files stay on disk. |
 | Selective ZIP extraction | Added in 2.6 | Tools → Pick files from ZIP; exact ranges and CRC validation, bounded selection. Standard ZIP, no encryption/ZIP64/multipart. |
 | Website archiving | Already present | Site grabber: depth/type/scope filters, saved offline pages and local link rewriting. |

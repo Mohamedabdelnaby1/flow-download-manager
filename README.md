@@ -1,10 +1,10 @@
 <div align="center">
 
-<img src="docs/hero.svg" alt="Flow â€” Downloads, under your control" width="100%">
+<img src="docs/hero.svg" alt="Flow  —  Downloads, under your control" width="100%">
 
 # Flow Download Manager
 
-**A Windows and Linux download manager with browser handoff, an encrypted local library, and tools for the whole download workflow.**
+**A Windows download manager with browser handoff, an encrypted local library, and tools for the whole download workflow.**
 
 ![Windows](https://img.shields.io/badge/Windows-x64-1975ca?style=flat-square)
 ![Version](https://img.shields.io/badge/version-2.6.0-1975ca?style=flat-square)
@@ -27,7 +27,7 @@ Find everyday tasks from one **Tools** button or **Ctrl+K**: torrents and magnet
 
 Personalize columns and fonts, choose optional history cleanup, or let slow queue tasks yield their slot. Queue completion can shut down the computer after a cancellable countdown.
 
-[Linux setup and testing boundaries](docs/LINUX.md) · [Simple tools guide](docs/TOOLS.md).
+[Linux packaging status](docs/LINUX.md) · [Simple tools guide](docs/TOOLS.md).
 
 ## A calmer workspace
 
@@ -37,7 +37,7 @@ Startup can stay quietly in the system tray, which shows transfer size and speed
 
 ## Update notifications
 
-Flow checks published GitHub releases at startup and every six hours, with a separate update window and a download-page button. Use **Help â†’ Check for updates**, defer a reminder, skip a version or turn automatic checks off. [How updates work](docs/UPDATES.md).
+Flow checks published GitHub releases at startup and every six hours, with a separate update window and a download-page button. Use **Help → Check for updates**, defer a reminder, skip a version or turn automatic checks off. [How updates work](docs/UPDATES.md).
 
 ## Reliability update in 2.5.2
 
@@ -49,7 +49,7 @@ Send a file from the browser. Confirm its destination in a separate desktop wind
 
 Free to download and use. Original Flow code and artwork are open source under the [MIT License](LICENSE); third-party components retain their own licenses.
 
-Created by **mohamed abdelnaby** â€” [Facebook](https://www.facebook.com/mohamedabdelnaby190).
+Created by **mohamed abdelnaby**  —  [Facebook](https://www.facebook.com/mohamedabdelnaby190).
 
 ## Download
 
@@ -57,11 +57,10 @@ Created by **mohamed abdelnaby** â€” [Facebook](https://www.facebook.com/mo
 | :--- | :--- | :--- |
 | **Installer** | Shortcuts, Start menu and a standard uninstall entry | [Flow-2.6.0-Setup.exe](https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/download/v2.6.0/Flow-2.6.0-Setup.exe) |
 | **Portable launcher** | Launch without running the installer | [Flow-2.6.0-Portable.exe](https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/download/v2.6.0/Flow-2.6.0-Portable.exe) |
-| **Linux DEB / RPM / AppImage** | Choose the package for your Linux desktop | [Linux downloads](https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/latest) |
 | **Browser companion** | Chrome, Edge, Brave and Chromium | [Flow-Companion-2.6.0.zip](https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/download/v2.6.0/Flow-Companion-2.6.0.zip) |
 | **Source bundle** | Source, tests, docs and screenshots | [Flow-2.6.0-Source.zip](https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/download/v2.6.0/Flow-2.6.0-Source.zip) |
 
-Windows and Linux x64. Windows executables are unsigned. Portable skips installation but still stores data in your Windows profile; enabling native browser integration registers a host for your user. It is not a zero-footprint USB edition. Verify files using the release's [SHA256SUMS.txt](https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/download/v2.6.0/SHA256SUMS.txt).
+Windows x64. Executables are unsigned. Linux packaging is deferred; no Linux download is included in 2.6.0. Portable skips installation but still stores data in your Windows profile; enabling native browser integration registers a host for your user. It is not a zero-footprint USB edition. Verify files using the release's [SHA256SUMS.txt](https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/download/v2.6.0/SHA256SUMS.txt).
 
 ## What you can do
 
@@ -74,7 +73,7 @@ Windows and Linux x64. Windows executables are unsigned. Portable skips installa
 | Unencrypted HLS/DASH assembly | Missing-file checks and duplicate candidates | SHA-256 / SHA-512 verification and URL rescue |
 | Public YouTube playlist selection | Selective configuration backup | Media conversion, trim and resolution limits |
 
-English by default, with optional Arabic RTL. **System, Light and Dark appearance**, live system changes, 80â€“150% text scaling and independently resizable/minimizable tool windows.
+English by default, with optional Arabic RTL. **System, Light and Dark appearance**, live system changes, 80–150% text scaling and independently resizable/minimizable tool windows.
 
 ### Browser handoff you can control
 
@@ -85,7 +84,7 @@ English by default, with optional Arabic RTL. **System, Light and Dark appearanc
 - Drag, minimize, close or reset the floating video panel; position persists per host.
 - Fragment URLs and signed duplicates are filtered. Website videos use readable titles and a quality picker.
 
-[Set up the extension â†’](BROWSER-INTEGRATION.md)
+[Set up the extension →](BROWSER-INTEGRATION.md)
 
 ## A closer look
 
@@ -95,16 +94,16 @@ English by default, with optional Arabic RTL. **System, Light and Dark appearanc
 <tr><td><img src="docs/screenshots/productivity.png" alt="Productivity tools"><br><b>Rules and traffic</b><br>Organize repetitive work and bandwidth.</td><td><img src="docs/screenshots/smart-tools.png" alt="Library health"><br><b>Inspect and recover</b><br>File presence, integrity and failed downloads.</td></tr>
 </table>
 
-Real desktop captures with demonstration records. They do not prove universal website support or support for every browser profile. [Gallery â†’](docs/SCREENSHOTS.md)
+Real desktop captures with demonstration records. They do not prove universal website support or support for every browser profile. [Gallery →](docs/SCREENSHOTS.md)
 
 ## Get started
 
 1. Download an edition from [Releases](https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/latest).
 2. Choose **Add URL**, or prepare integration from **Browser** in the toolbar.
 3. Inspect the link, choose destination/quality, then **Start download** or **Download later**.
-4. Use **Options â†’ General** for English/Arabic, System/Light/Dark and text size.
+4. Use **Options → General** for English/Arabic, System/Light/Dark and text size.
 
-Closing the main window keeps Flow in the tray. Use **Tasks â†’ Exit** or the tray's **Exit** to quit. Before upgrading, exit older versions, then reload the extension and affected browser tabs.
+Closing the main window keeps Flow in the tray. Use **Tasks → Exit** or the tray's **Exit** to quit. Before upgrading, exit older versions, then reload the extension and affected browser tabs.
 
 ## Build and develop
 
@@ -115,7 +114,7 @@ npm test
 npm start
 ```
 
-Build both Windows editions with `npm run dist`. Development requires Node.js 22.12+; Node 22 is the tested build line. Windows .NET Framework's compiler builds the native host. End users need no separate Node.js or Python installation. [Development guide â†’](docs/DEVELOPMENT.md)
+Build both Windows editions with `npm run dist`. Development requires Node.js 22.12+; Node 22 is the tested build line. Windows .NET Framework's compiler builds the native host. End users need no separate Node.js or Python installation. [Development guide →](docs/DEVELOPMENT.md)
 
 ## Architecture
 
@@ -131,7 +130,7 @@ flowchart LR
   S --> T[Library / rules / media tools]
 ```
 
-HTML/CSS/JavaScript UI, sandboxed renderers, context isolation and a bounded preload API. Realm stores tasks/settings locally; desktop keys use the OS secure store. [Architecture and data handling â†’](docs/ARCHITECTURE.md)
+HTML/CSS/JavaScript UI, sandboxed renderers, context isolation and a bounded preload API. Realm stores tasks/settings locally; desktop keys use the OS secure store. [Architecture and data handling →](docs/ARCHITECTURE.md)
 
 ## Validation and boundaries
 

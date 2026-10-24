@@ -8,7 +8,7 @@
 - FTP passive transfers and resume at saved local byte offsets.
 - Per-file, aggregate and shared queue HTTP bandwidth limits; scheduling, priorities and rolling quotas.
 - External scanner using argument arrays rather than shell command interpolation.
-- ZIP central-directory preview through HTTP ranges, excluding ZIP64 and multipart archives.
+- Selective standard ZIP extraction through exact HTTP ranges, CRC checks and bounded file selections; no ZIP64, multipart or encrypted entries.
 
 ## Browser integration
 
@@ -52,3 +52,10 @@ GitHub Release checks after startup and every six hours while running, independe
 - Close/minimize to the tray, quiet Windows startup, transfer sizes and speed in the tray tooltip.
 - Renderer recovery, hidden-window polling suspension and 200-row library pagination.
 - Transient HTTP reconnects, adaptive per-host concurrency and validated resume fallback.
+
+
+## Task-first tools in 2.6
+
+One Tools button and Ctrl+K find torrents/magnets, phone control over trusted local Wi-Fi, verified mirrors, selected ZIP files, completed-file move/rename, SHA-512, duplicate-task cleanup and personalization. See [the simple guide](docs/TOOLS.md). Technical controls stay collapsed; queue yielding and history cleanup are off by default. Queue shutdown includes a cancellable one-minute countdown and runs only after success with other work idle.
+
+Linux packaging is deferred; 2.6.0 ships Windows editions only. [Every reviewed FDM proposal](docs/FDM-FEATURE-AUDIT.md) has a status and a boundary.

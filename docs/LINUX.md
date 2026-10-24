@@ -1,6 +1,8 @@
-# Linux
+# Linux packaging - deferred
 
-Flow 2.6 targets Linux x64 with DEB, RPM and AppImage packages. The automated desktop gate runs the actual packaged application on Ubuntu 24.04 with an X11 virtual display. Wayland, physical audio devices and other distributions need separate testing; ARM/Flatpak builds are not supplied.
+**Linux packages are deferred at the author's request. The 2.6.0 public release contains Windows editions only.** The work below is preparatory and is retained for a future Linux release. The clean Linux dependency install succeeded, but the integration gate exposed an HLS processing failure; packaging and packaged desktop verification did not run. Do not treat the following build/setup instructions as a verified Linux release.
+
+The planned formats are DEB, RPM and AppImage. The automated desktop gate runs the actual packaged application on Ubuntu 24.04 with an X11 virtual display. Wayland, physical audio devices and other distributions need separate testing; ARM/Flatpak builds are not supplied.
 
 ## Install and start
 

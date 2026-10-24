@@ -1,0 +1,130 @@
+{
+  "version": "2.6.0",
+  "packaged": true,
+  "passed": 35,
+  "checks": [
+    "background launch keeps the main window hidden",
+    "tray is present at background startup",
+    "startup target includes quiet background mode",
+    "software rendering is active for compatibility",
+    "transfer window opens at a compact size",
+    "transfer status fits without vertical scrolling",
+    "technical connection table is hidden by default",
+    "transfer chart uses bounded real speed samples",
+    "tray click restores the last minimized transfer instead of the main app",
+    "send to tray remembers the same download window",
+    "minimizing main and transfer windows does not pause the download",
+    "minimize sends both windows to the tray",
+    "hidden windows suspend renderer polling while the native engine continues",
+    "tray tooltip contains actual transfer size and speed",
+    "switching focus does not pause the engine",
+    "actual renderer termination recovers the transfer window",
+    "engine remains active while the renderer restarts",
+    "an intentionally hung renderer is replaced without exiting Flow",
+    "transfer continued through hung-renderer recovery",
+    "download completed with identical bytes after focus/minimize/crash recovery",
+    "completion window has a compact size",
+    "completion summary fits without vertical scrolling",
+    "completion surface shows filename, size and file actions",
+    "compact completion supports Arabic RTL",
+    "large libraries render at most 200 rows per page",
+    "library pagination can reach later downloads",
+    "unchanged idle data does not rebuild the table DOM",
+    "transfer cancellation has an explicit confirmation",
+    "keeping a download dismisses cancellation without removing it",
+    "confirmed cancellation removes the task and closes its transfer window",
+    "closing main keeps the tray and engine alive",
+    "destroying every window does not terminate the resident service",
+    "tray open recreates a destroyed main window",
+    "after idle soak the tray restores a usable main window and tools",
+    "idle renderer memory stays within a bounded margin"
+  ],
+  "errors": [],
+  "soak": {
+    "durationMs": 600000,
+    "samples": [
+      {
+        "elapsedMs": 30010,
+        "rendererWorkingSetKB": 107668
+      },
+      {
+        "elapsedMs": 60018,
+        "rendererWorkingSetKB": 107672
+      },
+      {
+        "elapsedMs": 90031,
+        "rendererWorkingSetKB": 107680
+      },
+      {
+        "elapsedMs": 120047,
+        "rendererWorkingSetKB": 107680
+      },
+      {
+        "elapsedMs": 150050,
+        "rendererWorkingSetKB": 107684
+      },
+      {
+        "elapsedMs": 180060,
+        "rendererWorkingSetKB": 107684
+      },
+      {
+        "elapsedMs": 210069,
+        "rendererWorkingSetKB": 107684
+      },
+      {
+        "elapsedMs": 240075,
+        "rendererWorkingSetKB": 107684
+      },
+      {
+        "elapsedMs": 270090,
+        "rendererWorkingSetKB": 107684
+      },
+      {
+        "elapsedMs": 300093,
+        "rendererWorkingSetKB": 107828
+      },
+      {
+        "elapsedMs": 330101,
+        "rendererWorkingSetKB": 107828
+      },
+      {
+        "elapsedMs": 360116,
+        "rendererWorkingSetKB": 107060
+      },
+      {
+        "elapsedMs": 390122,
+        "rendererWorkingSetKB": 107060
+      },
+      {
+        "elapsedMs": 420129,
+        "rendererWorkingSetKB": 107056
+      },
+      {
+        "elapsedMs": 450135,
+        "rendererWorkingSetKB": 107056
+      },
+      {
+        "elapsedMs": 480151,
+        "rendererWorkingSetKB": 107056
+      },
+      {
+        "elapsedMs": 510156,
+        "rendererWorkingSetKB": 107056
+      },
+      {
+        "elapsedMs": 540160,
+        "rendererWorkingSetKB": 107056
+      },
+      {
+        "elapsedMs": 570182,
+        "rendererWorkingSetKB": 107056
+      },
+      {
+        "elapsedMs": 600004,
+        "rendererWorkingSetKB": 107088
+      }
+    ],
+    "beforeRendererWorkingSetKB": 111084,
+    "afterRendererWorkingSetKB": 107088
+  }
+}

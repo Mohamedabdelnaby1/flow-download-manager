@@ -1,0 +1,8 @@
+{
+  "version": "2.6.0",
+  "files": 70,
+  "allMatch": true,
+  "packagedMetadataMatches": true,
+  "buildOnlyMetadataStripped": true,
+  "nativeBridgeMatches": true
+}

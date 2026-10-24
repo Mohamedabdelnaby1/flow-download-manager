@@ -41,17 +41,22 @@ const Project = { name: 'Project', primaryKey: 'id', properties: {
 class Store {
   constructor(dir, protection) {
     fs.mkdirSync(dir, { recursive: true }); this.dir = dir;
-    const keyPath = path.join(dir, protection ? 'realm-key.protected' : 'realm-key.local');
-    let key;
-    if (fs.existsSync(keyPath)) {
-      const bytes = fs.readFileSync(keyPath);
-      key = protection ? Buffer.from(protection.decrypt(bytes), 'base64') : bytes;
-    } else {
-      key = crypto.randomBytes(64);
-      fs.writeFileSync(keyPath, protection ? protection.encrypt(key.toString('base64')) : key, { mode: 0o600 });
+    const securePath=path.join(dir,'realm-key.protected'),localPath=path.join(dir,'realm-key.local');
+    if(!protection&&fs.existsSync(securePath))throw Error('Unlock your desktop keyring, then restart Flow. The encrypted library has been kept.');
+    const keyPath=protection?securePath:localPath;let key,migrated=false;
+    if(fs.existsSync(keyPath)){
+      const bytes=fs.readFileSync(keyPath);key=protection?Buffer.from(protection.decrypt(bytes),'base64'):bytes;
+    }else if(protection&&fs.existsSync(localPath)){
+      key=fs.readFileSync(localPath);migrated=true;
+      if(key.length!==64)throw Error('The local library key is invalid. Restore its backup before continuing.');
+      fs.writeFileSync(securePath,protection.encrypt(key.toString('base64')),{mode:0o600,flag:'wx'});
+    }else{
+      key=crypto.randomBytes(64);fs.writeFileSync(keyPath,protection?protection.encrypt(key.toString('base64')):key,{mode:0o600});
     }
+    if(key.length!==64)throw Error('The library key could not be read. Unlock your desktop keyring and restart Flow.');
     this.secret = key.subarray(0, 32);
     this.realm = new Realm({ path: path.join(dir, 'flow.realm'), schema: [Segment, Download, Queue, KV, Event, Project], schemaVersion: 1, encryptionKey: key });
+    if(migrated)try{fs.unlinkSync(localPath);}catch{}
     this.settings = { ...DEFAULTS, ...this.get('settings', {}) };
     if (!this.settings.downloadDir) this.settings.downloadDir = path.join(dir, 'Downloads');
     if (!this.settings.tempDir) this.settings.tempDir = path.join(dir, 'Partial');

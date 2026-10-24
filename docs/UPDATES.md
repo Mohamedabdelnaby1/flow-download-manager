@@ -16,7 +16,7 @@ Closing an automatically opened window does not cause repeated popups for that v
 
 1. Increase the three-part version in `package.json`, the root package entries in `package-lock.json`, and `extension/manifest.json`. Keep visible version labels in sync.
 2. Build and test the Windows editions.
-3. Create a GitHub Release such as `v2.5.4`, attach `Flow-2.5.4-Setup.exe` and/or `Flow-2.5.4-Portable.exe`, and wait for uploads to complete.
+3. Create a GitHub Release such as `v2.6.0`, attach `Flow-2.6.0-Setup.exe` and/or `Flow-2.6.0-Portable.exe`, and wait for uploads to complete.
 4. Publish it as the latest stable release. Drafts, prereleases and releases without a ready Windows executable are not offered.
 
 A source commit or tag without a published Release does not contain an installable application and does not trigger an update notification. The app must be running to check; it does not add a separate Windows service. People using Flow 2.5.2 or earlier must install 2.5.3 once to receive this feature.
