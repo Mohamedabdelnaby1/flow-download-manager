@@ -24,8 +24,10 @@ async function api(type,data={}){
   const value=await r.json();if(!r.ok)throw Error(value.error);return value.result;
 }
 async function action(type,data={},message=''){try{const result=await api(type,data);if(message)toast(message);await refresh();return result;}catch(e){toast(e.message,true);return null;}}
-async function refresh(){
-  if(polling||windowClosing)return;polling=true;
+let refreshPending=null;
+function refresh(){if(windowClosing)return Promise.resolve();if(refreshPending)return refreshPending;refreshPending=refreshOnce().finally(()=>refreshPending=null);return refreshPending;}
+async function refreshOnce(){
+  if(windowClosing)return;polling=true;
   try{
     const next=window.desktopAPI?await window.desktopAPI.state():await (await fetch('/api/state',{headers:{'x-flow-token':session}})).json();
     if(next.error)throw Error(next.error);if(typeof next.windowVisible==='boolean')desktopWindowVisible=next.windowVisible;const stateKey=JSON.stringify(next);const unchanged=initialized&&stateKey===renderedStateKey;renderedStateKey=stateKey;const languageChanged=state&&state.settings.language!==next.settings.language;state=next;if(state.settings.language==='en')for(const item of state.downloads)item.error=englishMessage(item.error);if(unchanged){if($('#connection-state')?.classList.contains('offline'))renderFooter();return;}
