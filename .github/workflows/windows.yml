@@ -24,7 +24,7 @@ jobs:
       - name: Source and integration tests
         run: node --test --test-concurrency=1 test/*.test.cjs
       - name: Build installer and portable editions
-        run: npm run dist -- --publish never
+        run: node node_modules/electron-builder/cli.js --win portable nsis --publish=never
       - name: Verify the draft and upload Windows packages
         env:
           GH_TOKEN: ${{ github.token }}
