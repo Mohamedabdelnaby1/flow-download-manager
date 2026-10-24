@@ -42,7 +42,7 @@ function validateSettings(patch){
 }
 class Service{
   constructor(dir,options={}){
-    this.closed=false;this.browserControllers=new Set();this.browserPending=new Map();this.store=new Store(dir,options.protection);this.engine=new Engine(this.store,options);this.grabber=new Grabber(this.store,this.engine);this.desktop=options.desktop;
+    this.closed=false;this.probeJobs=new Map();this.browserControllers=new Set();this.browserPending=new Map();this.store=new Store(dir,options.protection);this.engine=new Engine(this.store,options);this.grabber=new Grabber(this.store,this.engine);this.desktop=options.desktop;
     this.extensionToken=this.store.get('extensionToken');if(!this.extensionToken){this.extensionToken=crypto.randomBytes(32).toString('hex');this.store.set('extensionToken',this.extensionToken);}
     this.updates=new (require('./updates.cjs').UpdateChecker)({version:require('../package.json').version,store:this.store,fetch:options.updateFetch,openExternal:this.desktop?.openUpdateRelease,onAvailable:()=>this.desktop?.updateAvailable?.()});
     this.remote=new (require('./remote.cjs').RemoteControl)(this);
@@ -113,7 +113,8 @@ class Service{
         const items=data.urls.map(url=>validateAdd({...data,url,later:true},s));
         return items.map(item=>e.add(item));
       }
-      case'videoInfo':case'probe':{net.validateURL(data.url,['http:','https:']);const stored=data.id&&s.find(data.id),headers=e.authHeaders(data.url,{headers:{...(stored&&new URL(stored.url).origin===new URL(data.url).origin?JSON.parse(stored.meta).headers:{}),...cleanHeaders(data.headers)}});if(type==='videoInfo'||data.mode==='site'||require('./video.cjs').isVideoPage(data.url))return e.video.inspect(data.url,headers);return net.probe(data.url,{headers,settings:s.settings});}
+      case'probeCancel':{this.probeJobs.get(data.requestId)?.abort(Error('Inspection cancelled'));return true;}
+      case'videoInfo':case'probe':{net.validateURL(data.url,['http:','https:']);const stored=data.id&&s.find(data.id),headers=e.authHeaders(data.url,{headers:{...(stored&&new URL(stored.url).origin===new URL(data.url).origin?JSON.parse(stored.meta).headers:{}),...cleanHeaders(data.headers)}});const controller=new AbortController(),key=String(data.requestId||crypto.randomUUID());if(this.probeJobs.size>=16)throw Error('Too many video inspections. Close another inspection and try again.');this.probeJobs.get(key)?.abort();this.probeJobs.set(key,controller);try{if(type==='videoInfo'||data.mode==='site'||require('./video.cjs').isVideoPage(data.url))return await e.video.inspect(data.url,headers,{signal:controller.signal});return await net.probe(data.url,{headers,settings:s.settings,signal:controller.signal});}finally{if(this.probeJobs.get(key)===controller)this.probeJobs.delete(key);}}
       case'zip':return net.zipPreview(data.url,{headers:e.authHeaders(data.url),settings:s.settings});
       case'start':{const item=s.find(data.id);if(!item)throw Error('التحميل غير موجود');if(item.status==='pending'&&this.desktop?.downloadInfo)return this.desktop.downloadInfo(item.id);e.start(data.id).catch(()=>{});return true;}
       case'pause':await e.pause(data.id);return true;
@@ -182,6 +183,6 @@ class Service{
     }
   }
   close(){if(this.closePromise)return this.closePromise;this.closed=true;this.closePromise=this.closeOnce();return this.closePromise;}
-  async closeOnce(){this.updates.stop();clearInterval(this.timer);for(const c of this.browserControllers)c.abort();await Promise.allSettled([...this.browserPending.values()]);await Promise.allSettled([...this.library.removing.values()]);await this.remote.close();await this.peers.close();await this.downloadTools.close();await this.power.close();await this.smart.close();for(const id of this.grabber.running)this.grabber.cancel(id);while(this.grabber.running.size)await new Promise(r=>setTimeout(r,50));await this.engine.close();this.store.close();}
+  async closeOnce(){for(const c of this.probeJobs.values())c.abort();this.updates.stop();clearInterval(this.timer);for(const c of this.browserControllers)c.abort();await Promise.allSettled([...this.browserPending.values()]);await Promise.allSettled([...this.library.removing.values()]);await this.remote.close();await this.peers.close();await this.downloadTools.close();await this.power.close();await this.smart.close();for(const id of this.grabber.running)this.grabber.cancel(id);while(this.grabber.running.size)await new Promise(r=>setTimeout(r,50));await this.engine.close();this.store.close();}
 }
 module.exports={Service,validateAdd,validateSettings};

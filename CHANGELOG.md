@@ -2,6 +2,11 @@
 
 ## 2.6.0
 
+- Reuse fresh in-memory video inspection for transfer, share concurrent inspections, and cancel obsolete URL inspections.
+- Bounded parallel HLS/DASH fragments, HTTP chunking, explicit connecting/processing phases and continuous byte-based speed when an extractor omits instantaneous speed.
+- Fall back to an available video source when a site omits resolution metadata.
+- Readable Download/Flow browser button with one options menu, direct dragging and persistent per-site placement; remove the permanent grip/minimize/close row.
+
 - Searchable task-first Tools hub and Ctrl+K; advanced controls stay collapsed.
 - Torrents/magnets through bundled aria2, file selection, peer/piece/tracker information and bounded seeding.
 - Verified multi-source mirrors and paired local-network phone control.

@@ -157,3 +157,9 @@ Renderer crashes/hangs trigger bounded interface recovery while the native trans
 ### Included sounds and video-tool recovery
 
 Three short original WAV sounds are included for completion, failure and queue completion, with direct preview and custom-file reset. A missing/corrupt extractor can be restored from the pinned official release after checksum verification. The 2.6.0 packaged check fully downloaded and decoded the exact user-supplied YouTube video; site availability and access restrictions still apply. Transfer windows provide explicit cancellation with confirmation. Clicking the tray icon restores the last minimized transfer. [Validation](VALIDATION.md).
+
+### Compact browser video button
+
+![Readable video download button](docs/screenshots/video-button-v2.6.0.png)
+
+Drag the Download button to move it. Its options menu offers compact mode, page/site hiding and position reset. A visible video is required before the button appears.

@@ -1,0 +1,50 @@
+{
+  "version": "2.6.0",
+  "packaged": false,
+  "checks": [
+    "public video metadata resolves: www.youtube.com",
+    "inspection and transfer use one extraction: www.youtube.com",
+    "public video completes minimized with positive speed: www.youtube.com",
+    "entire output decodes: www.youtube.com",
+    "public video metadata resolves: www.facebook.com",
+    "inspection and transfer use one extraction: www.facebook.com",
+    "public video completes minimized with positive speed: www.facebook.com",
+    "entire output decodes: www.facebook.com"
+  ],
+  "errors": [],
+  "videos": [
+    {
+      "url": "https://www.youtube.com/watch?v=peIksHiel34",
+      "metadataMs": 4298,
+      "title": "تطبيق بيخلي وحوش يوجي يو تخرج من الكروت! | \"!Yu-Gi-Oh\"",
+      "formats": 32,
+      "transferMs": 62736,
+      "firstByteMs": 4120,
+      "positiveSpeedSamples": 542,
+      "peakBps": 3193585.7477309476,
+      "status": "complete",
+      "extractions": 1,
+      "loads": 1,
+      "error": "",
+      "bytes": 48947231,
+      "sha256": "5a38fda59888be7269037c15b7eb843368cc6a1e969a0577e15ae5d94329d7a5"
+    },
+    {
+      "url": "https://www.facebook.com/reel/1706855744340700/",
+      "metadataMs": 2206,
+      "title": "5 comments | ديرب بقطارس #عقيقه #ريان #المحلاوي #البدوي #ديرب #بقطارس #أجا #الدقهليه | Aly Elnshawy",
+      "formats": 2,
+      "transferMs": 9822,
+      "firstByteMs": 1566,
+      "positiveSpeedSamples": 78,
+      "peakBps": 2533367.4257508437,
+      "status": "complete",
+      "extractions": 1,
+      "loads": 2,
+      "error": "",
+      "bytes": 19522606,
+      "sha256": "0b4da3e5b4088d0e64dd575dcba04ef593d8cb6b02f0d8abddd59c067a4b87f4"
+    }
+  ],
+  "passed": 8
+}

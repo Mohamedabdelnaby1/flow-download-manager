@@ -10,7 +10,7 @@ modal=function(title,body,foot='',wide=false){
   $('#dialog-content').innerHTML=`<div class="modal-head"><h2>${h(title)}</h2>${ib('windowMinimize',t('تصغير','Minimize'),'down')}${ib('close',t('إغلاق','Close'),'x')}</div>${body}<div class="modal-foot">${foot||button('close',t('إغلاق','Close'),null)}</div>`;
   if(!dlg.open)dlg.show();
 };
-closeModal=function(){if(windowContext&&document.body.classList.contains('native-form-open')){$('#dialog').close();document.body.classList.remove('native-form-open');detailId=null;settingsDraft=null;return;}if(windowContext==='scheduler'&&!$('#queue-form')){renderQueues();return;}if(windowContext){windowClosing=true;clearInterval(refreshTimer);api('windowClose').catch(e=>toast(e.message,true));return;}regularClose();};
+closeModal=function(){cancelProbe();if(windowContext&&document.body.classList.contains('native-form-open')){$('#dialog').close();document.body.classList.remove('native-form-open');detailId=null;settingsDraft=null;return;}if(windowContext==='scheduler'&&!$('#queue-form')){renderQueues();return;}if(windowContext){windowClosing=true;clearInterval(refreshTimer);api('windowClose').catch(e=>toast(e.message,true));return;}regularClose();};
 function renderNativeWindow(){
   if(!windowContext)return false;
   document.body.classList.add('native-window');
