@@ -35,3 +35,8 @@ Chrome cancels only after Flow acknowledges a handoff. On failure the extension 
 For website videos, open the dedicated page, play the media and inspect quality in Flow. Sessions and signed URLs expire. POST, blob/data, incognito and DRM downloads remain in the browser. Host/cookie/webRequest permissions support discovery and authorized session handoff. Never publish your pairing token, cookies or private URLs.
 
 The optional authenticated HTTP fallback accepts a loopback address only. Do not expose the local service to a network.
+
+
+## Linux
+
+See the [Linux browser setup](docs/LINUX.md#browser-integration) for Chrome, Chromium, Brave and Edge. Native hosts are registered per user. Browser sandbox packages may need separate integration.

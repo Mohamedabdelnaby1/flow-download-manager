@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Flow Companion",
-  "version": "2.5.4",
+  "version": "2.6.0",
   "description": "Desktop downloads, context menus, media detection and authorized session handoff.",
   "permissions": [
     "contextMenus",
@@ -40,7 +40,9 @@
       "css": [
         "content.css"
       ],
-      "run_at": "document_idle"
+      "run_at": "document_idle",
+      "all_frames": true,
+      "match_origin_as_fallback": true
     }
   ],
   "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEApCNrBxBIMg2LWFGm+yj9ykDYl8jLUV4Pc06/jfYtoFgqGQwZe06T8RQYTC0Mw4hDDVqtpvv/II5i2HMaWC5Z1Vjgj7GflStYEfMY+LQBTSI4QjEO+lSniuftV60hMmOVRCywOY4y6EvLfirtzcyJTx3n+h42K3JRovCXkTCymAI2IcDMTl1eacsWM/mOX1gC7EpvbGXHMoDzkOZv4fY1biOrJwnqwig7RelDvW2NxCooa61oRh25RZ7H6+OSnq/1IEwA/1uL4vHSrXiNIy051nxfG1vm+cZDRQ0k3NoJR3MKKATQFK9k0CQuj8C90usfadSIVm72iv+VccZpmnQiHwIDAQAB"

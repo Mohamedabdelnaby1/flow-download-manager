@@ -1,0 +1,7 @@
+{
+  "version": "1.37.0",
+  "source": "https://github.com/aria2/aria2/releases/tag/release-1.37.0",
+  "sourceArchive": "https://github.com/aria2/aria2/releases/download/release-1.37.0/aria2-1.37.0.tar.xz",
+  "binarySHA256": "be2099c214f63a3cb4954b09a0becd6e2e34660b886d4c898d260febfe9d70c2",
+  "license": "GPL-2.0-or-later; separate executable. See COPYING and LICENSE.OpenSSL."
+}

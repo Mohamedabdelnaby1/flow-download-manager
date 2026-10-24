@@ -58,23 +58,5 @@ async function probe(url,options={}) {
   const size=range?Number(range[1]):Number(headers['content-length']||0);
   return {size,resumable:code===206&&!!range,etag:headers.etag||'',modified:headers['last-modified']||'',type:headers['content-type']||'',disposition:headers['content-disposition']||'',url:finalURL,protocol:'HTTP'};
 }
-async function zipPreview(url,options={}) {
-  const info=await probe(url,options); if(!info.resumable||!info.size) throw Error('معاينة ZIP تحتاج خادماً يدعم النطاقات');
-  const start=Math.max(0,info.size-65557);
-  const {body:tail}=await buffer(url,{...options,headers:{...options.headers,range:`bytes=${start}-${info.size-1}`}},65557);
-  let end=-1; for(let i=tail.length-22;i>=0;i--) if(tail.readUInt32LE(i)===0x06054b50){end=i;break;}
-  if(end<0) throw Error('الملف ليس ZIP قياسياً');
-  if(tail.readUInt16LE(end+4)||tail.readUInt16LE(end+6)) throw Error('الأرشيف متعدد الأجزاء غير مدعوم');
-  const length=tail.readUInt32LE(end+12),offset=tail.readUInt32LE(end+16);
-  if(!length)return [];
-  if(offset+length>info.size)throw Error('فهرس ZIP غير صالح');
-  if(offset===0xffffffff||length===0xffffffff) throw Error('معاينة ZIP64 غير مدعومة');
-  if(length>8*1024*1024)throw Error('فهرس الأرشيف أكبر من حد المعاينة');
-  const {body}=await buffer(url,{...options,headers:{...options.headers,range:`bytes=${offset}-${offset+length-1}`}},8*1024*1024);
-  const files=[];let p=0;while(p+46<=body.length && body.readUInt32LE(p)===0x02014b50){
-    const n=body.readUInt16LE(p+28),extra=body.readUInt16LE(p+30),comment=body.readUInt16LE(p+32);
-    files.push({name:body.subarray(p+46,p+46+n).toString('utf8'),size:body.readUInt32LE(p+24),compressed:body.readUInt32LE(p+20)});p+=46+n+extra+comment;
-    if(files.length>=5000)break;
-  } return files;
-}
+async function zipPreview(url,options={}){return require('./zip.cjs').list(url,options);}
 module.exports={request,buffer,probe,zipPreview,validateURL};

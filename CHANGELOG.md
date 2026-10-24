@@ -1,5 +1,20 @@
 # Changelog
 
+## 2.6.0
+
+- Searchable task-first Tools hub and Ctrl+K; advanced controls stay collapsed.
+- Torrents/magnets through bundled aria2, file selection, peer/piece/tracker information and bounded seeding.
+- Verified multi-source mirrors and paired local-network phone control.
+- Selective standard ZIP extraction with exact byte ranges and CRC validation.
+- Completed-file relocation with progress, speed, cancellation and verification; completed-file rename.
+- SHA-512, previewed duplicate-task cleanup, natural case-insensitive sorting, optional history retention, fonts and list columns.
+- Optional slow-download queue yielding, independent of window focus.
+- Successful queue completion can request computer shutdown after a cancellable countdown; Flow product branding replaces the Electron label.
+- Compact draggable browser button, visible-player gating, child-frame sources and open shadow-root discovery.
+- Linux x64 AppImage, DEB and RPM build/test pipeline, XDG autostart, per-user native browser bridge and platform-correct media tools.
+- See docs/FDM-FEATURE-AUDIT.md for every reviewed FDM voting item and explicit platform boundaries.
+
+
 ## 2.5.4 — 2026-10-24
 
 - Restore a missing/corrupt video extractor from the pinned official release after SHA-256 verification; add packaged real-video checks.

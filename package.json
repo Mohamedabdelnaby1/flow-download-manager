@@ -1,6 +1,6 @@
 {
   "name": "flow-download-manager",
-  "version": "2.5.4",
+  "version": "2.6.0",
   "description": "Local-first download manager with Realm and an Electron shell",
   "main": "src/electron.cjs",
   "private": true,
@@ -14,7 +14,9 @@
     "pack": "electron-builder --dir",
     "dist": "electron-builder --win portable nsis",
     "postinstall": "node scripts/setup.cjs",
-    "native": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/build-native.ps1"
+    "native": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/build-native.ps1",
+    "dist:linux": "electron-builder --linux AppImage deb rpm --x64",
+    "prepare:linux": "node scripts/prepare-linux.cjs"
   },
   "dependencies": {
     "basic-ftp": "6.2.3",
@@ -40,7 +42,8 @@
       "node_modules/ffmpeg-static/**",
       "native/**",
       "vendor/**",
-      "ui/sounds/**"
+      "ui/sounds/**",
+      "vendor/aria2/**"
     ],
     "directories": {
       "output": "release"
@@ -63,7 +66,8 @@
       "COPYRIGHT.md",
       "CHANGELOG.md",
       "VALIDATION.md",
-      "LICENSE"
+      "LICENSE",
+      "native/flow-native-host.cjs"
     ],
     "win": {
       "target": [
@@ -84,11 +88,65 @@
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
       "include": "build/installer.nsh"
+    },
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb",
+        "rpm"
+      ],
+      "category": "Network",
+      "icon": "ui/logo.png",
+      "executableName": "flow",
+      "artifactName": "Flow-${version}-linux-${arch}.${ext}",
+      "desktop": {
+        "entry": {
+          "Name": "Flow Download Manager",
+          "Comment": "A simple, local-first download manager",
+          "Keywords": "download;manager;video;queue;",
+          "StartupWMClass": "flow-download-manager"
+        }
+      },
+      "maintainer": "mohamed abdelnaby <82710469+Mohamedabdelnaby1@users.noreply.github.com>"
+    },
+    "deb": {
+      "artifactName": "Flow-${version}-linux-amd64.deb",
+      "depends": [
+        "libgtk-3-0",
+        "libnotify4",
+        "libnss3",
+        "libxss1",
+        "libxtst6",
+        "xdg-utils",
+        "libatspi2.0-0",
+        "libuuid1",
+        "libsecret-1-0",
+        "pulseaudio-utils",
+        "aria2"
+      ]
+    },
+    "rpm": {
+      "artifactName": "Flow-${version}-linux-x86_64.rpm",
+      "depends": [
+        "gtk3",
+        "libnotify",
+        "nss",
+        "libXScrnSaver",
+        "libXtst",
+        "xdg-utils",
+        "at-spi2-core",
+        "libuuid",
+        "libsecret",
+        "pulseaudio-utils",
+        "aria2"
+      ]
     }
   },
   "author": {
     "name": "mohamed abdelnaby",
-    "url": "https://www.facebook.com/mohamedabdelnaby190"
+    "url": "https://www.facebook.com/mohamedabdelnaby190",
+    "email": "82710469+Mohamedabdelnaby1@users.noreply.github.com"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "homepage": "https://github.com/Mohamedabdelnaby1/flow-download-manager"
 }

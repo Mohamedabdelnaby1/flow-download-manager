@@ -34,7 +34,7 @@ async function sendDownload(data){
 }
 async function refreshContentScripts(){
  const tabs=await chrome.tabs.query({});
- for(const tab of tabs){if(!/^https?:/.test(tab.url||''))continue;try{await chrome.scripting.executeScript({target:{tabId:tab.id},files:['panel-model.js','media-model.js','content.js']});}catch{}}
+ for(const tab of tabs){if(!/^https?:/.test(tab.url||''))continue;try{await chrome.scripting.executeScript({target:{tabId:tab.id,allFrames:true},files:['panel-model.js','media-model.js','content.js']});}catch{}}
 }
 chrome.runtime.onInstalled.addListener(async()=>{
   await refreshContentScripts();await chrome.contextMenus.removeAll();chrome.contextMenus.create({id:'flow-link',title:'Download with Flow',contexts:['link','video','audio']});chrome.contextMenus.create({id:'flow-selection',title:'Download selected links with Flow',contexts:['selection']});chrome.contextMenus.create({id:'flow-page',title:'Download links on this page with Flow…',contexts:['page']});await chrome.alarms.create('flow-status',{periodInMinutes:1});
@@ -57,7 +57,7 @@ chrome.webRequest.onHeadersReceived.addListener(details=>{
   const type=details.responseHeaders?.find(h=>h.name.toLowerCase()==='content-type')?.value||'';
   if(!/video\/|audio\/|mpegurl|dash\+xml/i.test(type)&&!/\.(mp4|mkv|webm|mp3|m3u8|mpd)(\?|$)/i.test(details.url))return;
   const entry=FlowMediaModel.describe({url:details.url,type,size:details.responseHeaders?.find(h=>h.name.toLowerCase()==='content-length')?.value||'',contentRange:details.responseHeaders?.find(h=>h.name.toLowerCase()==='content-range')?.value||''});
-  if(!entry)return;
+  if(!entry)return;entry.frameId=details.frameId??0;entry.documentId=details.documentId||'';entry.seenAt=Date.now();
   const list=FlowMediaModel.select([...(media.get(details.tabId)||[]),entry],40).reverse();media.set(details.tabId,list);chrome.storage.session.set({['media:'+details.tabId]:list}).catch(()=>{});chrome.action.setBadgeText({tabId:details.tabId,text:String(list.length)}).catch(()=>{});
 },{urls:['http://*/*','https://*/*']},['responseHeaders']);
 // This also catches Content-Disposition attachments without a URL extension.
@@ -76,18 +76,18 @@ chrome.downloads.onDeterminingFilename.addListener((item,suggest)=>{
   })().catch(fail).finally(()=>suggest());return true;
 });
 chrome.tabs.onRemoved.addListener(id=>{media.delete(id);pausedDiscovery.delete(id);chrome.storage.session.remove(['media:'+id,'mediaPaused:'+id]).catch(()=>{});});
-chrome.tabs.onUpdated.addListener((id,info)=>{if(info.status==='loading'){media.delete(id);pausedDiscovery.delete(id);chrome.storage.session.remove(['media:'+id,'mediaPaused:'+id]).catch(()=>{});}});
+chrome.tabs.onUpdated.addListener((id,info)=>{if(info.status==='loading'||info.url){media.delete(id);pausedDiscovery.delete(id);chrome.storage.session.remove(['media:'+id,'mediaPaused:'+id]).catch(()=>{});}});
 chrome.runtime.onMessage.addListener((message,sender,respond)=>{
   if(!['media','clearMedia','resumeMedia','download','capture','ping','sync','bypass','batch','capturePause'].includes(message.type))return;
   (async()=>{
     if(message.type==='capturePause'){const minutes=Number(message.minutes);if(![0,15,60].includes(minutes))throw Error('Choose 0, 15 or 60 minutes');const until=minutes?Date.now()+minutes*60000:0;await chrome.storage.local.set({capturePausedUntil:until});return {until};}
     if(message.type==='bypass'){await chrome.storage.session.set({['bypass:'+message.url]:Date.now()});return {ok:true};}
     if(message.type==='clearMedia'||message.type==='resumeMedia'){const id=message.tabId??sender.tab?.id;if(!Number.isInteger(id))throw Error('No active tab');media.delete(id);await chrome.storage.session.remove('media:'+id);if(message.type==='clearMedia'){pausedDiscovery.add(id);await chrome.storage.session.set({['mediaPaused:'+id]:true});}else{pausedDiscovery.delete(id);await chrome.storage.session.remove('mediaPaused:'+id);}await chrome.action.setBadgeText({tabId:id,text:''});return {ok:true};}
-    if(message.type==='media'){const id=message.tabId??sender.tab?.id;return {media:FlowMediaModel.select(media.get(id)||(await chrome.storage.session.get('media:'+id))['media:'+id]||[]),discoveryPaused:pausedDiscovery.has(id),config:await config()};}
+    if(message.type==='media'){const id=message.tabId??sender.tab?.id;const list=media.get(id)||(await chrome.storage.session.get('media:'+id))['media:'+id]||[];return {media:FlowMediaModel.select(list.filter(item=>(sender.frameId===undefined||item.frameId===undefined||item.frameId===sender.frameId)&&(!item.seenAt||Date.now()-item.seenAt<600000))),discoveryPaused:pausedDiscovery.has(id),config:await config()};}
     if(message.type==='ping'||message.type==='sync')return ping();
     const c=await config();let tab=sender.tab;if(!tab&&message.tabId!==undefined)tab=await chrome.tabs.get(message.tabId);
     if(message.type==='batch'){if(!Array.isArray(message.urls)||message.urls.length>100)throw Error('Select up to 100 URLs');for(const url of [...new Set(message.urls)])await sendDownload({url,sourcePage:tab?.url,later:true});return {count:message.urls.length};}
     if(message.type==='capture'){if(!message.force&&(!c.autoCapture||capturePaused(c,message.url,tab?.url)))return {skip:true};if(excluded(message.url,c)||!message.force&&!fileMatch(message.url,'',c))return {skip:true};}
-    const tabId=message.tabId??tab?.id,list=media.get(tabId)||(await chrome.storage.session.get('media:'+tabId))['media:'+tabId]||[],entry=list.find(m=>m.url===message.url);return sendDownload({url:message.url,name:message.name||entry?.fileName,sourcePage:tab?.url,mode:message.mode||(/mpegurl|dash\+xml/i.test(entry?.type||'')?'media':undefined)});
+    const tabId=message.tabId??tab?.id,list=media.get(tabId)||(await chrome.storage.session.get('media:'+tabId))['media:'+tabId]||[],entry=list.find(m=>m.url===message.url);return sendDownload({url:message.url,name:message.name||entry?.fileName,sourcePage:sender.url||tab?.url,mode:message.mode||(/mpegurl|dash\+xml/i.test(entry?.type||'')?'media':undefined)});
   })().then(result=>respond({result})).catch(e=>respond({error:e.message}));return true;
 });

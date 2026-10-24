@@ -45,11 +45,14 @@ class Service{
     this.closed=false;this.browserControllers=new Set();this.browserPending=new Map();this.store=new Store(dir,options.protection);this.engine=new Engine(this.store,options);this.grabber=new Grabber(this.store,this.engine);this.desktop=options.desktop;
     this.extensionToken=this.store.get('extensionToken');if(!this.extensionToken){this.extensionToken=crypto.randomBytes(32).toString('hex');this.store.set('extensionToken',this.extensionToken);}
     this.updates=new (require('./updates.cjs').UpdateChecker)({version:require('../package.json').version,store:this.store,fetch:options.updateFetch,openExternal:this.desktop?.openUpdateRelease,onAvailable:()=>this.desktop?.updateAvailable?.()});
+    this.remote=new (require('./remote.cjs').RemoteControl)(this);
+    this.peers=new (require('./peers.cjs').PeerDownloads)(this);
+    this.downloadTools=new (require('./download-tools.cjs').DownloadTools)(this);
     this.smart=new (require('./smart.cjs').SmartTools)(this);
     this.power=new (require('./power.cjs').Power)(this);this.library=new (require('./library.cjs').Library)(this);
     this.timer=setInterval(()=>{try{this.grabber.finalize();}catch(e){this.store.log('error',e.message);}},3000);this.timer.unref();
   }
-  snapshot(){const browser=this.store.get('browserLastSeen',{});return {runtime:this.desktop?.runtimeStatus?.()||null,updates:this.updates.snapshot(),browser:{...browser,...this.browserBridge?.info(),connected:!!browser.lastSeen&&Date.now()-new Date(browser.lastSeen).getTime()<90000},downloads:this.store.list().map(d=>({...d,meta:JSON.stringify((({headers,...rest})=>rest)(JSON.parse(d.meta)))})),power:this.power.snapshot(),library:this.library.snapshot(),settings:this.store.settings,queues:this.store.queues(),projects:this.store.projects(),usage:this.engine.usage,logins:this.store.logins(),database:{engine:'Realm',encrypted:true,path:path.join(this.store.dir,'flow.realm')},desktop:!!this.desktop,extensionToken:this.extensionToken};}
+  snapshot(){const browser=this.store.get('browserLastSeen',{});return {runtime:this.desktop?.runtimeStatus?.()||null,updates:this.updates.snapshot(),browser:{...browser,...this.browserBridge?.info(),connected:!!browser.lastSeen&&Date.now()-new Date(browser.lastSeen).getTime()<90000},downloads:this.store.list().map(d=>({...d,meta:JSON.stringify((({headers,...rest})=>rest)(JSON.parse(d.meta)))})),remote:this.remote.snapshot(),peers:this.peers.snapshot(),downloadTools:this.downloadTools.snapshot(),power:this.power.snapshot(),library:this.library.snapshot(),settings:this.store.settings,queues:this.store.queues(),projects:this.store.projects(),usage:this.engine.usage,logins:this.store.logins(),database:{engine:'Realm',encrypted:true,path:path.join(this.store.dir,'flow.realm')},desktop:!!this.desktop,extensionToken:this.extensionToken};}
   async browserAdd(data){
     if(this.closed)throw Error('البرنامج يغلق؛ أكمل التنزيل في المتصفح');
     const key=String(data.requestId||crypto.randomUUID());
@@ -60,6 +63,7 @@ class Service{
   async acceptBrowserDownload(data){
     const requestId=String(data.requestId||'');if(requestId&&!/^[a-z0-9:-]{1,100}$/i.test(requestId))throw Error('Invalid handoff identifier');
     const recent=this.store.get('browserRequests',[]),existing=recent.find(r=>r.id===requestId);if(existing&&this.store.find(existing.downloadId))return this.store.find(existing.downloadId);
+    if(String(data.url).startsWith('magnet:')){const result=await this.peers.action('torrentAdd',{url:data.url});await this.desktop?.peerInfo?.();return {...result,name:'Torrent download',status:'active'};}
     const validated=validateAdd({url:data.url,name:data.name,headers:data.headers,sourcePage:data.sourcePage,later:!!data.later,mode:data.mode},this.store);
     if(this.store.settings.preventDuplicates){const duplicate=this.library.duplicates(validated.url)[0];if(duplicate){if(this.desktop){await this.desktop.downloadInfo?.(duplicate.id,duplicate.status);}return duplicate;}}
     let info;
@@ -79,6 +83,9 @@ class Service{
     if(this.closed)throw Error('البرنامج يغلق؛ انتظر انتهاء الإغلاق');
     const s=this.store,e=this.engine;
     if(type==='remove'&&!data.deleteFile&&this.library.removing.has(data.id))return this.library.removing.get(data.id);
+    if(require('./remote.cjs').ACTIONS.has(type))return this.remote.action(type,data);
+    if(require('./peers.cjs').ACTIONS.has(type))return this.peers.action(type,data);
+    if(require('./download-tools.cjs').ACTIONS.has(type))return this.downloadTools.action(type,data);
     if(require('./library.cjs').ACTIONS.has(type))return this.library.action(type,data);
     if(require('./power.cjs').ACTIONS.has(type))return this.power.action(type,data);
     if(['start','remove','redownload','update','confirmDownload'].includes(type)&&e.maintenance.has(data.id))throw Error('انتظر انتهاء الفحص أو العملية الحالية');
@@ -89,7 +96,7 @@ class Service{
       case'updatesLater':return this.updates.snooze();
       case'updatesSkip':return this.updates.skip();
       case'libraryHealth':return this.smart.run(()=>this.smart.library());
-      case'verifyFile':return this.smart.verify(data.id,data.expected);
+      case'verifyFile':return this.smart.verify(data.id,data.expected,data.algorithm);
       case'rescueLink':return this.smart.rescue(data.id,data.url,cleanHeaders(data.headers));
       case'add':{const validated=validateAdd(data,s);if(data.duplicateMode==='reuse'){const existing=this.library.duplicates(validated.url)[0];if(existing)return existing;}const item=e.add(validated);this.library.remember(item.directory);return item;}
       case'confirmDownload':{
@@ -110,7 +117,7 @@ class Service{
       case'zip':return net.zipPreview(data.url,{headers:e.authHeaders(data.url),settings:s.settings});
       case'start':{const item=s.find(data.id);if(!item)throw Error('التحميل غير موجود');if(item.status==='pending'&&this.desktop?.downloadInfo)return this.desktop.downloadInfo(item.id);e.start(data.id).catch(()=>{});return true;}
       case'pause':await e.pause(data.id);return true;
-      case'pauseAll':for(const q of s.queues())s.putQueue({...q,running:false});await e.pauseAll();return true;
+      case'pauseAll':for(const d of this.peers.records.filter(d=>d.state==='active'||d.state==='waiting'))await this.peers.action('torrentControl',{id:d.id,command:'pause'});for(const q of s.queues())s.putQueue({...q,running:false});await e.pauseAll();return true;
       case'remove':if(data.deleteFile)await e.remove(data.id,true);else await this.library.trash(data.id);return true;
       case'clearComplete':for(const d of s.list().filter(d=>d.status==='complete'))await this.library.trash(d.id);return true;
       case'redownload':await e.redownload(data.id);return true;
@@ -139,7 +146,7 @@ class Service{
         if(schedule.date&&(!/^\d{4}-\d{2}-\d{2}$/.test(schedule.date)||!Number.isFinite(Date.parse(schedule.date))))throw Error('تاريخ غير صالح');
         if(schedule.enabled&&!schedule.start)throw Error('حدد وقت بدء الجدول');
         for(const key of ['start','stop'])if(schedule[key]&&!/^([01]\d|2[0-3]):[0-5]\d$/.test(schedule[key]))throw Error('وقت غير صالح');
-        if(schedule.completion&&!['none','quit'].includes(schedule.completion))throw Error('إجراء الإنهاء غير مدعوم');
+        if(schedule.completion&&!['none','quit','shutdown'].includes(schedule.completion))throw Error('إجراء الإنهاء غير مدعوم');
         if(data.running===true)for(const d of s.list().filter(d=>d.queueId===id&&d.status==='paused'))s.update(d.id,{status:'queued'});
         e.queueNext.delete(id);return s.putQueue({id,name:String(data.name||old?.name||(s.settings.language==='en'?'New queue':'قائمة جديدة')).slice(0,100),running:data.running??old?.running??false,simultaneous:Math.max(1,Math.min(16,Math.trunc(Number(data.simultaneous))||old?.simultaneous||3)),schedule:JSON.stringify(schedule)});
       }
@@ -175,6 +182,6 @@ class Service{
     }
   }
   close(){if(this.closePromise)return this.closePromise;this.closed=true;this.closePromise=this.closeOnce();return this.closePromise;}
-  async closeOnce(){this.updates.stop();clearInterval(this.timer);for(const c of this.browserControllers)c.abort();await Promise.allSettled([...this.browserPending.values()]);await Promise.allSettled([...this.library.removing.values()]);await this.power.close();await this.smart.close();for(const id of this.grabber.running)this.grabber.cancel(id);while(this.grabber.running.size)await new Promise(r=>setTimeout(r,50));await this.engine.close();this.store.close();}
+  async closeOnce(){this.updates.stop();clearInterval(this.timer);for(const c of this.browserControllers)c.abort();await Promise.allSettled([...this.browserPending.values()]);await Promise.allSettled([...this.library.removing.values()]);await this.remote.close();await this.peers.close();await this.downloadTools.close();await this.power.close();await this.smart.close();for(const id of this.grabber.running)this.grabber.cancel(id);while(this.grabber.running.size)await new Promise(r=>setTimeout(r,50));await this.engine.close();this.store.close();}
 }
 module.exports={Service,validateAdd,validateSettings};

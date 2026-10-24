@@ -19,6 +19,8 @@ function renderNativeWindow(){
     case'settings':openSettings(windowArgs.get('tab')||'general');break;
     case'library':openLibrary(windowArgs.get('tab')||'folders');break;
     case'power':openPower(windowArgs.get('tab')||'links',windowArgs.get('url')||'');break;
+    case'shutdown':renderShutdown();break;
+    case'tools':openTools(windowArgs.get('tab')||'home');break;
     case'smart':openSmart(windowArgs.get('tab')||'health',id||'');break;
     case'add':case'download-info':openAdd(windowArgs.get('url')||state.downloads.find(d=>d.id===id)?.url||'');if(isSiteVideo($('#f-url')?.value)||isPlaylistURL($('#f-url')?.value))queueMicrotask(()=>handleAction('probeAdd',$('[data-action=probeAdd]')));break;
     case'details':openDetail(id);break;case'complete':showComplete(id);break;
@@ -36,7 +38,8 @@ function repaintNativeLanguage(){
  if(windowContext==='settings'){captureSettings();showSettings();}
  else if(windowContext==='library')renderLibrary();
  else if(windowContext==='power')renderPower();
- else if(windowContext==='smart')renderSmart();
+ else if(windowContext==='tools')renderTools();
+  else if(windowContext==='smart')renderSmart();
  else renderNativeWindow();
  for(const saved of fields){const el=[...document.querySelectorAll('[name]')].find(el=>el.name===saved.name);if(el){el.value=saved.value;if(el.type==='checkbox')el.checked=saved.checked;}}
  [...document.querySelectorAll('[name]')].find(el=>el.name===focus)?.focus();

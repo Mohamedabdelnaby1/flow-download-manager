@@ -7,8 +7,9 @@ function soundPath(file,event='complete'){
  return path.resolve(target);
 }
 function playSound(file,event='complete',execute=execFile){
- const target=soundPath(file,event),encodedPath=Buffer.from(target,'utf8').toString('base64');
+ const target=soundPath(file,event);if(process.platform==='linux')return linuxSound(target,execute);const encodedPath=Buffer.from(target,'utf8').toString('base64');
  const script="$ErrorActionPreference='Stop';$soundFile=[Text.Encoding]::UTF8.GetString([Convert]::FromBase64String('"+encodedPath+"'));$player=New-Object System.Media.SoundPlayer;$player.SoundLocation=$soundFile;try{$player.Load();$player.PlaySync()}finally{$player.Dispose()}";
  return new Promise((resolve,reject)=>execute('powershell.exe',['-NoProfile','-NonInteractive','-EncodedCommand',Buffer.from(script,'utf16le').toString('base64')],{windowsHide:true,timeout:10000},error=>error?reject(Error('Could not play the sound. Check Windows audio output or choose another WAV file.')):resolve(true)));
 }
-module.exports={soundPath,playSound};
+async function linuxSound(file,execute=execFile){for(const player of ['paplay','pw-play','aplay']){try{await new Promise((resolve,reject)=>execute(player,[file],{timeout:15000},e=>e?reject(e):resolve()));return true;}catch(e){if(e.code!=='ENOENT')throw Error('Could not play the sound. Check the audio output.');}}throw Error('Install a desktop sound player (pulseaudio-utils, pipewire-bin or alsa-utils) to enable WAV sounds.');}
+module.exports={soundPath,playSound,linuxSound};

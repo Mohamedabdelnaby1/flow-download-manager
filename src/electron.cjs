@@ -16,7 +16,7 @@ const {validateURL}=require('./network.cjs');
 function writeLog(error){try{const folder=process.env.FLOW_SMOKE_DIR||app.getPath('userData');rotatingLog(path.join(folder,'desktop.log'),error?.stack||String(error));}catch{}}
 console.error=(...args)=>writeLog(args.map(v=>v?.stack||String(v)).join(' '));
 console.log=(...args)=>{if(process.env.FLOW_SMOKE_TEST)writeLog(args.join(' '));};
-let win,service,web,quitting=false,clipTimer,drop,tray,toolsWindows,wakeTimer,wakeId,mainPromise,startup,trayTimer;
+let win,service,web,quitting=false,clipTimer,drop,tray,toolsWindows,wakeTimer,wakeId,mainPromise,startup,trayTimer,completionPower;
 const pendingCLI=[];let trayTarget=null;
 function rememberTrayWindow(window){if(!window||window.isDestroyed())return;trayTarget=window.flowDownloadId?{kind:window.flowKind,id:window.flowDownloadId}:null;}
 async function restoreTrayWindow(){if(quitting)return;if(trayTarget&&toolsWindows&&service.store.find(trayTarget.id)){await toolsWindows.open(trayTarget.kind,{id:trayTarget.id});return;}trayTarget=null;await showMain();}
@@ -36,7 +36,7 @@ function playEventSound(event){if(!service?.store.settings.sounds)return;const k
 function humanSize(n){return n>=1048576?(n/1048576).toFixed(1)+' MB':(n/1024).toFixed(0)+' KB';}
 function trayDownloads(){const rows=service.store.realm.objects('Download'),active=rows.filtered('status IN $0',['probing','downloading','processing']);return (active.length?active:rows.sorted('updatedAt',true)).slice(0,5).map(d=>({id:d.id,name:d.name,size:d.size,downloaded:d.downloaded,speed:d.speed,status:d.status}));}
 function updateTray(){if(quitting||!tray||tray.isDestroyed()||!service||service.closed)return;const records=trayDownloads(),active=records.filter(d=>['probing','downloading','processing'].includes(d.status)),bytes=records.reduce((n,d)=>n+d.downloaded,0),total=records.reduce((n,d)=>n+d.size,0),rate=active.reduce((n,d)=>n+d.speed,0);tray.setToolTip(('Flow · '+active.length+' '+tr('نشط','active')+'\n'+humanSize(bytes)+' / '+humanSize(total)+' · '+humanSize(rate)+'/s').slice(0,120));if(win&&!win.isDestroyed())win.setProgressBar(active.length?(total?Math.min(1,bytes/total):2):-1);for(const w of toolsWindows?.windows.values()||[])if(!w.isDestroyed()&&w.flowDownloadId){const d=service.store.find(w.flowDownloadId);w.setProgressBar(d&&['probing','downloading','processing'].includes(d.status)?d.size?Math.min(1,d.downloaded/d.size):2:-1);}}
-function syncWake(){const needed=!!service?.store.settings.preventSleep&&!!service?.engine.active.size;if(needed&&(wakeId===undefined||!powerSaveBlocker.isStarted(wakeId)))wakeId=powerSaveBlocker.start('prevent-app-suspension');if(!needed&&wakeId!==undefined){powerSaveBlocker.stop(wakeId);wakeId=undefined;}return wakeId!==undefined&&powerSaveBlocker.isStarted(wakeId);}
+function syncWake(){const needed=!!service?.store.settings.preventSleep&&(!!service?.engine.active.size||service?.peers.records.some(d=>['active','waiting'].includes(d.state)));if(needed&&(wakeId===undefined||!powerSaveBlocker.isStarted(wakeId)))wakeId=powerSaveBlocker.start('prevent-app-suspension');if(!needed&&wakeId!==undefined){powerSaveBlocker.stop(wakeId);wakeId=undefined;}return wakeId!==undefined&&powerSaveBlocker.isStarted(wakeId);}
 if(process.env.FLOW_SMOKE_DIR)app.setPath('userData',process.env.FLOW_SMOKE_DIR);
 function smokeReport(data){if(process.env.FLOW_SMOKE_REPORT){fs.mkdirSync(path.dirname(process.env.FLOW_SMOKE_REPORT),{recursive:true});fs.writeFileSync(process.env.FLOW_SMOKE_REPORT,JSON.stringify(data,null,2));}}
 smokeReport({stage:'starting',electron:process.versions.electron});
@@ -70,12 +70,13 @@ if(!app.requestSingleInstanceLock({version:app.getVersion()})){
 }else{
   app.on('second-instance',(_event,args)=>{if(!service||!toolsWindows){pendingCLI.push(args);return;}cli(args).catch(writeLog);if(!args.includes('--background'))showMain().catch(writeLog);});
   app.whenReady().then(async()=>{
-    const protectedStorage=safeStorage.isEncryptionAvailable()?{encrypt:v=>safeStorage.encryptString(v),decrypt:v=>safeStorage.decryptString(v)}:undefined;
-    if(!protectedStorage)throw Error('تعذر الوصول إلى مخزن مفاتيح النظام الآمن');
-    startup=new StartupManager(app,{portable:process.env.PORTABLE_EXECUTABLE_FILE});
+    const protectedStorage=safeStorage.isEncryptionAvailable()&&!(process.platform==='linux'&&safeStorage.getSelectedStorageBackend()==='basic_text')?{encrypt:v=>safeStorage.encryptString(v),decrypt:v=>safeStorage.decryptString(v)}:undefined;
+    if(!protectedStorage&&process.platform!=='linux')throw Error('تعذر الوصول إلى مخزن مفاتيح النظام الآمن');
+    startup=new StartupManager(app,{portable:process.env.PORTABLE_EXECUTABLE_FILE||process.env.APPIMAGE});
     const desktop={
-      runtimeStatus:()=>({startup:startup.status(),trayResident:!!tray&&!tray.isDestroyed(),softwareRendering:!process.argv.includes('--flow-hardware-acceleration'),rendererRecoveries:win?.flowRecovery?.recovered||0}),
+      runtimeStatus:()=>({shutdown:completionPower?.snapshot()||null,platform:process.platform,keyProtection:protectedStorage?'system-keyring':'local-private-key',startup:startup.status(),trayResident:!!tray&&!tray.isDestroyed(),softwareRendering:!process.argv.includes('--flow-hardware-acceleration'),rendererRecoveries:win?.flowRecovery?.recovered||0}),
       downloadInfo:async (id,status='pending')=>{for(let n=0;n<200&&!toolsWindows;n++)await new Promise(r=>setTimeout(r,50));if(!toolsWindows)throw Error('نافذة التطبيق لم تجهز بعد');return toolsWindows.open(status==='pending'?'download-info':'details',{id});},
+      peerInfo:()=>toolsWindows?.open('tools',{tab:'torrent'}),
       scale:value=>{if(win&&!win.isDestroyed())win.webContents.setZoomFactor(value);toolsWindows?.scale(value);},
       browserFallback:async url=>{validateURL(url,['http:','https:']);await shell.openExternal(url);return true;},
       wakeStatus:()=>syncWake(),
@@ -83,13 +84,13 @@ if(!app.requestSingleInstanceLock({version:app.getVersion()})){
       openUpdateRelease:async url=>{await shell.openExternal(url);return true;},
       authorProfile:async()=>{await shell.openExternal('https://www.facebook.com/mohamedabdelnaby190');return true;},
       quit:()=>{app.quit();return true;},
-      browserExtensions:async()=>{let chrome;for(const base of [process.env.PROGRAMFILES,process.env['PROGRAMFILES(X86)'],process.env.LOCALAPPDATA].filter(Boolean)){const file=path.join(base,'Google/Chrome/Application/chrome.exe');if(fs.existsSync(file)){chrome=file;break;}}if(!chrome)throw Error('افتح chrome://extensions في كروم');const {spawn}=require('node:child_process');const child=spawn(chrome,['chrome://extensions'],{detached:true,stdio:'ignore',windowsHide:true});child.on('error',()=>{});child.unref();return true;},
+      browserExtensions:async()=>{if(process.platform==='linux'){for(const name of ['google-chrome','google-chrome-stable','chromium','chromium-browser','brave-browser','microsoft-edge']){const exe=(process.env.PATH||'').split(path.delimiter).map(dir=>path.join(dir,name)).find(file=>fs.existsSync(file));if(exe){const child=require('node:child_process').spawn(exe,['chrome://extensions'],{detached:true,stdio:'ignore'});child.on('error',writeLog);child.unref();return true;}}throw Error('Open your browser extensions page and load the Flow Companion folder.');}let chrome;for(const base of [process.env.PROGRAMFILES,process.env['PROGRAMFILES(X86)'],process.env.LOCALAPPDATA].filter(Boolean)){const file=path.join(base,'Google/Chrome/Application/chrome.exe');if(fs.existsSync(file)){chrome=file;break;}}if(!chrome)throw Error('افتح chrome://extensions في كروم');const {spawn}=require('node:child_process');const child=spawn(chrome,['chrome://extensions'],{detached:true,stdio:'ignore',windowsHide:true});child.on('error',()=>{});child.unref();return true;},
       open:async file=>{const result=await shell.openPath(file);if(result)throw Error(result);return true;},
       folder:file=>{shell.showItemInFolder(file);return true;},
       chooseDirectory:async()=>{const r=await dialog.showOpenDialog(BrowserWindow.getFocusedWindow()||win,{properties:['openDirectory','createDirectory']});return r.canceled?null:r.filePaths[0];},
       chooseSound:async()=>{const r=await dialog.showOpenDialog(BrowserWindow.getFocusedWindow()||win,{filters:[{name:'WAV',extensions:['wav']}],properties:['openFile']});return r.canceled?null:r.filePaths[0];},
       playSound:(file,event)=>require('./sounds.cjs').playSound(file,event),
-      startup:enabled=>startup.apply(enabled),
+      startup:enabled=>startup.apply(enabled),cancelShutdown:()=>completionPower?.cancel(),
       vpnConnect:async name=>{if(process.platform!=='win32'||!name)throw Error('اختر اسم اتصال VPN مسجل في ويندوز');await runFile('rasdial.exe',[name]);return true;},
       vpnDisconnect:async name=>{if(process.platform!=='win32'||!name)throw Error('اختر اسم اتصال VPN مسجل في ويندوز');await runFile('rasdial.exe',[name,'/disconnect']);return true;}
     };
@@ -107,6 +108,7 @@ if(!app.requestSingleInstanceLock({version:app.getVersion()})){
       if(!trusted(event))throw Error('مصدر غير موثوق');
       if(drop&&!drop.isDestroyed()&&event.sender===drop.webContents&&!['add','dropClose'].includes(type))throw Error('أمر غير مسموح');
       if(type==='add'&&drop&&!drop.isDestroyed()&&event.sender===drop.webContents)return service.browserAdd(data);
+      if(type==='shutdownCancel')return completionPower?.cancel();
       if(type==='windowHide'){const target=BrowserWindow.fromWebContents(event.sender);rememberTrayWindow(target);target?.hide();return true;}
       if(type==='windowReload')return BrowserWindow.fromWebContents(event.sender)?.flowRecovery?.retry()||false;
       if(type==='window')return toolsWindows.open(data.kind,data);
@@ -120,6 +122,7 @@ if(!app.requestSingleInstanceLock({version:app.getVersion()})){
     service.engine.on('failure',()=>{playEventSound('error');});
     service.engine.on('queueComplete',()=>{playEventSound('queue');});
     service.engine.on('quitRequested',()=>app.quit());
+    completionPower=new (require('./completion-power.cjs').CompletionPower)(service,{onPrompt:()=>toolsWindows.open('shutdown')});service.engine.on('shutdownRequested',queue=>completionPower.request(queue).catch(writeLog));
     await ensureMain();toolsWindows=new ToolWindows({BrowserWindow,service,origin:web.origin,main:win,screen,guardWindow});
     service.engine.on('started',d=>{if(service.store.settings.showProgress)toolsWindows.open('details',{id:d.id}).catch(writeLog);});
     for(const d of service.store.list().filter(d=>d.status==='pending'))toolsWindows.open('download-info',{id:d.id}).catch(writeLog);
@@ -136,7 +139,7 @@ if(!app.requestSingleInstanceLock({version:app.getVersion()})){
       try{if(process.env.FLOW_SMOKE_VIEW)await win.webContents.executeJavaScript(process.env.FLOW_SMOKE_VIEW);await new Promise(r=>setTimeout(r,500));const state=await win.webContents.executeJavaScript('({title:document.title,bridge:!!window.desktopAPI,connection:document.querySelector("#connection-state")?.textContent,bodyWidth:document.body.scrollWidth,viewport:innerWidth})');const report={stage:'complete',...state,database:service.store.realm.path,electron:process.versions.electron,sandbox:win.webContents.getLastWebPreferences().sandbox};console.log('ELECTRON_SMOKE_OK',JSON.stringify(report));smokeReport(report);if(process.env.FLOW_SMOKE_IMAGE){const capture=await win.webContents.capturePage();fs.writeFileSync(process.env.FLOW_SMOKE_IMAGE,capture.toPNG());}app.quit();}catch(e){console.error(e);smokeReport({stage:'error',error:e.message});app.quit();}
     },Number(process.env.FLOW_SMOKE_DELAY)||2500);}
   }).catch(e=>{console.error(e);smokeReport({stage:'error',error:e.message});if(!process.env.FLOW_SMOKE_TEST)dialog.showErrorBox('Flow',e.message);app.quit();});
-  app.on('before-quit',event=>{if(quitting)return;event.preventDefault();quitting=true;toolsWindows?.closeAll();clearInterval(clipTimer);clearInterval(wakeTimer);clearInterval(trayTimer);if(wakeId!==undefined)powerSaveBlocker.stop(wakeId);win?.flowRecovery?.dispose();Promise.resolve().then(async()=>{if(service)await service.close();if(web)await web.close();app.exit(0);}).catch(()=>app.exit(1));});
+  app.on('before-quit',event=>{if(quitting)return;event.preventDefault();quitting=true;completionPower?.close();toolsWindows?.closeAll();clearInterval(clipTimer);clearInterval(wakeTimer);clearInterval(trayTimer);if(wakeId!==undefined)powerSaveBlocker.stop(wakeId);win?.flowRecovery?.dispose();Promise.resolve().then(async()=>{if(service)await service.close();if(web)await web.close();app.exit(0);}).catch(()=>app.exit(1));});
   app.on('window-all-closed',()=>{if(!quitting&&(!tray||tray.isDestroyed()))app.quit();});
 }
 module.exports={parseCLI};

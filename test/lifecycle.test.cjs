@@ -7,11 +7,11 @@ test('startup uses the permanent portable launcher and explicit background argum
 });
 test('installed startup overwrites the legacy key and verifies registration before success',()=>{
  const file=path.join(fs.mkdtempSync(path.join(os.tmpdir(),'flow-startup-')),'Flow.exe');fs.writeFileSync(file,'fixture');let value=false,calls=[];const app={isPackaged:true,getAppPath:()=>path.dirname(file),setLoginItemSettings:o=>{calls.push(o);value=o.openAtLogin;},getLoginItemSettings:()=>({openAtLogin:value,executableWillLaunchAtLogin:value})};
- const manager=new StartupManager(app,{executable:file});assert.equal(manager.apply(true).enabled,true);assert.deepEqual(calls[0],{name:'electron.app.Flow',path:file,args:['--background'],openAtLogin:true});assert.equal(manager.apply(false).enabled,false);
+ const manager=new StartupManager(app,{executable:file,platform:'win32'});assert.equal(manager.apply(true).enabled,true);assert.deepEqual(calls[0],{name:'electron.app.Flow',path:file,args:['--background'],openAtLogin:true});assert.equal(manager.apply(false).enabled,false);
  app.setLoginItemSettings=()=>{};assert.throws(()=>manager.apply(true),/Windows did not/);
 });
 test('startup reconciliation respects Windows Startup apps being explicitly disabled',()=>{
- let called=false;const app={isPackaged:true,getAppPath:()=>path.resolve('.'),setLoginItemSettings:()=>called=true,getLoginItemSettings:()=>({openAtLogin:false,launchItems:[{name:'electron.app.Flow',enabled:false}]})};const manager=new StartupManager(app);assert.equal(manager.reconcile().enabled,false);assert.equal(called,false);
+ let called=false;const app={isPackaged:true,getAppPath:()=>path.resolve('.'),setLoginItemSettings:()=>called=true,getLoginItemSettings:()=>({openAtLogin:false,launchItems:[{name:'electron.app.Flow',enabled:false}]})};const manager=new StartupManager(app,{platform:'win32'});assert.equal(manager.reconcile().enabled,false);assert.equal(called,false);
 });
 test('crashed renderer reloads only its own trusted URL and never closes the service',async()=>{
  const w=fakeWindow(),events=[],guard=new WindowRecovery(w,{url:'http://127.0.0.1:17863/?window=details&id=test',fallback:'http://127.0.0.1:17863/recovery.html',delay:5,log:e=>events.push(e)});w.webContents.emit('render-process-gone',{}, {reason:'crashed',exitCode:1});await wait(20);assert.equal(w.loads.length,1);assert.match(w.loads[0],/window=details/);assert.equal(guard.recovered,1);assert.equal(events[0].event,'renderer-gone');guard.dispose();

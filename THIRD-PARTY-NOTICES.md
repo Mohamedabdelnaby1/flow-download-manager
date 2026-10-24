@@ -22,3 +22,8 @@ Flow is provided as editable project source. No commercial publisher signing cer
 The independently executed official Windows utility is distributed in vendor/yt-dlp.exe. Its release metadata and verified SHA-256 are in vendor/yt-dlp.json. The upstream project is https://github.com/yt-dlp/yt-dlp and corresponding release sources are available at https://github.com/yt-dlp/yt-dlp/releases/tag/2026.10.21 and https://github.com/yt-dlp/yt-dlp/tree/2026.10.21 .
 
 The project source is Unlicense. The official bundled executable includes third-party components and the combined executable is GPLv3+. Full upstream notices and GPL text accompany it in vendor/yt-dlp-THIRD-PARTY-LICENSES.txt and vendor/GPL-3.0.txt. It runs as a separate process; Flow source is provided with this delivery. EJS scripts are bundled by the official utility. Electron supplies the Node runtime; no separate runtime download is used.
+
+
+## aria2
+
+Flow 2.6 includes aria2 1.37.0 as a separate executable, licensed GPL-2.0-or-later with its OpenSSL exception and notices. Windows binary provenance, AUTHORS, COPYING, LICENSE.OpenSSL and build README are in `vendor/aria2/`. Corresponding upstream source: https://github.com/aria2/aria2/releases/download/release-1.37.0/aria2-1.37.0.tar.xz . Linux builds use the distribution aria2 package and bundle its linked libraries with copyright files and version provenance under `vendor/aria2/`. Flow original application code remains MIT; do not remove third-party license/source obligations.

@@ -1,0 +1,66 @@
+name: Linux packages and integration checks
+on:
+  workflow_dispatch:
+    inputs:
+      releaseTag:
+        description: 'Optional existing draft release tag for uploading verified Linux packages'
+        required: false
+        default: ''
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/linux.yml'
+      - 'src/**'
+      - 'native/flow-native-host.cjs'
+      - 'extension/**'
+      - 'ui/**'
+      - 'scripts/**'
+      - 'test/**'
+      - 'package*.json'
+permissions:
+  contents: read
+jobs:
+  linux:
+    permissions:
+      contents: write
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.14.0'
+          cache: npm
+      - name: Desktop and packaging dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y xvfb rpm libgtk-3-0 libnss3 libasound2t64 libsecret-1-0 libnotify4 libgbm1 pulseaudio-utils aria2
+      - run: npm ci
+      - run: npm run prepare:linux
+      - name: Source and integration tests
+        run: node --test --test-concurrency=1 test/*.test.cjs
+      - name: Package Linux editions
+        run: npm run dist:linux -- --publish never
+      - name: Test packaged desktop, bridge and background download
+        run: xvfb-run -a node scripts/linux-package-qa.cjs
+      - name: Export packages and evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: Flow-Linux-x64
+          path: |
+            release/*.AppImage
+            release/*.deb
+            release/*.rpm
+            release/Linux-Verification.json
+          if-no-files-found: error
+          retention-days: 14
+      - name: Upload verified Linux packages to the requested draft release
+        if: github.event_name == 'workflow_dispatch' && inputs.releaseTag != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ inputs.releaseTag }}
+        run: |
+          EXPECTED="v$(node -p "require('./package.json').version")"
+          test "$RELEASE_TAG" = "$EXPECTED"
+          test "$(gh release view "$RELEASE_TAG" --json isDraft --jq .isDraft)" = true
+          gh release upload "$RELEASE_TAG" release/*.AppImage release/*.deb release/*.rpm release/Linux-Verification.json --clobber

@@ -10,9 +10,10 @@ class BrowserBridge{
   constructor(app,service,origin){this.app=app;this.service=service;this.origin=origin;this.root=path.join(app.getPath('userData'),'BrowserIntegration');this.extensionPath=path.join(this.root,'Flow-Companion');this.manifestPath=path.join(this.root,HOST+'.json');}
   info(){return {registered:fs.existsSync(this.manifestPath),extensionPath:this.extensionPath,extensionId};}
   async install(){
-    if(process.platform!=='win32')throw Error('The packaged native bridge supports Windows.');
+    if(!['win32','linux'].includes(process.platform))throw Error('Native browser integration supports Windows and Linux.');
     fs.mkdirSync(this.root,{recursive:true});
     fs.cpSync(path.join(__dirname,'../extension'),this.extensionPath,{recursive:true});
+    if(process.platform==='linux'){const result=require('./linux.cjs').registerLinux(this);this.service.store.saveSettings({integration:true});return result;}
     const host=path.join(this.root,'FlowNativeHost.exe'),source=this.app.isPackaged?path.join(process.resourcesPath,'app.asar.unpacked/native/FlowNativeHost.exe'):path.join(__dirname,'../native/FlowNativeHost.exe');
     if(!fs.existsSync(host)||!fs.readFileSync(source).equals(fs.readFileSync(host)))fs.copyFileSync(source,host);
     await this.configure(host);

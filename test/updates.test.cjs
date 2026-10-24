@@ -1,7 +1,8 @@
 const test=require('node:test'),assert=require('node:assert/strict');
-const {UpdateChecker,newerVersion,releaseInfo,RELEASE_API,REPOSITORY_URL}=require('../src/updates.cjs');
+const {UpdateChecker,newerVersion,releaseInfo:rawReleaseInfo,RELEASE_API,REPOSITORY_URL}=require('../src/updates.cjs');
+const releaseInfo=data=>rawReleaseInfo(data,'win32');
 function release(version='2.6.0',extra={}){const tag='v'+version;return {tag_name:tag,draft:false,prerelease:false,name:'Flow '+version,body:'## Improvements\nNew features and fixes.',html_url:REPOSITORY_URL+'/releases/tag/'+tag,assets:[{name:`Flow-${version}-Setup.exe`,state:'uploaded',size:123,browser_download_url:REPOSITORY_URL+`/releases/download/${tag}/Flow-${version}-Setup.exe`}],...extra};}
-function fixture(options={}){const data=new Map(),notifications=[],opened=[],store=options.store||{get:(k,f)=>data.has(k)?structuredClone(data.get(k)):f,set:(k,v)=>data.set(k,structuredClone(v))};const checker=new UpdateChecker({version:'2.5.3',store,fetch:async()=>Response.json(release()),openExternal:async url=>opened.push(url),onAvailable:async()=>notifications.push(true),...options});return {checker,store,notifications,opened};}
+function fixture(options={}){const data=new Map(),notifications=[],opened=[],store=options.store||{get:(k,f)=>data.has(k)?structuredClone(data.get(k)):f,set:(k,v)=>data.set(k,structuredClone(v))};const checker=new UpdateChecker({platform:'win32',version:'2.5.3',store,fetch:async()=>Response.json(release()),openExternal:async url=>opened.push(url),onAvailable:async()=>notifications.push(true),...options});return {checker,store,notifications,opened};}
 
 test('update versions use numeric stable semantic versions',()=>{
  assert.equal(newerVersion('v2.10.0','2.9.9'),true);assert.equal(newerVersion('2.5.3','2.5.3'),false);assert.equal(newerVersion('2.4.99','2.5.3'),false);assert.equal(newerVersion('3.0.0','2.99.99'),true);

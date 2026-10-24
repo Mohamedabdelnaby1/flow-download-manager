@@ -4,22 +4,32 @@
 
 # Flow Download Manager
 
-**A Windows download manager with browser handoff, an encrypted local library, and tools for the whole download workflow.**
+**A Windows and Linux download manager with browser handoff, an encrypted local library, and tools for the whole download workflow.**
 
 ![Windows](https://img.shields.io/badge/Windows-x64-1975ca?style=flat-square)
-![Version](https://img.shields.io/badge/version-2.5.4-1975ca?style=flat-square)
+![Version](https://img.shields.io/badge/version-2.6.0-1975ca?style=flat-square)
 ![Electron](https://img.shields.io/badge/Electron-45-293744?style=flat-square)
 ![Realm](https://img.shields.io/badge/Realm-local%20%26%20encrypted-5f4bb6?style=flat-square)
 [![License: MIT](https://img.shields.io/badge/License-MIT-5f4bb6?style=flat-square)](LICENSE)
 ![Languages](https://img.shields.io/badge/English%20%2F%20Arabic-293744?style=flat-square)
 
-[**Download for Windows**](https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/latest) آ· [Features](FEATURES.md) آ· [Browser setup](BROWSER-INTEGRATION.md) آ· [Development](docs/DEVELOPMENT.md) آ· [Report a problem](https://github.com/Mohamedabdelnaby1/flow-download-manager/issues/new/choose)
+[**Download Flow**](https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/latest) آ· [Features](FEATURES.md) آ· [Browser setup](BROWSER-INTEGRATION.md) آ· [Development](docs/DEVELOPMENT.md) آ· [Report a problem](https://github.com/Mohamedabdelnaby1/flow-download-manager/issues/new/choose)
 
 </div>
 
 ![Flow desktop in English](docs/screenshots/desktop-light.png)
 
-## A calmer workspace in 2.5.4
+![Searchable tools](docs/screenshots/tools-hub.png)
+
+## Task-first tools in 2.6.0
+
+Find everyday tasks from one **Tools** button or **Ctrl+K**: torrents and magnets, phone handoff on your local network, selected files from ZIP archives, verified mirrors, moving and renaming completed files, duplicate cleanup and SHA-512 checks. Advanced settings stay collapsed. [Full FDM feature audit](docs/FDM-FEATURE-AUDIT.md).
+
+Personalize columns and fonts, choose optional history cleanup, or let slow queue tasks yield their slot. Queue completion can shut down the computer after a cancellable countdown.
+
+[Linux setup and testing boundaries](docs/LINUX.md) · [Simple tools guide](docs/TOOLS.md).
+
+## A calmer workspace
 
 A consistent Material-inspired interface across the main library, settings and tools: sage green surfaces, muted category colors, slim progress tracks, contextual file actions and compact transfer/completion windows. English and Arabic layouts follow light, dark or system appearance.
 
@@ -45,12 +55,13 @@ Created by **mohamed abdelnaby** â€” [Facebook](https://www.facebook.com/mo
 
 | Edition | Best for | Download |
 | :--- | :--- | :--- |
-| **Installer** | Shortcuts, Start menu and a standard uninstall entry | [Flow-2.5.4-Setup.exe](https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/download/v2.5.4/Flow-2.5.4-Setup.exe) |
-| **Portable launcher** | Launch without running the installer | [Flow-2.5.4-Portable.exe](https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/download/v2.5.4/Flow-2.5.4-Portable.exe) |
-| **Browser companion** | Chrome, Edge, Brave and Chromium | [Flow-Companion-2.5.4.zip](https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/download/v2.5.4/Flow-Companion-2.5.4.zip) |
-| **Source bundle** | Source, tests, docs and screenshots | [Flow-2.5.4-Source.zip](https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/download/v2.5.4/Flow-2.5.4-Source.zip) |
+| **Installer** | Shortcuts, Start menu and a standard uninstall entry | [Flow-2.6.0-Setup.exe](https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/download/v2.6.0/Flow-2.6.0-Setup.exe) |
+| **Portable launcher** | Launch without running the installer | [Flow-2.6.0-Portable.exe](https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/download/v2.6.0/Flow-2.6.0-Portable.exe) |
+| **Linux DEB / RPM / AppImage** | Choose the package for your Linux desktop | [Linux downloads](https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/latest) |
+| **Browser companion** | Chrome, Edge, Brave and Chromium | [Flow-Companion-2.6.0.zip](https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/download/v2.6.0/Flow-Companion-2.6.0.zip) |
+| **Source bundle** | Source, tests, docs and screenshots | [Flow-2.6.0-Source.zip](https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/download/v2.6.0/Flow-2.6.0-Source.zip) |
 
-Windows x64. Executables are unsigned. Portable skips installation but still stores data in your Windows profile; enabling native browser integration registers a host for your user. It is not a zero-footprint USB edition. Verify files using the release's [SHA256SUMS.txt](https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/download/v2.5.4/SHA256SUMS.txt).
+Windows and Linux x64. Windows executables are unsigned. Portable skips installation but still stores data in your Windows profile; enabling native browser integration registers a host for your user. It is not a zero-footprint USB edition. Verify files using the release's [SHA256SUMS.txt](https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/download/v2.6.0/SHA256SUMS.txt).
 
 ## What you can do
 
@@ -60,7 +71,7 @@ Windows x64. Executables are unsigned. Portable skips installation but still sto
 | Pause, resume and persistent checkpoints | Batch rename with preview and guarded undo | Schedules, quotas and traffic profiles |
 | FTP transfer and byte-offset resume | Tags, compound search and saved views | Rules by host and extension |
 | Website quality selection and audio merging | Recovery bin for tasks and partial data | Capture snooze and site exclusions |
-| Unencrypted HLS/DASH assembly | Missing-file checks and duplicate candidates | SHA-256 verification and URL rescue |
+| Unencrypted HLS/DASH assembly | Missing-file checks and duplicate candidates | SHA-256 / SHA-512 verification and URL rescue |
 | Public YouTube playlist selection | Selective configuration backup | Media conversion, trim and resolution limits |
 
 English by default, with optional Arabic RTL. **System, Light and Dark appearance**, live system changes, 80â€“150% text scaling and independently resizable/minimizable tool windows.
@@ -79,7 +90,7 @@ English by default, with optional Arabic RTL. **System, Light and Dark appearanc
 ## A closer look
 
 <table>
-<tr><td width="50%"><img src="docs/screenshots/desktop-dark.png" alt="Dark desktop"><br><b>Dark appearance</b><br>Follow Windows or choose your palette.</td><td width="50%"><img src="docs/screenshots/settings.png" alt="Appearance settings"><br><b>Your interface</b><br>Language, appearance and text scaling.</td></tr>
+<tr><td width="50%"><img src="docs/screenshots/desktop-dark.png" alt="Dark desktop"><br><b>Dark appearance</b><br>Follow your system or choose your palette.</td><td width="50%"><img src="docs/screenshots/settings.png" alt="Appearance settings"><br><b>Your interface</b><br>Language, appearance and text scaling.</td></tr>
 <tr><td><img src="docs/screenshots/library.png" alt="Folders and storage"><br><b>Library and storage</b><br>Destinations and disk capacity within reach.</td><td><img src="docs/screenshots/rename.png" alt="Batch rename"><br><b>Prepare a batch</b><br>Preview filenames before applying changes.</td></tr>
 <tr><td><img src="docs/screenshots/productivity.png" alt="Productivity tools"><br><b>Rules and traffic</b><br>Organize repetitive work and bandwidth.</td><td><img src="docs/screenshots/smart-tools.png" alt="Library health"><br><b>Inspect and recover</b><br>File presence, integrity and failed downloads.</td></tr>
 </table>
@@ -146,4 +157,4 @@ Renderer crashes/hangs trigger bounded interface recovery while the native trans
 
 ### Included sounds and video-tool recovery
 
-Three short original WAV sounds are included for completion, failure and queue completion, with direct preview and custom-file reset. A missing/corrupt extractor can be restored from the pinned official release after checksum verification. The 2.5.4 packaged check fully downloaded and decoded the exact user-supplied YouTube video; site availability and access restrictions still apply. Transfer windows provide explicit cancellation with confirmation. Clicking the tray icon restores the last minimized transfer. [Validation](VALIDATION.md).
+Three short original WAV sounds are included for completion, failure and queue completion, with direct preview and custom-file reset. A missing/corrupt extractor can be restored from the pinned official release after checksum verification. The 2.6.0 packaged check fully downloaded and decoded the exact user-supplied YouTube video; site availability and access restrictions still apply. Transfer windows provide explicit cancellation with confirmation. Clicking the tray icon restores the last minimized transfer. [Validation](VALIDATION.md).

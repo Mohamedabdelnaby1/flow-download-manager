@@ -27,14 +27,14 @@ class SmartTools{
   const duplicates=[...hashes.values()].filter(g=>g.length>1).map(g=>({ids:g.map(d=>d.id),names:g.map(d=>d.name),size:g[0].size,sha256:g[0].sha256,savings:(g.length-1)*g[0].size}));
   return {files,duplicates,totals:{count:files.length,missing:files.filter(d=>d.disk==='missing').length,changed:files.filter(d=>d.disk==='size-changed').length,errors:files.filter(d=>d.status==='error').length,savings:duplicates.reduce((n,g)=>n+g.savings,0)},checkedAt:new Date().toISOString()};
  }
- verify(id,expected=''){return this.run(async()=>{
-  expected=String(expected).trim().toLowerCase();if(expected&&!/^[a-f0-9]{64}$/.test(expected))throw Error('أدخل بصمة SHA-256 من 64 رمزًا');
+ verify(id,expected='',algorithm='sha256'){return this.run(async()=>{
+  if(!['sha256','sha512'].includes(algorithm))throw Error('Choose SHA-256 or SHA-512');expected=String(expected).trim().toLowerCase();if(expected&&!new RegExp('^[a-f0-9]{'+(algorithm==='sha512'?128:64)+'}$').test(expected))throw Error('Invalid '+algorithm.toUpperCase()+' fingerprint; expected '+(algorithm==='sha512'?128:64)+' hexadecimal characters');
   const d=this.service.store.find(id),meta=d&&JSON.parse(d.meta);if(!d||d.status!=='complete'||!meta.filePath)throw Error('اختر ملفًا مكتملًا');
   const controller=new AbortController();this.controllers.add(controller);
-  try{const before=await fs.promises.stat(meta.filePath),hash=crypto.createHash('sha256');
+  try{const before=await fs.promises.stat(meta.filePath),hash=crypto.createHash(algorithm);
    for await(const chunk of fs.createReadStream(meta.filePath,{signal:controller.signal}))hash.update(chunk);
    const after=await fs.promises.stat(meta.filePath);if(before.size!==after.size||before.mtimeMs!==after.mtimeMs)throw Error('تغير الملف أثناء الفحص؛ أعد المحاولة');
-   const sha256=hash.digest('hex'),result={sha256,expectedMatch:expected?sha256===expected:null,baselineMatch:meta.sha256?sha256===meta.sha256:null,bytes:after.size,checkedAt:new Date().toISOString()};
+   const digest=hash.digest('hex'),result={algorithm,digest,[algorithm]:digest,expectedMatch:expected?digest===expected:null,baselineMatch:meta[algorithm]?digest===meta[algorithm]:null,bytes:after.size,checkedAt:new Date().toISOString()};
    const latest=this.service.store.find(id);if(latest){const next=JSON.parse(latest.meta);if(next.filePath===meta.filePath)this.service.store.update(id,{meta:JSON.stringify({...next,verification:result})});}
    return result;
   }finally{this.controllers.delete(controller);}

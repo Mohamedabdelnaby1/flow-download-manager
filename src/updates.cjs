@@ -8,19 +8,20 @@ function versionParts(value){
 }
 function newerVersion(candidate,current){const a=versionParts(candidate),b=versionParts(current);if(!a||!b)return false;for(let n=0;n<3;n++){if(a[n]!==b[n])return a[n]>b[n];}return false;}
 function updateError(code){const error=new Error(code);error.updateCode=code;return error;}
-function releaseInfo(data){
+function releaseInfo(data,platform=process.platform){
  if(!data||data.draft!==false||data.prerelease!==false||!versionParts(data.tag_name)||!Array.isArray(data.assets))throw updateError('invalid-release');
  const tag=data.tag_name,version=versionParts(tag).join('.'),url=REPOSITORY_URL+'/releases/tag/'+encodeURIComponent(tag);
  if(data.html_url!==url)throw updateError('invalid-release');
  const prefix=REPOSITORY_URL+'/releases/download/'+encodeURIComponent(tag)+'/';
  const ready=name=>(data.assets||[]).some(a=>a.name===name&&a.state==='uploaded'&&Number.isFinite(a.size)&&a.size>0&&a.browser_download_url===prefix+name);
  const setup=ready(`Flow-${version}-Setup.exe`),portable=ready(`Flow-${version}-Portable.exe`);
- if(!setup&&!portable)throw updateError('not-ready');
- return {version,tag,url,title:String(data.name||'Flow '+version).replace(/[\u0000-\u001f\u007f]/g,' ').slice(0,180),notes:String(data.body||'').replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f]/g,'').slice(0,12000),publishedAt:typeof data.published_at==='string'?data.published_at:'',setup,portable};
+ const linux=ready(`Flow-${version}-linux-x64.AppImage`)||ready(`Flow-${version}-linux-amd64.deb`)||ready(`Flow-${version}-linux-x86_64.rpm`);
+ if(platform==='linux'?!linux:!setup&&!portable)throw updateError('not-ready');
+ return {version,tag,url,title:String(data.name||'Flow '+version).replace(/[\u0000-\u001f\u007f]/g,' ').slice(0,180),notes:String(data.body||'').replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f]/g,'').slice(0,12000),linux,publishedAt:typeof data.published_at==='string'?data.published_at:'',setup,portable};
 }
 class UpdateChecker{
- constructor({version,store,fetch:fetchRelease=globalThis.fetch,openExternal,onAvailable,now=Date.now,timeout=10000}){
-  Object.assign(this,{version,store,fetch:fetchRelease,openExternal,onAvailable,now,timeout});
+ constructor({version,store,fetch:fetchRelease=globalThis.fetch,openExternal,onAvailable,platform=process.platform,now=Date.now,timeout=10000}){
+  Object.assign(this,{version,store,fetch:fetchRelease,openExternal,onAvailable,platform,now,timeout});
   const saved=store.get('updatePreferences',{});
   this.preferences={enabled:saved.enabled!==false,skippedVersion:versionParts(saved.skippedVersion)?saved.skippedVersion:'',remindAfter:Number.isFinite(saved.remindAfter)?saved.remindAfter:0,lastPromptedVersion:String(saved.lastPromptedVersion||''),lastPromptedAt:Number.isFinite(saved.lastPromptedAt)?saved.lastPromptedAt:0};
   this.status='idle';this.release=null;this.lastChecked=null;this.error='';this.disposed=false;this.etag='';this.cachedRelease=null;
@@ -53,7 +54,7 @@ class UpdateChecker{
     const chunks=[];let size=0;
     for await(const chunk of response.body){size+=chunk.length;if(size>512*1024){this.controller.abort();throw updateError('invalid-release');}chunks.push(Buffer.from(chunk));}
     let data;try{data=JSON.parse(Buffer.concat(chunks).toString('utf8'));}catch{throw updateError('invalid-release');}
-    release=releaseInfo(data);this.cachedRelease=release;this.etag=response.headers.get('etag')||'';
+    release=releaseInfo(data,this.platform);this.cachedRelease=release;this.etag=response.headers.get('etag')||'';
    }
    if(this.disposed)return this.snapshot();
    this.release=release;this.lastChecked=new Date(this.now()).toISOString();this.status=newerVersion(release.version,this.version)?'available':'current';

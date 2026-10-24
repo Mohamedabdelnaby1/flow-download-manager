@@ -195,8 +195,8 @@ class Engine extends EventEmitter {
       }
       if(!q.running||limited)continue;
       const all=this.store.list().filter(d=>d.queueId===q.id),count=all.filter(d=>this.active.has(d.id)).length;
-      for(const d of all.filter(d=>d.status==='queued').sort((a,b)=>(JSON.parse(b.meta).priority||0)-(JSON.parse(a.meta).priority||0)||a.createdAt.localeCompare(b.createdAt)).slice(0,Math.max(0,Math.min(q.simultaneous-count,this.settings().simultaneous-this.active.size))))this.start(d.id).catch(()=>{});
-      if(all.length&&all.every(d=>['complete','error'].includes(d.status))){this.store.putQueue({...q,running:false});this.store.log('queue',`${q.name}: انتهت القائمة`);this.emit('queueComplete',q);if(s.completion==='quit')this.emit('quitRequested');}
+      for(const d of all.filter(d=>d.status==='queued'&&(!JSON.parse(d.meta).yieldUntil||JSON.parse(d.meta).yieldUntil<=Date.now())).sort((a,b)=>(JSON.parse(b.meta).priority||0)-(JSON.parse(a.meta).priority||0)||a.createdAt.localeCompare(b.createdAt)).slice(0,Math.max(0,Math.min(q.simultaneous-count,this.settings().simultaneous-this.active.size))))this.start(d.id).catch(()=>{});
+      if(all.length&&all.every(d=>['complete','error'].includes(d.status))){this.store.putQueue({...q,running:false});this.store.log('queue',`${q.name}: انتهت القائمة`);this.emit('queueComplete',q);if(s.completion==='quit')this.emit('quitRequested');if(s.completion==='shutdown'&&all.every(d=>d.status==='complete'))this.emit('shutdownRequested',q);}
     }
   }
   async finish(ctx){
