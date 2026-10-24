@@ -1,0 +1,47 @@
+name: Windows release packages
+on:
+  workflow_dispatch:
+    inputs:
+      releaseTag:
+        description: Existing draft release tag
+        required: true
+        default: v2.6.0
+permissions:
+  contents: read
+jobs:
+  windows:
+    runs-on: windows-2022
+    timeout-minutes: 25
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.14.0'
+          cache: npm
+      - run: npm ci
+      - name: Source and integration tests
+        run: node --test --test-concurrency=1 test/*.test.cjs
+      - name: Build installer and portable editions
+        run: npm run dist -- --publish never
+      - name: Verify the draft and upload Windows packages
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ inputs.releaseTag }}
+        shell: pwsh
+        run: |
+          $expected="v$(node -p "require('./package.json').version")"
+          if($env:RELEASE_TAG -ne $expected){throw 'Release version mismatch'}
+          if((gh release view $env:RELEASE_TAG --json isDraft --jq .isDraft) -ne 'true'){throw 'Only a draft can receive candidate packages'}
+          $files=Get-ChildItem release -File | Where-Object Name -in @("Flow-$($expected.Substring(1))-Setup.exe","Flow-$($expected.Substring(1))-Portable.exe")
+          if($files.Count -ne 2){throw 'Both Windows editions are required'}
+          $receipt=@($files | ForEach-Object{[pscustomobject]@{name=$_.Name;bytes=$_.Length;sha256=(Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash.ToLowerInvariant()}})
+          $receipt|ConvertTo-Json|Set-Content release/Windows-CI-Packages.json
+          gh release upload $env:RELEASE_TAG @($files.FullName) --clobber
+          if($LASTEXITCODE -ne 0){throw 'Windows upload failed'}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Windows-build-receipt
+          path: release/Windows-CI-Packages.json
+          retention-days: 14
