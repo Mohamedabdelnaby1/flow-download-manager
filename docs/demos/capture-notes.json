@@ -1,0 +1,40 @@
+{
+  "application": "Flow Download Manager",
+  "version": "2.7.1",
+  "format": "Three independent looping GIF screen recordings",
+  "capture": "Continuous captures of the installed application, using real mouse and keyboard input. The pointer is a synchronized recording overlay. Tool windows are placed over the captured workspace; application controls and transitions are not recreated.",
+  "demonstrationLibrary": true,
+  "isolatedProfile": true,
+  "controlledLocalDownloadBytes": 3145728,
+  "realTransferCompleted": true,
+  "internetSpeedBenchmark": false,
+  "clips": [
+    {
+      "name": "tools-live",
+      "title": "Find and pin a tool",
+      "frames": 116,
+      "width": 960,
+      "height": 608,
+      "durationSeconds": 11.58,
+      "bytes": 288703
+    },
+    {
+      "name": "appearance-live",
+      "title": "Change appearance and save",
+      "frames": 130,
+      "width": 960,
+      "height": 608,
+      "durationSeconds": 12.91,
+      "bytes": 358368
+    },
+    {
+      "name": "download-live",
+      "title": "Resume a real download and watch it finish",
+      "frames": 217,
+      "width": 960,
+      "height": 608,
+      "durationSeconds": 21.68,
+      "bytes": 419881
+    }
+  ]
+}

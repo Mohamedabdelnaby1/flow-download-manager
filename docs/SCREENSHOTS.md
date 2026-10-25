@@ -1,4 +1,23 @@
-# Inside Flow 2.7
+# Inside Flow
+
+## Three tasks, three live GIFs
+
+### Search and pin a tool
+
+![Actual continuous usage: type a search, pin a tool and see its toolbar shortcut](demos/tools-live.gif)
+
+### Resume and finish a download
+
+![Actual continuous usage: open a paused task, resume it and watch it reach completion](demos/download-live.gif)
+
+### Change your appearance
+
+![Actual continuous usage: choose light appearance and save preferences](demos/appearance-live.gif)
+
+These are three separate continuous recordings of actual mouse and keyboard actions in the installed Flow 2.7.1 application. The cursor is a synchronized recording overlay; tool windows are placed over the captured workspace. Library records are demonstration data in an isolated profile. The download GIF records a completed 3 MiB local fixture and is not an internet-speed comparison. [Capture notes](demos/capture-notes.json).
+
+<details>
+<summary><b>Reference stills — light, dark and Arabic RTL</b></summary>
 
 [Download](../README.md#choose-your-flow) · [Tools guide](TOOLS.md) · [Validation](../VALIDATION.md)
 
@@ -35,3 +54,5 @@ Accent colors, density, corners, motion, fonts, toolbar labels and columns. Save
 The source capture check passed 45 appearance/localization checks. Browser panel tests use controlled browser-API fixtures and are documented separately. Native Messaging, actual browser installation, public video transfers and installer tests have separate evidence; a gallery image does not stand in for those checks.
 
 Older version captures remain in the parent screenshots folder for historical validation links. [Current capture notes](screenshots/v2.7/capture-notes.json).
+
+</details>

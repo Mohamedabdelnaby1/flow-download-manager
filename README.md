@@ -1,170 +1,120 @@
 <div align="center">
 
-<img src="docs/hero.svg" width="100%" alt="Flow Download Manager — Less friction. More flow.">
+<img src="docs/brand/hero.png" width="100%" alt="Flow Download Manager — Downloads. On your terms. Created by mohamed abdelnaby.">
 
-**A calmer home for your downloads.**
+<a href="https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/download/v2.7.1/Flow-2.7.1-Setup.exe"><img src="docs/brand/download-setup.svg" width="322" alt="Download Flow for Windows — Setup, updates your installed copy"></a> <a href="https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/download/v2.7.1/Flow-2.7.1-Portable.exe"><img src="docs/brand/download-portable.svg" width="238" alt="Download Portable — Run without installing"></a> <a href="https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/download/v2.7.1/Flow-Companion-2.7.1.zip"><img src="docs/brand/download-companion.svg" width="266" alt="Get the browser extension for Chrome, Edge and Brave"></a>
 
-Browser capture, playlists, torrents, queues and useful file tools — in one customizable Windows workspace.
+[Explore the tools](docs/TOOLS.md) · [Browser setup](BROWSER-INTEGRATION.md) · [Full gallery](docs/SCREENSHOTS.md) · [What's new](CHANGELOG.md) · [Report a problem](https://github.com/Mohamedabdelnaby1/flow-download-manager/issues/new?template=bug_report.yml)
 
-[Download](#choose-your-flow) · [Explore the tools](#more-than-a-download-list) · [Browser setup](BROWSER-INTEGRATION.md) · [Gallery](docs/SCREENSHOTS.md) · [Build it](docs/DEVELOPMENT.md)
+[![Latest release](https://img.shields.io/github/v/release/Mohamedabdelnaby1/flow-download-manager?style=flat-square&color=c7ff5e&labelColor=141c31)](https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/latest) [![MIT source](https://img.shields.io/badge/source-MIT-aa95ff?style=flat-square&labelColor=141c31)](LICENSE) ![Windows 10 and 11 x64](https://img.shields.io/badge/Windows-10%20%2F%2011%20x64-62e3fa?style=flat-square&labelColor=141c31) ![English and Arabic](https://img.shields.io/badge/English%20%2B%20Arabic-RTL%20ready-ff947f?style=flat-square&labelColor=141c31)
 
-![Windows x64](https://img.shields.io/badge/Windows_10_%2F_11-x64-397e6d?style=flat-square) [![MIT source](https://img.shields.io/badge/Source-MIT-75609a?style=flat-square)](LICENSE) ![English and Arabic](https://img.shields.io/badge/English_%2B_Arabic-RTL_ready-896b39?style=flat-square) [![Release](https://img.shields.io/github/v/release/Mohamedabdelnaby1/flow-download-manager?style=flat-square&color=397e6d)](https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/latest)
+**Free to use. Open to improve. Built around your workflow.**
 
 </div>
 
-<img src="docs/screenshots/v2.7/workspace-light.png" width="100%" alt="The actual Flow 2.7 workspace in light mode, with pinned tools and demonstration downloads">
+<img src="docs/brand/chapter-motion.svg" width="100%" alt="01 — See Flow in motion. Real application, real controls.">
 
-<p align="center"><sub>Actual application captures with demonstration records. Light, dark and Arabic layouts share the same workspace.</sub></p>
+### Find it. Pin it. Keep it close.
 
-## Choose your Flow
+<a href="docs/demos/tools-live.gif"><img src="docs/demos/tools-live.gif" width="100%" alt="Continuous screen recording: search for a media tool, click its pin and see the new toolbar shortcut"></a>
 
-**Free to use. Open to inspect, modify and improve.** No paid edition is required to unlock the tools below.
+<p align="center"><sub>A real mouse-and-keyboard workflow in Flow 2.7.1. Each GIF on this page is a separate, continuously recorded task.</sub></p>
 
-| Edition | Install | Run without installing | Download size |
-| :--- | :--- | :--- | :--- |
-| **Complete** · retained compatibility choice | [Windows setup](https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/download/v2.7.1/Flow-2.7.1-Setup.exe) | [Portable](https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/download/v2.7.1/Flow-2.7.1-Portable.exe) | 148.1 / 147.9 MB |
-| **Compact Preview** · optional smaller host | [Compact setup](https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/download/v2.7.1/Flow-2.7.1-Compact-Preview-Setup.exe) | [Compact portable](https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/download/v2.7.1/Flow-2.7.1-Compact-Preview-Portable.exe) | **59.5 / 62.1 MB** |
+<a id="more-than-a-download-list"></a>
+<table><tr>
+<td width="33%"><a href="FEATURES.md"><img src="docs/brand/feature-capture.svg" width="100%" alt="Capture — browser handoff, playlists and torrents"></a></td>
+<td width="33%"><a href="docs/TOOLS.md"><img src="docs/brand/feature-control.svg" width="100%" alt="Control — transfer limits, queues and pinned tools"></a></td>
+<td width="33%"><a href="docs/STABILITY.md"><img src="docs/brand/feature-recover.svg" width="100%" alt="Recover — valid partial files, readable errors and file tools"></a></td>
+</tr></table>
 
-[All release files](https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/tag/v2.7.1) · [SHA-256 checksums](https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/download/v2.7.1/SHA256SUMS.txt) · [Companion extension](https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/download/v2.7.1/Flow-Companion-2.7.1.zip) · [Source ZIP](https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/download/v2.7.1/Flow-2.7.1-Source.zip)
+**Capture** browser downloads, website videos, playlists, torrents and magnet links. **Control** how many files and connections run, choose queues and pin up to eight tools. **Recover and organize** with resume, integrity checks, clear errors, tags and file tools. [Explore the full toolkit →](docs/TOOLS.md)
 
-Compact Preview keeps the same interface, complete official Node runtime, full FFmpeg, aria2 and video-extraction tools. It uses **shared Microsoft WebView2 and .NET Framework 4.8**, which are not part of the reported download size. It is an optional preview, with [its own compatibility and validation notes](docs/COMPACT-WINDOWS-PREVIEW.md). The complete edition remains available.
+<a id="choose-your-flow"></a>
+<img src="docs/brand/chapter-downloads.svg" width="100%" alt="02 — Pick your Flow. One complete toolkit, two hosts.">
 
-Windows 10/11 **64-bit**. Windows 7/8/8.1 are unsupported. Linux packages are deferred. Executables are currently unsigned; see [publisher verification](docs/WINDOWS-SIGNING.md).
+### Complete · the main Windows edition
 
-<img src="docs/brand/workflow.svg" width="100%" alt="Capture a link. Choose quality, destination and limits. Carry on while Flow handles the queue.">
+Everything bundled in the Electron edition. **Setup: 148.1 MB · Portable: 147.9 MB.**
 
-## More than a download list
+[![Download Windows Setup](https://img.shields.io/badge/%E2%86%93_Download-Setup-c7ff5e?style=for-the-badge&labelColor=141c31)](https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/download/v2.7.1/Flow-2.7.1-Setup.exe) [![Download Portable](https://img.shields.io/badge/%E2%86%93_Download-Portable-62e3fa?style=for-the-badge&labelColor=141c31)](https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/download/v2.7.1/Flow-2.7.1-Portable.exe)
 
-<table>
-<tr>
-<td width="33%" valign="top">
+### Compact Preview · a smaller optional host
 
-### Capture & download
+The same interface and full Node, FFmpeg, aria2 and video-extraction tools, using shared **Microsoft WebView2 + .NET Framework 4.8**. These system prerequisites are outside the reported download size. This remains an optional preview. [Compare editions →](docs/COMPACT-WINDOWS-PREVIEW.md)
 
-- Segmented HTTP/HTTPS and FTP resume.
-- Browser handoff with a separate confirmation window.
-- Website video qualities and audio merging.
-- YouTube playlist selection and duplicate skipping.
-- Torrents, magnet links and file selection.
-- Verified mirrors for the same file.
+<a href="https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/download/v2.7.1/Flow-2.7.1-Compact-Preview-Setup.exe"><img src="docs/brand/download-compact.svg" width="320" alt="Download Compact Preview Setup — 59.5 MB"></a> <a href="https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/download/v2.7.1/Flow-2.7.1-Compact-Preview-Portable.exe"><img src="docs/brand/compact-portable.svg" width="320" alt="Download Compact Preview Portable — 62.1 MB"></a>
 
-</td>
-<td width="33%" valign="top">
+**Updating? Use Setup to replace the existing installation.** Portable opens separately. Exit Flow from the tray before updating. [Update walkthrough](docs/UPDATING.md) · [All release files](https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/latest) · [Checksums](https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/download/v2.7.1/SHA256SUMS.txt)
 
-### Organize & recover
+<img src="docs/brand/chapter-workspace.svg" width="100%" alt="03 — A workspace that feels like you. Light, dark and six accent palettes.">
 
-- Favorite folders, tags and saved views.
-- Batch rename with a preview.
-- Move completed files with verification.
-- Recovery bin and duplicate-task cleanup.
-- SHA-256/SHA-512 integrity checks.
-- Verified expired-link rescue where supported.
+### See it move. Stay in control.
 
-</td>
-<td width="33%" valign="top">
+<a href="docs/demos/download-live.gif"><img src="docs/demos/download-live.gif" width="100%" alt="Continuous screen recording: open a paused task, click Resume and watch a real local transfer reach 100 percent"></a>
 
-### Make it yours
+Progress, speed, remaining time, pause, cancel and tray access. Details are there when you need them.
 
-- Pin up to eight tools on the toolbar.
-- Set file and connection limits in two fields.
-- Schedule queues, traffic and completion actions.
-- Six accent palettes, density and fonts.
-- Light, dark or system appearance.
-- English and Arabic RTL, including tool windows.
+### Same Flow. Your atmosphere.
 
-</td>
-</tr>
-</table>
+<a href="docs/demos/appearance-live.gif"><img src="docs/demos/appearance-live.gif" width="100%" alt="Continuous screen recording: open preferences, select light appearance and save it"></a>
 
-The toolkit also includes selective ZIP extraction, media conversion/trim, link inspection, organization rules, local-network phone control and safe configuration backup. Find a task through **Tools** or **Ctrl+K**; advanced controls stay collapsed. [Simple tools guide →](docs/TOOLS.md)
+Choose your accent, density, corners, fonts, columns and motion. Follow your system or keep your own appearance.
 
-<table>
-<tr>
-<td width="58%" valign="top"><img src="docs/screenshots/v2.7/tools.png" width="100%" alt="Searchable Flow tools with individual pin buttons"><br><b>The right tool, close at hand.</b><br>Search by task. Pin what you use. Keep the rest out of your way.</td>
-<td width="42%" valign="top"><img src="docs/screenshots/v2.7/personalize.png" width="100%" alt="Appearance controls for accent color, density, corners, motion and fonts"><br><b>Your workspace, your style.</b><br>Preview a calmer palette and choose the amount of detail you want.</td>
-</tr>
-</table>
+<p align="center"><sub>Recorded in an isolated example library, with a synchronized cursor overlay. The transfer GIF shows a completed 3 MiB local download; it is not an internet-speed benchmark. <a href="docs/demos/capture-notes.json">Capture notes</a>.</sub></p>
 
-## Downloads should stay out of your way
+<details>
+<summary><b>Open the full toolkit</b> — useful tools, without a crowded workspace</summary>
 
-Transfer and completion windows keep the essentials close: progress, speed, time remaining and useful actions. Details stay available when you need them.
+| Download | Organize | Make it yours |
+| :--- | :--- | :--- |
+| Segmented HTTP/HTTPS and FTP resume | Favorite folders, tags and saved views | Up to eight pinned tool shortcuts |
+| Browser handoff with a separate confirmation | Batch rename with a preview | Simple file and connection limits |
+| Website qualities, audio merging and playlists | Verified moves and integrity checks | Six accents and layout preferences |
+| Torrents, magnets and file selection | Recovery bin and duplicate cleanup | Light, dark and system appearance |
+| Verified same-file mirrors | Selective ZIP and local media tools | English and Arabic RTL |
 
-<table>
-<tr>
-<td width="55%" valign="top"><img src="docs/screenshots/v2.7/transfer.png" width="100%" alt="A real controlled download in Flow's compact transfer window"><br><b>See the progress. Keep the control.</b><br>Pause, cancel or send the transfer to the tray.</td>
-<td width="45%" valign="top"><img src="docs/screenshots/v2.7/complete.png" width="100%" alt="The same controlled download's completion window"><br><b>Done, without the clutter.</b><br>Open the file or jump straight to its folder.</td>
-</tr>
-</table>
+Also included: queue scheduling, completion actions with cancellable shutdown, expired-link rescue where identity can be verified, local-network phone control, organization rules and safe configuration backup. Open **Tools** or press **Ctrl+K**. Advanced controls stay collapsed. [Tool guide →](docs/TOOLS.md)
 
-- Start quietly with Windows and stay in the system tray.
-- See transferred bytes and speed from the tray.
-- Restore the last minimized transfer instead of losing it behind the main app.
-- Recover the interface around an independent transfer service.
-- Read a clear error explanation, then open technical details only if needed.
+</details>
 
-Use **Exit Flow** when you intentionally want to stop the service. Closing or minimizing a window is separate from exiting the application. [Startup and stability →](docs/STABILITY.md)
+<details>
+<summary><b>Arabic RTL, static screenshots and full-size views</b></summary>
 
-## At home in light, dark and Arabic
+![Flow in Arabic RTL](docs/screenshots/v2.7/workspace-arabic.png)
 
-<table>
-<tr>
-<td width="50%"><img src="docs/screenshots/v2.7/workspace-dark.png" width="100%" alt="Flow's dark workspace in English"><br><b>Quiet after dark.</b><br>Follow your system or keep your own preference.</td>
-<td width="50%"><img src="docs/screenshots/v2.7/workspace-arabic.png" width="100%" alt="Flow's actual Arabic right-to-left workspace"><br><b>A complete RTL workspace.</b><br>Navigation, tools and transfer windows follow your language.</td>
-</tr>
-</table>
+[Open the complete gallery →](docs/SCREENSHOTS.md)
 
-[See the complete gallery →](docs/SCREENSHOTS.md)
+</details>
 
-## Get started
+### Get connected in three steps
 
-1. Download an edition above and open Flow.
-2. Paste a link with **New download**. Choose a destination and start now or queue it for later.
-3. For browser capture, open **Browser integration**, prepare the native connection and enable the companion once. Chrome, Edge and Brave use the same companion. [Walkthrough →](BROWSER-INTEGRATION.md)
-4. Pin your usual tools and choose **Download limits** if you want fewer simultaneous transfers.
+1. **Open Flow.** Paste a link into **New download**, choose a destination and start or queue it.
+2. **Connect the browser.** Open **Browser integration**, prepare the connection and load the companion once in Chrome, Edge or Brave. [Illustrated instructions →](BROWSER-INTEGRATION.md)
+3. **Make it comfortable.** Pin your usual tools, set your download limits and pick an appearance.
 
-The local extension currently needs one manual **Load unpacked** step because it is not published in a browser store. Native integration registers a host for your Windows user. Portable editions keep their data in your Windows profile; they are not zero-footprint USB applications.
+The companion currently needs a manual **Load unpacked** step because it is not in a browser store. Portable editions save data in your Windows profile; they are not zero-footprint USB applications.
 
-Before updating, exit the running edition from its tray menu. Your library, settings and downloaded files are retained by the normal upgrade. Do not open two editions against the same library simultaneously.
+<img src="docs/brand/chapter-open.svg" width="100%" alt="04 — Built in the open. MIT source, clear documentation and contributions.">
 
-**Updating an installed copy? Choose Setup.** Portable runs separately and does not update an existing installation. The in-app update notice opens the release page; it does not install the update automatically. [Upgrade walkthrough →](docs/UPDATING.md)
+Flow is an independent, AI-assisted project by **mohamed abdelnaby**. The original source is **MIT licensed**; dependencies retain their own licenses. Flow has no affiliation with IDM and contains no Tonec binaries.
 
-## Built in the open
-
-Flow is an independent, AI-assisted development project by **mohamed abdelnaby**. It is not a redistribution of IDM, contains no Tonec binaries and has no affiliation with IDM.
-
-The original Flow source is MIT licensed. Dependencies retain their own licenses and source/distribution obligations. [Third-party notices](THIRD-PARTY-NOTICES.md) · [Copyright](COPYRIGHT.md)
-
-```powershell
-npm ci
-npm run native
-npm test
-npm start
-```
-
-Build the complete Windows editions with `npm run dist`. The optional compact build has a separate reproducible pipeline with verified official inputs. [Development and architecture →](docs/DEVELOPMENT.md)
-
-| Understand the project | Help improve it |
+| Explore | Build & contribute |
 | :--- | :--- |
-| [Changelog](CHANGELOG.md) · [Validation evidence](VALIDATION.md) | [Report a bug](https://github.com/Mohamedabdelnaby1/flow-download-manager/issues/new?template=bug_report.yml) |
-| [Feature reference](FEATURES.md) · [Known boundaries](docs/LIMITATIONS.md) | [Request a feature](https://github.com/Mohamedabdelnaby1/flow-download-manager/issues/new?template=feature_request.yml) |
-| [Research and feature audit](docs/FDM-FEATURE-AUDIT.md) | [Contributing](CONTRIBUTING.md) · [Security](SECURITY.md) |
+| [Feature reference](FEATURES.md) · [Changelog](CHANGELOG.md) | [Development guide](docs/DEVELOPMENT.md) · [Source ZIP](https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/download/v2.7.1/Flow-2.7.1-Source.zip) |
+| [Validation evidence](VALIDATION.md) · [Known boundaries](docs/LIMITATIONS.md) | [Report a bug](https://github.com/Mohamedabdelnaby1/flow-download-manager/issues/new?template=bug_report.yml) · [Suggest a feature](https://github.com/Mohamedabdelnaby1/flow-download-manager/issues/new?template=feature_request.yml) |
+| [Privacy and security](SECURITY.md) · [Third-party notices](THIRD-PARTY-NOTICES.md) | [Contributing](CONTRIBUTING.md) · [MIT license](LICENSE) |
 
-### A few honest boundaries
+<details>
+<summary><b>Compatibility, validation and current limits</b></summary>
 
-No download manager can guarantee a fixed speed increase or support for every website. Flow does not decrypt DRM. Access-controlled sites can require authentication or block extraction. The updater currently announces releases and opens the official download page; unattended install/rollback is not included. Cross-device sync, playlist subscriptions and general ZIP/7Z/RAR auto-extraction remain future work.
+Windows 10/11 x64. Windows 7/8/8.1 are unsupported, Linux packages are deferred, and executables remain unsigned. [Publisher signing](docs/WINDOWS-SIGNING.md).
 
-Validation distinguishes service tests, actual UI checks, controlled transfers, installed upgrades and exact release-file verification. A screenshot or a passing fixture is not proof of every website, computer or browser profile.
+Both 2.7.1 package jobs passed 250 source tests. The actual installed upgrade preserved its library, settings and two completed-file hashes. Compact Preview has separate payload and native integration evidence. The 170-check UI baseline describes 2.7.0's unchanged interface. [Read the exact results →](VALIDATION.md)
 
-<div align="center">
+Website restrictions, authentication and extractor changes can affect downloads. Flow does not decrypt DRM or promise a fixed speed multiplier. The updater announces releases and opens the official page; unattended installation/rollback, playlist subscriptions, general ZIP/7Z/RAR auto-extraction and cross-device sync remain future work.
 
-<br>
+</details>
 
-<img src="ui/logo.svg" width="38" alt="Flow">
+<a href="https://www.facebook.com/mohamedabdelnaby190"><img src="docs/brand/footer.svg" width="100%" alt="Made to keep you in flow. Designed and built by mohamed abdelnaby."></a>
 
-**Less friction. More flow.**
-
-Designed & built by [**mohamed abdelnaby**](https://www.facebook.com/mohamedabdelnaby190)
-
-[GitHub](https://github.com/Mohamedabdelnaby1) · [Facebook](https://www.facebook.com/mohamedabdelnaby190) · [MIT License](LICENSE)
-
-</div>
+<p align="center"><a href="https://github.com/Mohamedabdelnaby1">GitHub</a> · <a href="https://www.facebook.com/mohamedabdelnaby190">Facebook</a> · <a href="LICENSE">MIT License</a></p>
