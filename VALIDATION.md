@@ -1,3 +1,24 @@
+# Validation - Flow 2.7.1 maintenance
+
+Checks dated 25 October 2026. This update changes Windows browser-configuration replacement and version metadata; the 2.7 interface and transfer implementation are unchanged.
+
+| Gate | Result | Evidence |
+| --- | --- | --- |
+| Windows source suite in both package jobs | **250 passed, 0 failed** per job | [Complete CI](https://github.com/Mohamedabdelnaby1/flow-download-manager/actions/runs/40188878790), [Compact CI](https://github.com/Mohamedabdelnaby1/flow-download-manager/actions/runs/40188880958) |
+| Existing protected configuration reproduction and focused error/security checks | Failed before fix; **31 passed** after fix | [Regression](docs/validation/bridge-regression-v2.7.1.json) |
+| Exact GitHub-built normal installer on the actual existing installation | Updated in the same machine-wide location; **one registration**, two library records and two completed-file SHA-256 values preserved | [Installed upgrade](docs/validation/installed-upgrade-v2.7.1.json) |
+| Same installed payload: browser repair, native handoff, startup and tray | Existing configuration replaced twice; real framed Native Messaging handshake; preferences/startup/tray retained | [Installed upgrade](docs/validation/installed-upgrade-v2.7.1.json) |
+| Exact downloaded compact setup payload | **3,135 hashes match; 10 preservation checks** | [Payload](docs/validation/compact-payload-v2.7.1.json) |
+| Same compact payload: native startup, sounds, browser reopening and verified bytes | **14 passed** | [Integration](docs/validation/compact-integration-v2.7.1.json) |
+
+The installed maintenance exercise used the real normal installer, retained an encrypted library backup, and did not interrupt active downloads. The first immediate health response preceded tray initialization; the later browser/startup check verified the tray was ready. Windows was not rebooted. Compact extraction emitted the NSIS executable-tail warning; every manifest-listed file matched.
+
+The full 170-check interface and compact portable lifecycle suites below describe 2.7.0, whose UI and portable-launcher code are unchanged by this focused fix. They are not presented as newly repeated 2.7.1 checks. The build commit is `10258e6b10e115b7047aa98f2dbced8d5524c662`; later documentation/evidence changes do not alter production code. Executables remain unsigned; Compact Preview remains optional.
+
+[How to update an installed copy](docs/UPDATING.md)
+
+---
+
 # Validation - Flow 2.7.0
 
 Checks dated 25 October 2026. The complete Windows edition is retained; Compact Preview is an additional optional host. Results describe bounded scenarios, not universal device, website or performance parity.

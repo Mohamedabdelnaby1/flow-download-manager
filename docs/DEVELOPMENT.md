@@ -19,7 +19,7 @@ npm start
 npm run dist
 ```
 
-Outputs: `release/Flow-2.7.0-Setup.exe` and `release/Flow-2.7.0-Portable.exe`. `npm run pack` creates an unpacked app. Runtime/dependencies are pinned in the lockfile; `npmRebuild: false` preserves the Realm distribution used here.
+Outputs: `release/Flow-2.7.1-Setup.exe` and `release/Flow-2.7.1-Portable.exe`. `npm run pack` creates an unpacked app. Runtime/dependencies are pinned in the lockfile; `npmRebuild: false` preserves the Realm distribution used here.
 
 The official independent `vendor/yt-dlp.exe` has version, SHA-256 and licenses in `vendor/`. Verify hashes and update notices when replacing it. Electron supplies the JavaScript runtime; FFmpeg comes from `ffmpeg-static`. End users need no separate Node or Python installation.
 

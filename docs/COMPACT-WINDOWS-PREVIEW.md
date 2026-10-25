@@ -21,7 +21,16 @@ to obtain the smaller package. Apple Realm build files are excluded from this
 Windows-only candidate. Android Realm development archives are also omitted;
 the actual Windows Realm native addon is retained.
 
-## Evidence recorded locally on 25 October 2026
+## 2.7.1 maintenance update
+
+The optional 2.7.1 setup is 59,474,834 bytes and portable is 62,122,754 bytes.
+Both retain the same complete tools. The maintenance fix updates an existing
+encrypted browser configuration under Windows PowerShell. Both build jobs passed
+250 source checks; the exact compact setup payload passed all 3,135 manifest
+hashes, ten tool-preservation checks and 14 native integration checks.
+[Maintenance evidence](../VALIDATION.md).
+
+## 2.7.0 baseline evidence recorded on 25 October 2026
 
 - 249 service regression tests passed independently in both Windows CI jobs.
 - All 21 tool destinations opened and rendered in the native host.

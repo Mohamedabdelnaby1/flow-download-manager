@@ -1,0 +1,21 @@
+{
+  "passed": 14,
+  "checks": [
+    "first launch preserves Unicode/spaces and queued-download command",
+    "background launch has a connected independent engine",
+    "startup registration is enabled in an isolated QA key",
+    "startup registration can be disabled again",
+    "second launch forwards its download to the same backend",
+    "bundled complete sound executes",
+    "bundled error sound executes",
+    "bundled queue sound executes",
+    "real Native Messaging handshake connects without registering over the user browser",
+    "UI process can terminate while the backend remains available",
+    "browser download reopens a background UI around the existing backend",
+    "browser handoff creates a pending confirmation instead of losing the link",
+    "confirmed browser transfer completes byte-for-byte",
+    "Exit Flow closes both UI and service cleanly"
+  ],
+  "bytes": 2097152,
+  "installed": false
+}

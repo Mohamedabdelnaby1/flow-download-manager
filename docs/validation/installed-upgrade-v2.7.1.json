@@ -1,0 +1,21 @@
+{
+  "version": "2.7.1",
+  "realUserInstallation": true,
+  "installedInSameLocation": true,
+  "registeredInstallations": 1,
+  "preservedLibraryRecords": 2,
+  "completedFileSHA256Verified": 2,
+  "allExistingSettingsPreserved": true,
+  "encryptedLibraryBackupCreated": true,
+  "activeDownloadsInterrupted": false,
+  "initialTrayMeasurement": false,
+  "finalTrayResident": true,
+  "startupEnabled": true,
+  "existingBrowserConfigurationUpdatedTwice": true,
+  "companionVersion": "2.7.1",
+  "realNativeHandshake": true,
+  "noAdditionalDownloadTasksCreated": true,
+  "installerBytes": 148108960,
+  "installerSHA256": "dc10ad8754e6e67838d684ecd9bc6c3ccdcfeb941e696ac74e4ba6409b1dd675",
+  "windowsRebooted": false
+}

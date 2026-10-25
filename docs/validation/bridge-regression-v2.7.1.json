@@ -1,0 +1,18 @@
+{
+  "version": "2.7.1",
+  "reproducedBeforeFix": true,
+  "realWindowsPowerShell": true,
+  "isolatedUnicodeProfile": true,
+  "existingConfigurationReplaced": true,
+  "credentialsRemainProtected": true,
+  "noTemporaryFilesRemain": true,
+  "focusedSourceChecks": {
+    "passed": 31,
+    "failed": 0
+  },
+  "ciSourceChecksPerBuild": {
+    "passed": 250,
+    "failed": 0
+  },
+  "uiAndTransferCodeUnchangedFrom": "2.7.0"
+}

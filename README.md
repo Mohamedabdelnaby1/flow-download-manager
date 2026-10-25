@@ -22,10 +22,10 @@ Browser capture, playlists, torrents, queues and useful file tools — in one cu
 
 | Edition | Install | Run without installing | Download size |
 | :--- | :--- | :--- | :--- |
-| **Complete** · retained compatibility choice | [Windows setup](https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/download/v2.7.0/Flow-2.7.0-Setup.exe) | [Portable](https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/download/v2.7.0/Flow-2.7.0-Portable.exe) | 146.8 / 146.6 MB |
-| **Compact Preview** · optional smaller host | [Compact setup](https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/download/v2.7.0/Flow-2.7.0-Compact-Preview-Setup.exe) | [Compact portable](https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/download/v2.7.0/Flow-2.7.0-Compact-Preview-Portable.exe) | **59.5 / 62.1 MB** |
+| **Complete** · retained compatibility choice | [Windows setup](https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/download/v2.7.1/Flow-2.7.1-Setup.exe) | [Portable](https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/download/v2.7.1/Flow-2.7.1-Portable.exe) | 148.1 / 147.9 MB |
+| **Compact Preview** · optional smaller host | [Compact setup](https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/download/v2.7.1/Flow-2.7.1-Compact-Preview-Setup.exe) | [Compact portable](https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/download/v2.7.1/Flow-2.7.1-Compact-Preview-Portable.exe) | **59.5 / 62.1 MB** |
 
-[All release files](https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/tag/v2.7.0) · [SHA-256 checksums](https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/download/v2.7.0/SHA256SUMS.txt) · [Companion extension](https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/download/v2.7.0/Flow-Companion-2.7.0.zip) · [Source ZIP](https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/download/v2.7.0/Flow-2.7.0-Source.zip)
+[All release files](https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/tag/v2.7.1) · [SHA-256 checksums](https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/download/v2.7.1/SHA256SUMS.txt) · [Companion extension](https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/download/v2.7.1/Flow-Companion-2.7.1.zip) · [Source ZIP](https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/download/v2.7.1/Flow-2.7.1-Source.zip)
 
 Compact Preview keeps the same interface, complete official Node runtime, full FFmpeg, aria2 and video-extraction tools. It uses **shared Microsoft WebView2 and .NET Framework 4.8**, which are not part of the reported download size. It is an optional preview, with [its own compatibility and validation notes](docs/COMPACT-WINDOWS-PREVIEW.md). The complete edition remains available.
 
@@ -125,6 +125,8 @@ Use **Exit Flow** when you intentionally want to stop the service. Closing or mi
 The local extension currently needs one manual **Load unpacked** step because it is not published in a browser store. Native integration registers a host for your Windows user. Portable editions keep their data in your Windows profile; they are not zero-footprint USB applications.
 
 Before updating, exit the running edition from its tray menu. Your library, settings and downloaded files are retained by the normal upgrade. Do not open two editions against the same library simultaneously.
+
+**Updating an installed copy? Choose Setup.** Portable runs separately and does not update an existing installation. The in-app update notice opens the release page; it does not install the update automatically. [Upgrade walkthrough →](docs/UPDATING.md)
 
 ## Built in the open
 
