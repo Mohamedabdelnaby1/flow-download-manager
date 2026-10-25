@@ -20,8 +20,12 @@ jobs:
       - name: Download and verify the upstream runtime source
         shell: pwsh
         run: |
-          Invoke-WebRequest https://nodejs.org/dist/v22.14.0/node-v22.14.0.tar.xz -OutFile runtime-source.tar.xz
-          if((Get-FileHash runtime-source.tar.xz -Algorithm SHA256).Hash.ToLowerInvariant() -ne 'c609946bf793b55c7954c26582760808d54c16185d79cb2fb88065e52de21914'){throw 'Upstream Node source digest mismatch'}
+          $verified=$false
+          foreach($url in @('https://nodejs.org/dist/v22.14.0/node-v22.14.0.tar.xz','https://registry.npmmirror.com/-/binary/node/v22.14.0/node-v22.14.0.tar.xz')){
+            curl.exe -4 --connect-timeout 20 --max-time 90 --fail --location $url --output runtime-source.tar.xz
+            if($LASTEXITCODE -eq 0 -and (Get-FileHash runtime-source.tar.xz -Algorithm SHA256).Hash.ToLowerInvariant() -eq 'c609946bf793b55c7954c26582760808d54c16185d79cb2fb88065e52de21914'){$verified=$true;break}
+          }
+          if(!$verified){throw 'Could not download the exact verified upstream Node source'}
           tar -xf runtime-source.tar.xz
       - name: Compile the same runtime with the supported interface locales
         shell: cmd
