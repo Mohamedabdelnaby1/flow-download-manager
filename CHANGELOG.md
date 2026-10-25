@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.7.1
+
+- Fix replacement of an existing encrypted browser-bridge configuration on Windows PowerShell during upgrades and reconnects. Preserve atomic writes and protected tokens instead of treating a missing backup path as an empty filename.
+- Add a real Windows regression that creates the configuration, updates it in a Unicode profile path, checks protected credentials and verifies temporary-file cleanup. Existing 2.7 interface and download tools are retained.
+
 ## 2.7.0
 
 - Pin and reorder up to eight tools on the main toolbar; shortcuts open the actual tool, and unpinning preserves its settings.

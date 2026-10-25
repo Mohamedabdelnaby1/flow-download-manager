@@ -11,7 +11,9 @@ $protected=[Convert]::ToBase64String([Security.Cryptography.ProtectedData]::Prot
 $target=[string]$c.configFile
 $out=@{address=$c.address;extensionId=$c.extensionId;executable=$c.executable;arguments=$c.arguments;protectedToken=$protected}
 $temp=$target+'.'+[Guid]::NewGuid().ToString('N')+'.tmp'
-try{[IO.File]::WriteAllText($temp,($out|ConvertTo-Json -Compress),(New-Object Text.UTF8Encoding($false)));if([IO.File]::Exists($target)){[IO.File]::Replace($temp,$target,$null)}else{[IO.File]::Move($temp,$target)}}finally{if([IO.File]::Exists($temp)){[IO.File]::Delete($temp)}}
+# Windows PowerShell binds $null to an empty string for this string parameter.
+# NullString preserves a real null backup path for atomic File.Replace.
+try{[IO.File]::WriteAllText($temp,($out|ConvertTo-Json -Compress),(New-Object Text.UTF8Encoding($false)));if([IO.File]::Exists($target)){[IO.File]::Replace($temp,$target,[System.Management.Automation.Language.NullString]::Value)}else{[IO.File]::Move($temp,$target)}}finally{if([IO.File]::Exists($temp)){[IO.File]::Delete($temp)}}
 `;
 async function configure(config,options={}){const exe=systemFile('WindowsPowerShell/v1.0/powershell.exe',options.env);return (options.run||run)(exe,['-NoLogo','-NoProfile','-NonInteractive','-EncodedCommand',Buffer.from(configureScript,'utf16le').toString('base64')],JSON.stringify(config));}
 async function register(manifest,host,options={}){const exe=systemFile('reg.exe',options.env);for(const browser of ['Google\\Chrome','Microsoft\\Edge','BraveSoftware\\Brave-Browser','Chromium'])await (options.run||run)(exe,['ADD',`HKCU\\Software\\${browser}\\NativeMessagingHosts\\${host}`,'/ve','/t','REG_SZ','/d',manifest,'/f']);}
