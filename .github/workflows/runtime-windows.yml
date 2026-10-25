@@ -1,0 +1,50 @@
+name: Compact Windows runtime validation
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  runtime:
+    runs-on: windows-2022
+    timeout-minutes: 100
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.14.0'
+          cache: npm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: npm ci
+      - name: Download and verify the upstream runtime source
+        shell: pwsh
+        run: |
+          Invoke-WebRequest https://nodejs.org/dist/v22.14.0/node-v22.14.0.tar.xz -OutFile runtime-source.tar.xz
+          if((Get-FileHash runtime-source.tar.xz -Algorithm SHA256).Hash.ToLowerInvariant() -ne 'c609946bf793b55c7954c26582760808d54c16185d79cb2fb88065e52de21914'){throw 'Upstream Node source digest mismatch'}
+          tar -xf runtime-source.tar.xz
+      - name: Compile the same runtime with the supported interface locales
+        shell: cmd
+        run: |
+          cd node-v22.14.0
+          set config_flags=--with-icu-locales=en,ar,en-CA,en-GB,ar-EG --without-inspector
+          call vcbuild.bat release x64 vs2022 small-icu nonpm nocorepack no-cctest
+      - name: Verify locale and native-addon compatibility, then run the engine tests
+        shell: pwsh
+        run: |
+          $runtime=(Resolve-Path node-v22.14.0/Release/node.exe).Path
+          & $runtime -e "const a=require('assert');a.equal(process.versions.node,'22.14.0');a.ok(Intl.DateTimeFormat.supportedLocalesOf(['ar-EG','en-CA','en-GB']).length===3);a.ok(new Date(2026,9,25).toLocaleDateString('en-CA').includes('2026-10-25'));const r=require('realm');r.shutdown();console.log('Locale and Realm compatibility passed')"
+          if($LASTEXITCODE -ne 0){throw 'Runtime compatibility failed'}
+          & $runtime --test --test-concurrency=1 test/*.test.cjs > runtime-tests.txt 2>&1
+          Get-Content runtime-tests.txt -Tail 15
+          if($LASTEXITCODE -ne 0){throw 'Engine tests failed on the compact runtime'}
+          @{version='22.14.0';sourceSHA256='c609946bf793b55c7954c26582760808d54c16185d79cb2fb88065e52de21914';bytes=(Get-Item $runtime).Length;sha256=(Get-FileHash $runtime -Algorithm SHA256).Hash.ToLowerInvariant();locales=@('en','ar','en-CA','en-GB','ar-EG');inspector=$false;notAReleasedPackage=$true}|ConvertTo-Json|Set-Content Runtime-Provenance.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: compact-windows-runtime
+          path: |
+            node-v22.14.0/Release/node.exe
+            node-v22.14.0/LICENSE
+            Runtime-Provenance.json
+            runtime-tests.txt
+          retention-days: 14
