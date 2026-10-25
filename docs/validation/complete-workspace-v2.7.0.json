@@ -1,0 +1,22 @@
+{
+  "version": "2.7.0",
+  "packaged": true,
+  "passed": 14,
+  "checks": [
+    "en: pin buttons are separate from tool launch buttons",
+    "en: pin appears on main toolbar",
+    "en: pinned playlist opens the actual playlist tool",
+    "en: limits are a simple two-field form",
+    "en: toolbar reflects saved limits",
+    "en: search hides complete tool cards including pin controls",
+    "en: unpin removes only the shortcut",
+    "ar: pin buttons are separate from tool launch buttons",
+    "ar: pin appears on main toolbar",
+    "ar: pinned playlist opens the actual playlist tool",
+    "ar: limits are a simple two-field form",
+    "ar: toolbar reflects saved limits",
+    "ar: search hides complete tool cards including pin controls",
+    "ar: unpin removes only the shortcut"
+  ],
+  "errors": []
+}

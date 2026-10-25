@@ -1,0 +1,14 @@
+{
+  "version": "2.7.0",
+  "packaged": true,
+  "passed": 6,
+  "checks": [
+    "appearance preview applies without saving",
+    "leaving an unsaved preview restores the stored palette",
+    "saved appearance applies across the actual main interface",
+    "custom accent follows system dark changes",
+    "customized Arabic layout fits a narrow window",
+    "Reset restores defaults without removing download history"
+  ],
+  "errors": []
+}

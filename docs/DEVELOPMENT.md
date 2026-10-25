@@ -19,7 +19,7 @@ npm start
 npm run dist
 ```
 
-Outputs: `release/Flow-2.5.4-Setup.exe` and `release/Flow-2.5.4-Portable.exe`. `npm run pack` creates an unpacked app. Runtime/dependencies are pinned in the lockfile; `npmRebuild: false` preserves the Realm distribution used here.
+Outputs: `release/Flow-2.7.0-Setup.exe` and `release/Flow-2.7.0-Portable.exe`. `npm run pack` creates an unpacked app. Runtime/dependencies are pinned in the lockfile; `npmRebuild: false` preserves the Realm distribution used here.
 
 The official independent `vendor/yt-dlp.exe` has version, SHA-256 and licenses in `vendor/`. Verify hashes and update notices when replacing it. Electron supplies the JavaScript runtime; FFmpeg comes from `ffmpeg-static`. End users need no separate Node or Python installation.
 
@@ -43,12 +43,29 @@ Compact Preview requires shared Microsoft WebView2 and .NET Framework 4.8. Those
 
 ## Project responsibilities
 
+```mermaid
+flowchart LR
+  Browser[Browser companion] --> Bridge[Native Messaging bridge]
+  Bridge --> Service[Validated local service]
+  Electron[Complete Electron UI] --> Service
+  Compact[Optional WebView2 UI] --> Service
+  Service --> Engine[Independent transfer engine]
+  Service --> Realm[Encrypted Realm library]
+  Engine --> Tools[HTTP / FTP / aria2 / yt-dlp / FFmpeg]
+```
+
+The two desktop hosts use the same interface and service code. Compact Preview
+uses a full official Node process outside the UI; its versioned portable runtime
+remains available while transfers continue.
+
 | Path | Responsibility |
 | --- | --- |
 | `src/electron.cjs`, `src/windows.cjs` | Main process, tray, IPC and tool windows |
 | `src/service.cjs`, `src/server.cjs` | Validated actions and authenticated local service |
 | `src/engine.cjs`, `src/network.cjs` | Transfers, segments, validation and transport |
 | `src/store.cjs` | Encrypted Realm schemas and settings |
+| `src/native-backend.cjs`, `src/native-profile.cjs` | Compact service, library ownership and migration backup |
+| `native/FlowWebView.cs`, `native/webview-bridge.js` | Optional Windows WebView2 host and explicit action bridge |
 | `src/library.cjs`, `src/smart.cjs` | Organization, recovery, integrity and rescue |
 | `src/power.cjs`, `src/automation.cjs`, `src/workshop.cjs` | Link tools, rules, traffic and media |
 | `src/video.cjs`, `src/grabber.cjs` | Website extraction and static site capture |

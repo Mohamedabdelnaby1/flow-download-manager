@@ -1,17 +1,24 @@
-# Known limitations
+# Known boundaries
 
-- Windows x64 is the packaged target; no macOS/Linux binaries are supplied.
-- Executables are unsigned; no publisher certificate is supplied.
-- Portable skips installation but uses Windows profile storage. Browser setup registers a per-user host.
-- The extension needs manual developer-mode loading. An existing personal Chrome installation was upgraded and checked for YouTube handoff, panel close/reset and real mouse dragging in 2.5.2. A fresh Chrome/Edge install and authenticated Facebook downloads remain unverified.
-- Site support changes with sessions, signed URLs, restrictions and extractor updates. Two successful YouTube examples do not establish universal support.
-- No DRM bypass, torrent engine, phone remote control or cross-device sync.
-- HTTP/HTTPS files support per-file/global/shared-queue speed caps. FTP limiting is unavailable. Direct FFmpeg streams reject configured speed/quota restrictions. Website videos take the program/file limit at start and do not share HTTP queue aggregate limiting.
-- Rescue checks validators and saved-byte samples, not complete file identity. Verify a publisher checksum after finishing.
-- Recovery cannot restore a completed file physically deleted from disk. Changing the partial folder may require restoring its old location first.
-- Configuration backups exclude files, partials, keys, passwords and scanner/proxy secrets. Imported schedules stay disabled until manually enabled.
-- ZIP preview needs ranges and excludes ZIP64/multipart archives. Site grabber reads static HTML rather than running a full browser crawler.
-- One workshop job at a time. Media without audio cannot produce meaningful audio output.
-- A same-version repair on the current Windows system kept one registration and preserved the library. This is not a clean-machine install/uninstall test. Dependency audit covers known package advisories, not the entire product's security.
+Flow's feature descriptions refer to implemented behavior, not a guarantee for every website, device or network.
 
-- Another installed download manager can take a request before Flow sees it. In the live 2.5.2 check, a native IDM interceptor continued taking extensionless attachments after disabling its Chrome extension and restarting Chrome. Direct ZIP capture completed and matched SHA-256; extensionless capture on that machine remains blocked.
+| Area | Current boundary |
+| --- | --- |
+| Platform | Windows 10/11 x64. No Windows 7/8/8.1 support. Linux packages are deferred; no macOS release is supplied. |
+| Signing | Windows executables are currently unsigned. Trusted publisher signing needs a certificate or configured signing service. A SHA-256 checksum does not establish publisher identity. |
+| Compact Preview | An optional host using shared Microsoft WebView2 and .NET Framework 4.8. Those prerequisites are outside the compact download size. Keep the complete Electron edition for compatibility. Short local checks do not establish identical speed or behavior on every computer. |
+| Portable | Skips application installation but stores data in the Windows profile. Browser integration registers a per-user native host. The compact portable launcher retains a versioned runtime cache for its independent engine; this is not a zero-footprint USB application. |
+| Browser setup | The companion needs one manual Load unpacked step because it is not listed in a browser store. Native Messaging checks and fixture-based panel tests do not prove every personal browser profile. |
+| Website videos | Site availability, signed URLs, authentication, geographic restrictions and extractor changes can affect support. Flow does not decrypt DRM. Successful public YouTube checks do not prove authenticated Facebook or every course platform. |
+| Torrents and mirrors | The bundled aria2 engine supports transfers, file selection and piece information. Availability and speed depend on peers, seeds, trackers and source servers. Flow does not supply torrent content or promise a speed multiplier. |
+| Transfer limits | Simultaneous-file admission includes direct tasks, queues, torrents and mirrors. Torrent peer count is separate from HTTP connections. HTTP tasks support per-file/global/shared-queue bandwidth caps. FTP limiting is unavailable. Direct FFmpeg streams reject configured speed/quota restrictions. Website videos take their limit at start and do not share the HTTP queue's aggregate bandwidth pool. |
+| Recovery | Expired-link rescue needs a saved source page, strong file identity and matching partial-byte samples; other cases require manual review. A publisher checksum should be verified after completion. Recovery cannot recreate a completed file physically deleted from disk. |
+| Archives | Selective ZIP preview needs range support and excludes ZIP64, multipart and encrypted entries. General automatic ZIP/7Z/RAR extraction is not included. |
+| Media tools | One workshop job runs at a time. Trimming currently processes an already downloaded file. Subtitle/audio-track selection and direct time-range downloads are future work. |
+| Configuration backups | Exclude files, partials, keys, passwords and scanner/proxy secrets. Imported schedules remain disabled until explicitly enabled. Cross-device sync is not implemented. |
+| Updates | Release notifications and a trusted GitHub download-page button are implemented. Unattended download/install, waiting-for-transfers update orchestration and automatic rollback are not. |
+| Other workflows | Playlist subscriptions, watched link folders and reliable file-update subscriptions are not included yet. The site grabber inspects static HTML rather than running a complete browser crawler. |
+
+Another download manager can intercept a browser request before Flow receives it. In an older live test, an IDM native interceptor continued taking extensionless attachments after its Chrome extension was disabled; direct ZIP handoff succeeded. Keep this access condition separate from the result of a Flow transfer test.
+
+See [validation](../VALIDATION.md) for the exact distinction between source tests, packaged UI checks, installed upgrade exercises, controlled transfers and public release verification. No Windows 7 VM or clean machine without WebView2/.NET was tested.

@@ -1,4 +1,31 @@
-# Validation - Flow 2.6.1 foundation update
+# Validation - Flow 2.7.0
+
+Checks dated 25 October 2026. The complete Windows edition is retained; Compact Preview is an additional optional host. Results describe bounded scenarios, not universal device, website or performance parity.
+
+| Gate | Result | Evidence |
+| --- | --- | --- |
+| Windows source regressions, independently in both build jobs | **249 passed, 0 failed** in each | [Complete CI](https://github.com/Mohamedabdelnaby1/flow-download-manager/actions/runs/40179855302), [Compact CI](https://github.com/Mohamedabdelnaby1/flow-download-manager/actions/runs/40179857065) |
+| Exact downloaded complete portable: limits/pins and actual tool destinations | **14 + 42 passed** | [Controls](docs/validation/complete-workspace-v2.7.0.json), [Tool windows](docs/validation/complete-tool-windows-v2.7.0.json) |
+| Same complete payload: menus, customization, tools and appearance | **38 + 6 + 25 + 45 passed** | [Interactions](docs/validation/complete-interactions-v2.7.0.json), [Customization](docs/validation/complete-customization-v2.7.0.json), [Tools](docs/validation/complete-tools-v2.7.0.json), [Appearance](docs/validation/complete-appearance-v2.7.0.json) |
+| Exact downloaded compact setup payload | **3,135 file hashes match; 10 preservation checks passed** | [Payload](docs/validation/compact-payload-v2.7.0.json) |
+| Same compact payload: all 21 tools, tray restoration and process recovery | **63 passed** | [Native UI](docs/validation/compact-ui-v2.7.0.json) |
+| Same compact payload: startup, sound, Native Messaging and interface reopening | **14 passed**, real transfer verified | [Integration](docs/validation/compact-integration-v2.7.0.json) |
+| Exact downloaded compact portable | **6 passed**, 8 MiB transfer survived whole-interface termination | [Portable](docs/validation/compact-portable-v2.7.0.json) |
+| Earlier compact candidate, isolated real installation identity | **11 passed**: upgrade, encrypted library/settings, repair, uninstall, rollback | [Installed exercise](docs/validation/compact-upgrade-v2.7.0.json) |
+| Bounded compact minimized run | **6 passed**, six minutes and 48 MiB verified | [Background](docs/validation/compact-background-v2.7.0.json) |
+| Compact media path, supplied public YouTube video | 134,937,326 bytes, full FFmpeg decode | [Media](docs/validation/compact-video-v2.7.0.json) |
+
+The 170 complete-edition UI checks ran against the extracted exact GitHub portable payload, with isolated profiles. Tools and appearance used fresh profiles to avoid test-fixture interference. Compact UI/integration checks used the extracted exact GitHub setup payload; its portable launcher was also exercised directly. Extraction emitted the usual 7-Zip NSIS executable-tail warning; every manifest-listed compact file matched its SHA-256 value.
+
+The isolated installer exercise used an earlier compact candidate and a separate QA application identity. It did not replace the author's real installation or browser registration. Final release payload checks are distinct from that upgrade exercise. Windows was not rebooted, prerequisite-missing virtual machines were not exercised, and no controlled speed comparison with IDM was performed. Executables remain unsigned.
+
+Both build workflows used production commit `be5d1f629e84fef65042a85183ac2bb6d1265351`. Later documentation, gallery and evidence changes do not alter the built production code. Exact sizes, SHA-256 values and final source commit are recorded in the release verification asset. Public release state and asset completeness are verified separately from local checks.
+
+[Compact prerequisites and remaining gates](docs/COMPACT-WINDOWS-PREVIEW.md) · [Known boundaries](docs/LIMITATIONS.md)
+
+---
+
+# Historical validation - Flow 2.6.1 foundation update
 
 Source checks: **231 passed, 0 failed** ([report](docs/validation/engine-tests-v2.6.1.txt)). Real desktop error-assistant checks: **12 passed**, covering visible English/Arabic cards, collapsed diagnostics, explicit browser repair, local redacted reports, renderer rejection handling, and simple connection-health/rescue controls ([report](docs/validation/errors-v2.6.1.json)). Existing source desktop tools flow: **25 passed** ([report](docs/validation/tools-source-v2.6.1.json)). Packaged release verification is recorded in the accompanying release verification asset.
 

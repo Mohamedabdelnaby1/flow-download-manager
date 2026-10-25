@@ -1,5 +1,17 @@
 # Feature guide
 
+## Workspace controls in 2.7
+
+- Pin and reorder up to eight tools on the main toolbar.
+- Set simultaneous files (1–16) and HTTP connections per file (1–32) with a simple two-field form. Extra tasks wait with resumable bytes retained; torrent peer settings remain separate.
+- Share admission limits across direct tasks, queues, torrents and mirrors.
+- Choose sage, blue, violet, rose, sand or teal accents; compact/comfortable/spacious density; soft/crisp corners; reduced/system motion; fonts, sidebar width, labels and columns.
+- Recover the torrent process after an unexpected exit using retained source and partial data; expose balanced/fast/quiet profiles and observed connection health.
+- Use the independent transfer service and reconnect the interface after a crash.
+- Keep the complete Windows edition, or choose an optional smaller Compact Preview with shared Microsoft prerequisites. [Edition details](docs/COMPACT-WINDOWS-PREVIEW.md).
+
+[Quick start and downloads](README.md#choose-your-flow) · [Simple tools guide](docs/TOOLS.md) · [Current boundaries](docs/LIMITATIONS.md)
+
 ## Download engine
 
 - HTTP/HTTPS range probing with GET fallback, redirects and HTTP/2.

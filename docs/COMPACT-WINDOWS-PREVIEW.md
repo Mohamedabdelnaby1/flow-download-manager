@@ -23,7 +23,7 @@ the actual Windows Realm native addon is retained.
 
 ## Evidence recorded locally on 25 October 2026
 
-- 245 existing and new service regression tests passed.
+- 249 service regression tests passed independently in both Windows CI jobs.
 - All 21 tool destinations opened and rendered in the native host.
 - A staged-package scenario completed 63 steps, including saved pins/limits,
   drop basket, minimizing and restoring the actual download window from the
@@ -49,9 +49,14 @@ the actual Windows Realm native addon is retained.
 - The exact public YouTube reproduction URL `peIksHiel34` supplied real quality
   choices, downloaded a 134,937,326-byte video at Best available, and passed a
   complete FFmpeg decode without using browser cookies or stored credentials.
-- An actual NSIS preview installer was produced: 61,502,297 bytes, SHA-256
-  `26b5747ad3231f267ec0ec42e18cc4ed16b9682eb27da6ac5f08e87bb95d0c78`.
-  This identifies that exact candidate, not any later rebuild.
+- The GitHub-built preview setup is **59,478,112 bytes** (59.5 MB), SHA-256
+  `87e992b2f9641a74ec8497366ddfc162d8b4531e63f826ffe12d5f1466ad97f6`.
+- The GitHub-built preview portable is **62,124,594 bytes** (62.1 MB), SHA-256
+  `4c0b2b3466d849b459f3b72ac6004c3f788f5d524650c760a0896f1a2dee6a53`.
+- The exact downloaded setup payload passed 63 UI and 14 integration checks;
+  every one of its 3,135 manifest-listed files matched. The downloaded portable
+  passed six lifecycle checks, including a completed transfer after whole-UI
+  termination. [Detailed evidence](../VALIDATION.md).
 
 The host checks for a live library owner before opening Realm. Before the first
 native opening of an existing library, it verifies an encrypted library/key

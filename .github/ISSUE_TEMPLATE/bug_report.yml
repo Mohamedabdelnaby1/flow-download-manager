@@ -11,6 +11,18 @@ body:
       label: Flow version and installer or portable edition
     validations:
       required: true
+  - type: dropdown
+    id: edition
+    attributes:
+      label: Edition
+      options:
+        - Complete setup
+        - Complete portable
+        - Compact Preview setup
+        - Compact Preview portable
+        - Running from source
+    validations:
+      required: true
   - type: input
     id: environment
     attributes:

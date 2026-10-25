@@ -1,0 +1,297 @@
+{
+  "passed": 63,
+  "results": [
+    {
+      "step": "existing desktop UI and Realm service",
+      "value": true
+    },
+    {
+      "step": "private desktop commands are blocked",
+      "value": true
+    },
+    {
+      "step": "open limits",
+      "value": true
+    },
+    {
+      "step": "render limits",
+      "value": true
+    },
+    {
+      "step": "open connection",
+      "value": true
+    },
+    {
+      "step": "render connection",
+      "value": true
+    },
+    {
+      "step": "open troubleshoot",
+      "value": true
+    },
+    {
+      "step": "render troubleshoot",
+      "value": true
+    },
+    {
+      "step": "open remote",
+      "value": true
+    },
+    {
+      "step": "render remote",
+      "value": true
+    },
+    {
+      "step": "open torrent",
+      "value": true
+    },
+    {
+      "step": "render torrent",
+      "value": true
+    },
+    {
+      "step": "open mirrors",
+      "value": true
+    },
+    {
+      "step": "render mirrors",
+      "value": true
+    },
+    {
+      "step": "open links",
+      "value": true
+    },
+    {
+      "step": "render links",
+      "value": true
+    },
+    {
+      "step": "open playlist",
+      "value": true
+    },
+    {
+      "step": "render playlist",
+      "value": true
+    },
+    {
+      "step": "open zip",
+      "value": true
+    },
+    {
+      "step": "render zip",
+      "value": true
+    },
+    {
+      "step": "open move",
+      "value": true
+    },
+    {
+      "step": "render move",
+      "value": true
+    },
+    {
+      "step": "open verify",
+      "value": true
+    },
+    {
+      "step": "render verify",
+      "value": true
+    },
+    {
+      "step": "open rescue",
+      "value": true
+    },
+    {
+      "step": "render rescue",
+      "value": true
+    },
+    {
+      "step": "open duplicates",
+      "value": true
+    },
+    {
+      "step": "render duplicates",
+      "value": true
+    },
+    {
+      "step": "open trash",
+      "value": true
+    },
+    {
+      "step": "render trash",
+      "value": true
+    },
+    {
+      "step": "open media",
+      "value": true
+    },
+    {
+      "step": "render media",
+      "value": true
+    },
+    {
+      "step": "open rename",
+      "value": true
+    },
+    {
+      "step": "render rename",
+      "value": true
+    },
+    {
+      "step": "open traffic",
+      "value": true
+    },
+    {
+      "step": "render traffic",
+      "value": true
+    },
+    {
+      "step": "open rules",
+      "value": true
+    },
+    {
+      "step": "render rules",
+      "value": true
+    },
+    {
+      "step": "open folders",
+      "value": true
+    },
+    {
+      "step": "render folders",
+      "value": true
+    },
+    {
+      "step": "open backup",
+      "value": true
+    },
+    {
+      "step": "render backup",
+      "value": true
+    },
+    {
+      "step": "open preferences",
+      "value": true
+    },
+    {
+      "step": "render preferences",
+      "value": true
+    },
+    {
+      "step": "save limits and pinned shortcuts",
+      "value": true
+    },
+    {
+      "step": "open drop basket",
+      "value": true
+    },
+    {
+      "step": "drop basket uses existing localized UI",
+      "value": true
+    },
+    {
+      "step": "close drop basket",
+      "value": true
+    },
+    {
+      "step": "minimize main window",
+      "value": null
+    },
+    {
+      "step": "main hidden in tray",
+      "value": {
+        "visible": false,
+        "minimized": true,
+        "key": "main",
+        "width": 276,
+        "height": 45,
+        "dpi": 1.75,
+        "recoveries": 0
+      }
+    },
+    {
+      "step": "restore the last window from tray",
+      "value": null
+    },
+    {
+      "step": "main restored",
+      "value": {
+        "visible": true,
+        "minimized": false,
+        "key": "main",
+        "width": 2240,
+        "height": 1400,
+        "dpi": 1.75,
+        "recoveries": 0
+      }
+    },
+    {
+      "step": "prepare paused download window",
+      "value": "fcc12128-8afd-4204-a070-c61956699ed6"
+    },
+    {
+      "step": "download window initialized",
+      "value": true
+    },
+    {
+      "step": "minimize download to tray",
+      "value": null
+    },
+    {
+      "step": "download hidden",
+      "value": {
+        "visible": false,
+        "minimized": true,
+        "key": "details:fcc12128-8afd-4204-a070-c61956699ed6",
+        "width": 276,
+        "height": 45,
+        "dpi": 1.75,
+        "recoveries": 0
+      }
+    },
+    {
+      "step": "restore download from tray",
+      "value": null
+    },
+    {
+      "step": "download restored instead of main",
+      "value": {
+        "visible": true,
+        "minimized": false,
+        "key": "details:fcc12128-8afd-4204-a070-c61956699ed6",
+        "width": 962,
+        "height": 805,
+        "dpi": 1.75,
+        "recoveries": 0
+      }
+    },
+    {
+      "step": "customization screenshot",
+      "value": {
+        "initialized": true,
+        "language": "en",
+        "pins": [
+          "torrent",
+          "limits",
+          "media"
+        ]
+      }
+    },
+    {
+      "step": "terminate only the renderer",
+      "value": null
+    },
+    {
+      "step": "renderer recovers without losing backend or settings",
+      "value": true
+    },
+    {
+      "step": "terminate only the WebView browser",
+      "value": null
+    },
+    {
+      "step": "browser process and all views recover",
+      "value": true
+    }
+  ]
+}

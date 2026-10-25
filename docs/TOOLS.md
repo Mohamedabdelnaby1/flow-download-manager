@@ -4,6 +4,10 @@ Open **Tools** in the toolbar, or press **Ctrl+K**. Type what you want to do and
 
 | I want to… | Choose | Do this |
 | --- | --- | --- |
+| Keep a tool on the main toolbar | Its pin button | Pin it in the Tools hub. Use the shortcut-order controls to move it earlier or later. Unpinning removes only the shortcut. |
+| Download fewer things at once | Download limits | Choose the file count and maximum connections, then Apply limits. Extra transfers wait automatically. |
+| Change colors or layout | Personalize your list | Preview an accent, density, corners, motion or font, then save. Reset appearance keeps your history and pinned shortcuts. |
+| Understand a failed task | Troubleshoot a problem | Read the explanation and suggested step; open technical details or copy a redacted report if needed. |
 | Download several links | Add several links | Paste one URL per line, inspect, then add selected results. |
 | Download a playlist | Download a playlist | Paste the playlist link, choose videos and quality, then start. |
 | Use a magnet/torrent | Torrents & magnet links | Paste a magnet link or choose a `.torrent` file, then Start. Files save in your Downloads folder. |

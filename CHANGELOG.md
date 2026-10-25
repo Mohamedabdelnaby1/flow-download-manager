@@ -8,6 +8,8 @@
 - Recover the torrent engine after an unexpected process exit, retaining the source and partial data. Balanced, fast and quiet connection profiles expose actual peer/metadata health; no fixed speed multiplier is claimed.
 - Run transfer work independently of the interface and reconnect to the existing service. Keyed download rows avoid replacing the whole table on each update.
 - Correct tool-window tab reuse and language repainting, and classify unavailable video qualities separately from missing videos.
+- Restore the sandboxed desktop action bridge so pinned tools open their actual independent windows, and clear stale installer error state in the compact portable launcher.
+- Refresh the repository with a new visual identity, actual 2.7 screenshots, clearer edition choices and linked release-validation evidence.
 - Include the 2.6.1 error-assistant, bridge-configuration, expired-link rescue and connection-health improvements below.
 - Offer optional Compact Preview Windows installer and portable packages using the same interface and full offline Windows tools with the unchanged official Node runtime. Shared Microsoft WebView2 and .NET Framework 4.8 are prerequisites. The complete Electron edition remains available.
 - Compact Preview adds verified pre-migration library backups, isolated ownership checks, UI crash recovery, command forwarding, tray restore, browser-driven UI reopening and a persistent portable runtime cache.

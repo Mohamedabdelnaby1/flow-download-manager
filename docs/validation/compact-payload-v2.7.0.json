@@ -1,0 +1,23 @@
+{
+  "version": "2.7.0",
+  "passed": 10,
+  "checks": [
+    "every downloaded release payload file matches its manifest",
+    "official full Node executable is byte-identical",
+    "full FFmpeg executable is byte-identical",
+    "torrent engine is byte-identical",
+    "complete video extractor is available offline",
+    "extractor executes with the expected version",
+    "full curl impersonation dependency executes offline",
+    "all three notification sounds remain in the installer",
+    "full Node international locale support remains",
+    "all extractor distribution files are preserved"
+  ],
+  "payloadFiles": 3135,
+  "installerBytes": 59478112,
+  "installerSHA256": "87e992b2f9641a74ec8497366ddfc162d8b4531e63f826ffe12d5f1466ad97f6",
+  "exactDownloadedRelease": true,
+  "installerExtractionWarning": "7-Zip reports data after the end of the archive (NSIS executable tail); extracted files match the payload manifest.",
+  "installed": false,
+  "published": false
+}

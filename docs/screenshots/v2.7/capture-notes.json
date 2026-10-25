@@ -1,0 +1,16 @@
+{
+  "version": "2.7.0",
+  "actualApplicationCaptures": true,
+  "demonstrationRecords": true,
+  "localTransferFixture": true,
+  "files": [
+    "complete.png",
+    "personalize.png",
+    "tools-dark.png",
+    "tools.png",
+    "transfer.png",
+    "workspace-arabic.png",
+    "workspace-dark.png",
+    "workspace-light.png"
+  ]
+}
