@@ -1,5 +1,20 @@
 # Changelog
 
+## 2.7.0
+
+- Pin and reorder up to eight tools on the main toolbar; shortcuts open the actual tool, and unpinning preserves its settings.
+- Control simultaneous files and connections from a simple two-field panel. Direct downloads, queued files, torrents and mirrors share the file limit. Lowering limits preserves validated partial bytes.
+- Customize six accent palettes, density, corners, motion, font, text scale, sidebar width, toolbar labels and table columns. Preview changes and restore appearance without clearing downloads or pinned tools.
+- Recover the torrent engine after an unexpected process exit, retaining the source and partial data. Balanced, fast and quiet connection profiles expose actual peer/metadata health; no fixed speed multiplier is claimed.
+- Run transfer work independently of the interface and reconnect to the existing service. Keyed download rows avoid replacing the whole table on each update.
+- Correct tool-window tab reuse and language repainting, and classify unavailable video qualities separately from missing videos.
+- Include the 2.6.1 error-assistant, bridge-configuration, expired-link rescue and connection-health improvements below.
+- Offer optional Compact Preview Windows installer and portable packages using the same interface and full offline Windows tools with the unchanged official Node runtime. Shared Microsoft WebView2 and .NET Framework 4.8 are prerequisites. The complete Electron edition remains available.
+- Compact Preview adds verified pre-migration library backups, isolated ownership checks, UI crash recovery, command forwarding, tray restore, browser-driven UI reopening and a persistent portable runtime cache.
+- Provide reproducible compact builds, payload fingerprints and a prepared trusted-signing path. Packages remain unsigned until a trusted signing identity is supplied. Linux packages remain deferred.
+
+The in-app updater still announces releases and opens the official download page. Automatic installation/rollback, subscriptions, watched folders, general archive extraction and encrypted cross-device sync are not claimed in this release.
+
 ## 2.6.1
 
 - Shared Arabic/English error assistant for service, renderer, download, background and companion failures. Technical details stay collapsed; local problem reports redact credentials. Browser failures offer an explicit repair action.

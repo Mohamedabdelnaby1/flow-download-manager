@@ -1,4 +1,5 @@
 let smartTab='health',smartLibrary=null,smartBusy=false,smartId='',smartResult=null;
+window.desktopAPI?.onToolContext?.(data=>{if(windowContext==='smart'&&data.tab)openSmart(data.tab,data.id||'');});
 async function openSmart(tab='health',id=''){
  if(nativeTool('smart',{tab,id}))return;
  smartTab=tab;smartId=id;smartResult=null;renderSmart();await scanLibrary();

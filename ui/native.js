@@ -33,7 +33,7 @@ function renderNativeWindow(){
   }return true;
 }
 function repaintNativeLanguage(){
- const fields=[...document.querySelectorAll('input[name],textarea[name],select[name]')].map(el=>({name:el.name,value:el.value,checked:el.checked}));
+ const fields=[...document.querySelectorAll('input[name],textarea[name],select[name]')].map(el=>({name:el.name,type:el.type,value:el.value,checked:el.checked}));
  const focus=document.activeElement?.name;
  if(windowContext==='settings'){captureSettings();showSettings();}
  else if(windowContext==='library')renderLibrary();
@@ -41,7 +41,7 @@ function repaintNativeLanguage(){
  else if(windowContext==='tools')renderTools();
   else if(windowContext==='smart')renderSmart();
  else renderNativeWindow();
- for(const saved of fields){const el=[...document.querySelectorAll('[name]')].find(el=>el.name===saved.name);if(el){el.value=saved.value;if(el.type==='checkbox')el.checked=saved.checked;}}
+ for(const saved of fields){const el=[...document.querySelectorAll('[name]')].find(el=>el.name===saved.name&&(!['checkbox','radio'].includes(saved.type)||el.value===saved.value));if(el){if(!['checkbox','radio'].includes(saved.type))el.value=saved.value;else el.checked=saved.checked;}}
  [...document.querySelectorAll('[name]')].find(el=>el.name===focus)?.focus();
 }
 const nativeHandleAction=handleAction;

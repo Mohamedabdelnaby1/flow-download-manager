@@ -1,0 +1,13 @@
+{
+  "passed": 6,
+  "checks": [
+    "portable wrapper exits without removing the extracted runtime",
+    "entire portable UI closes while its independent backend remains available",
+    "portable transfer survives UI termination byte-for-byte",
+    "runtime files remain available for the headless service",
+    "reopening reuses the existing backend and does not overwrite active runtime files",
+    "portable Exit Flow cleanly stops the independent service"
+  ],
+  "bytes": 8388608,
+  "installed": false
+}

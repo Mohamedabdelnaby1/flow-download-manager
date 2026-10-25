@@ -9,3 +9,22 @@ test('valid local extractor is preferred with no network request',async()=>{cons
 test('invalid cached extractor is replaced only with verified official bytes',async()=>{const tools=fixture(async()=>new Response(bytes));fs.mkdirSync(path.dirname(tools.cached()),{recursive:true});fs.writeFileSync(tools.cached(),'corrupt');assert.equal(await tools.ensure(),tools.cached());assert.deepEqual(fs.readFileSync(tools.cached()),bytes);});
 test('cancelling a waiting task returns promptly and shutdown cancels the shared repair',async()=>{const tools=fixture(async(_url,{signal})=>new Promise((_resolve,reject)=>signal.addEventListener('abort',()=>reject(signal.reason),{once:true})));const controller=new AbortController(),pending=tools.ensure({signal:controller.signal});controller.abort(Error('Task removed'));await assert.rejects(pending,/Task removed/);tools.close();await assert.rejects(tools.pending,/closing/);assert.equal(fs.existsSync(tools.cached()),false);});
 test('unexpected repair URLs are rejected before requesting a file',async()=>{let requested=false;const tools=fixture(()=>{requested=true;});tools.metadata.url='https://other.test/tool.exe';await assert.rejects(tools.ensure(),/metadata/);assert.equal(requested,false);});
+
+function unpackedFixture(mutator=()=>{}){
+ const tools=fixture(()=>{throw Error('Unpacked offline bundle must not access the network');}),root=path.join(tools.dir,'yt-dlp-unpacked');
+ fs.mkdirSync(root);fs.writeFileSync(path.join(root,'yt-dlp.exe'),bytes);fs.writeFileSync(path.join(root,'dependency.dll'),bytes);
+ const manifest={version:tools.metadata.version,files:{'yt-dlp.exe':sha256,'dependency.dll':sha256}};mutator(manifest,root);
+ fs.writeFileSync(path.join(tools.dir,'yt-dlp-unpacked.json'),JSON.stringify(manifest));return tools;
+}
+test('complete verified unpacked extractor works offline with all dependencies',async()=>{
+ const tools=unpackedFixture();assert.equal(tools.available(),true);assert.equal(await tools.ensure(),path.join(tools.dir,'yt-dlp-unpacked/yt-dlp.exe'));
+});
+test('incomplete or corrupt unpacked dependencies never become ready',()=>{
+ for(const mutation of [(_,root)=>fs.unlinkSync(path.join(root,'dependency.dll')),(_,root)=>fs.writeFileSync(path.join(root,'dependency.dll'),'wrong'),m=>m.version='1900',m=>m.files={},m=>m.files['../outside.dll']=sha256,m=>m.files['C:\\outside.dll']=sha256]){
+  const tools=unpackedFixture(mutation);assert.equal(tools.verifiedUnpacked(),null);assert.equal(tools.ready,null);
+ }
+});
+test('malformed unpacked manifest falls back to the verified bundled extractor',async()=>{
+ const tools=unpackedFixture();fs.writeFileSync(path.join(tools.dir,'yt-dlp-unpacked.json'),'{bad');fs.writeFileSync(tools.bundled,bytes);
+ assert.equal(await tools.ensure(),tools.bundled);
+});

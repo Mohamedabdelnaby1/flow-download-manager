@@ -1,4 +1,5 @@
 const paths={
+ pin:'M16 3l5 5-4 1-3 5v4l-3-3-6 6m6-6-5-5h4l5-3z',
  arrow:'M12 3v12m-5-5 5 5 5-5M4 16v4h16v-4',plus:'M12 5v14M5 12h14',search:'m21 21-4.5-4.5M19 10.5a8.5 8.5 0 1 1-17 0 8.5 8.5 0 0 1 17 0',
  grid:'M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h7v7h-7z',play:'m8 4 12 8-12 8z',pause:'M8 4v16M16 4v16',stop:'M5 5h14v14H5z',check:'m5 12 4 4L19 6',chevron:'m9 5 7 7-7 7',down:'m6 9 6 6 6-6',
  clock:'M12 8v5l3 2M22 12a10 10 0 1 1-20 0 10 10 0 0 1 20 0',folder:'M3 6a2 2 0 0 1 2-2h5l2 3h7a2 2 0 0 1 2 2v10H3z',file:'M14 2H4v20h16V8zM14 2v6h6M8 13h8M8 17h5',

@@ -18,7 +18,7 @@ module.exports=async({app,win,service,toolsWindows})=>{
  nativeTheme.themeSource='light';await ready(win);await js(win,'refresh();renderShell();renderMain()');
  check('main document uses English LTR',await js(win,'document.documentElement.lang==="en"&&document.documentElement.dir==="ltr"'));
  check('English main commands render',await js(win,'document.querySelector(".command-toolbar [data-action=add]").textContent.includes("New download")'));
- check('English errors preserve HTTP status',await js(win,'state.downloads.find(d=>d.status==="error").error==="HTTP 403 — URL refused or expired"'));
+ check('English errors show a readable explanation and retain original HTTP status',await js(win,'(()=>{const d=state.downloads.find(d=>d.status==="error");return !d.error.startsWith("HTTP")&&d.errorOriginal.includes("403")&&d.error.length>10})()'));
  check('main fits normal window',await js(win,'document.body.scrollWidth<=innerWidth+1'));
  await capture(win,'desktop-light');
  const settings=await tool('settings'),library=await tool('library'),power=await tool('power'),smart=await tool('smart'),add=await tool('add');

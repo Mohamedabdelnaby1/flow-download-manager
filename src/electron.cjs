@@ -16,7 +16,7 @@ const {validateURL}=require('./network.cjs');
 function writeLog(error){try{const folder=process.env.FLOW_SMOKE_DIR||app.getPath('userData');rotatingLog(path.join(folder,'desktop.log'),require('../ui/error-model.js').redact(error?.stack||String(error)));}catch{}}
 console.error=(...args)=>writeLog(args.map(v=>v?.stack||String(v)).join(' '));
 console.log=(...args)=>{if(process.env.FLOW_SMOKE_TEST)writeLog(args.join(' '));};
-let win,service,web,quitting=false,clipTimer,drop,tray,toolsWindows,wakeTimer,wakeId,mainPromise,startup,trayTimer,completionPower;
+let win,service,web,quitting=false,clipTimer,drop,tray,toolsWindows,wakeTimer,wakeId,mainPromise,startup,trayTimer,completionPower,releaseProfile;
 const pendingCLI=[];let trayTarget=null;
 function rememberTrayWindow(window){if(!window||window.isDestroyed())return;trayTarget=window.flowDownloadId?{kind:window.flowKind,id:window.flowDownloadId}:null;}
 async function restoreTrayWindow(){if(quitting)return;if(trayTarget&&toolsWindows&&service.store.find(trayTarget.id)){await toolsWindows.open(trayTarget.kind,{id:trayTarget.id});return;}trayTarget=null;await showMain();}
@@ -77,7 +77,7 @@ if(!app.requestSingleInstanceLock({version:app.getVersion()})){
     if(!protectedStorage&&process.platform!=='linux')throw Error('تعذر الوصول إلى مخزن مفاتيح النظام الآمن');
     startup=new StartupManager(app,{portable:process.env.PORTABLE_EXECUTABLE_FILE||process.env.APPIMAGE});
     const desktop={
-      runtimeStatus:()=>({version:app.getVersion(),shutdown:completionPower?.snapshot()||null,platform:process.platform,keyProtection:protectedStorage?'system-keyring':'local-private-key',startup:startup.status(),trayResident:!!tray&&!tray.isDestroyed(),softwareRendering:!process.argv.includes('--flow-hardware-acceleration'),rendererRecoveries:win?.flowRecovery?.recovered||0}),
+      runtimeStatus:()=>({version:app.getVersion(),engine:service?.engineHost?.snapshot()||null,shutdown:completionPower?.snapshot()||null,platform:process.platform,keyProtection:protectedStorage?'system-keyring':'local-private-key',startup:startup.status(),trayResident:!!tray&&!tray.isDestroyed(),softwareRendering:!process.argv.includes('--flow-hardware-acceleration'),rendererRecoveries:win?.flowRecovery?.recovered||0}),
       downloadInfo:async (id,status='pending')=>{for(let n=0;n<200&&!toolsWindows;n++)await new Promise(r=>setTimeout(r,50));if(!toolsWindows)throw Error('نافذة التطبيق لم تجهز بعد');return toolsWindows.open(status==='pending'?'download-info':'details',{id});},
       peerInfo:()=>toolsWindows?.open('tools',{tab:'torrent'}),
       scale:value=>{if(win&&!win.isDestroyed())win.webContents.setZoomFactor(value);toolsWindows?.scale(value);},
@@ -97,6 +97,7 @@ if(!app.requestSingleInstanceLock({version:app.getVersion()})){
       vpnConnect:async name=>{if(process.platform!=='win32'||!name)throw Error('اختر اسم اتصال VPN مسجل في ويندوز');await runFile('rasdial.exe',[name]);return true;},
       vpnDisconnect:async name=>{if(process.platform!=='win32'||!name)throw Error('اختر اسم اتصال VPN مسجل في ويندوز');await runFile('rasdial.exe',[name,'/disconnect']);return true;}
     };
+    releaseProfile=require('./native-profile.cjs').acquireProfile(app.getPath('userData'));
     service=new Service(path.join(app.getPath('userData'),'FlowData'),{protection:protectedStorage,desktop});
     // Use the user's Downloads folder for the first desktop launch.
     if(!service.store.get('desktopInitialized')){service.store.saveSettings({downloadDir:path.join(app.getPath('downloads'),'Flow')});service.store.set('desktopInitialized',true);}
@@ -126,8 +127,10 @@ if(!app.requestSingleInstanceLock({version:app.getVersion()})){
     service.engine.on('queueComplete',()=>{playEventSound('queue');});
     service.engine.on('quitRequested',()=>app.quit());
     completionPower=new (require('./completion-power.cjs').CompletionPower)(service,{onPrompt:()=>toolsWindows.open('shutdown')});service.engine.on('shutdownRequested',queue=>completionPower.request(queue).catch(writeLog));
+    service.engineHost=new (require('./engine-host-client.cjs').EngineHostClient)(service);service.engine.workerClient=service.engineHost;
     await ensureMain();toolsWindows=new ToolWindows({BrowserWindow,service,origin:web.origin,main:win,screen,guardWindow});
     service.engine.on('started',d=>{if(service.store.settings.showProgress)toolsWindows.open('details',{id:d.id}).catch(writeLog);});
+    await service.engineHost.attach();
     for(const d of service.store.list().filter(d=>d.status==='pending'))toolsWindows.open('download-info',{id:d.id}).catch(writeLog);
     wakeTimer=setInterval(syncWake,500);
     await cli(process.argv);
@@ -142,7 +145,7 @@ if(!app.requestSingleInstanceLock({version:app.getVersion()})){
       try{if(process.env.FLOW_SMOKE_VIEW)await win.webContents.executeJavaScript(process.env.FLOW_SMOKE_VIEW);await new Promise(r=>setTimeout(r,500));const state=await win.webContents.executeJavaScript('({title:document.title,bridge:!!window.desktopAPI,connection:document.querySelector("#connection-state")?.textContent,bodyWidth:document.body.scrollWidth,viewport:innerWidth})');const report={stage:'complete',...state,database:service.store.realm.path,electron:process.versions.electron,sandbox:win.webContents.getLastWebPreferences().sandbox};console.log('ELECTRON_SMOKE_OK',JSON.stringify(report));smokeReport(report);if(process.env.FLOW_SMOKE_IMAGE){const capture=await win.webContents.capturePage();fs.writeFileSync(process.env.FLOW_SMOKE_IMAGE,capture.toPNG());}app.quit();}catch(e){console.error(e);smokeReport({stage:'error',error:e.message});app.quit();}
     },Number(process.env.FLOW_SMOKE_DELAY)||2500);}
   }).catch(e=>{console.error(e);smokeReport({stage:'error',error:e.message});if(!process.env.FLOW_SMOKE_TEST){showFatalError(e).catch(()=>app.exit(1));return;}app.quit();});
-  app.on('before-quit',event=>{if(quitting)return;event.preventDefault();quitting=true;completionPower?.close();toolsWindows?.closeAll();clearInterval(clipTimer);clearInterval(wakeTimer);clearInterval(trayTimer);if(wakeId!==undefined)powerSaveBlocker.stop(wakeId);win?.flowRecovery?.dispose();Promise.resolve().then(async()=>{if(service)await service.close();if(web)await web.close();app.exit(0);}).catch(()=>app.exit(1));});
+  app.on('before-quit',event=>{if(quitting)return;event.preventDefault();quitting=true;completionPower?.close();toolsWindows?.closeAll();clearInterval(clipTimer);clearInterval(wakeTimer);clearInterval(trayTimer);if(wakeId!==undefined)powerSaveBlocker.stop(wakeId);win?.flowRecovery?.dispose();Promise.resolve().then(async()=>{if(service)await service.close();if(web)await web.close();releaseProfile?.();app.exit(0);}).catch(()=>app.exit(1));});
   app.on('window-all-closed',()=>{if(!quitting&&(!tray||tray.isDestroyed()))app.quit();});
 }
 module.exports={parseCLI};

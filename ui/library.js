@@ -40,4 +40,4 @@ handleAction=async(name,el)=>{
 };
 document.addEventListener('change',e=>{if(e.target.dataset.libraryId){e.target.checked?librarySelection.add(e.target.dataset.libraryId):librarySelection.delete(e.target.dataset.libraryId);}if(e.target.hasAttribute('data-folder-shortcut')&&e.target.value){const form=e.target.closest('form');form.querySelector('[name=directory]').value=e.target.value;form.dataset.directoryEdited='1';}});
 
-window.desktopAPI?.onToolContext(value=>{if(windowContext==='library')openLibrary(value.tab,value.id.split(',').filter(Boolean));});
+window.desktopAPI?.onToolContext(value=>{if(windowContext==='library')openLibrary(value.tab,(value.id||'').split(',').filter(Boolean));});

@@ -22,8 +22,8 @@ class BrowserBridge{
   }
   async configure(host=path.join(this.root,'FlowNativeHost.exe')){
     if(!fs.existsSync(host))return;
-    const executable=process.env.PORTABLE_EXECUTABLE_FILE||process.execPath;
-    const args=this.app.isPackaged?'--background':`"${this.app.getAppPath()}" --background`;
+    const executable=this.app.flowExecutable||process.env.PORTABLE_EXECUTABLE_FILE||process.execPath;
+    const args=this.app.flowArguments||(this.app.isPackaged?'--background':`"${this.app.getAppPath()}" --background`);
     await require('./windows-bridge.cjs').configure({configFile:path.join(this.root,'host-config.json'),address:this.origin,extensionId,token:this.service.extensionToken,executable,arguments:args});
   }
   async ensure(){if(!fs.existsSync(this.manifestPath))return;await this.install();}

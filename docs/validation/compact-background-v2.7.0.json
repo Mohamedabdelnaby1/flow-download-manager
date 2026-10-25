@@ -1,0 +1,8 @@
+{
+  "passed": 6,
+  "elapsed": 363688,
+  "minimizedDuration": 360000,
+  "bytes": 50331648,
+  "samples": 181,
+  "scope": "bounded local minimized/idle run; not a guarantee for every machine or site"
+}

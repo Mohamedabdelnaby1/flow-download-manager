@@ -1,0 +1,19 @@
+{
+  "passed": 11,
+  "checks": [
+    "older full edition installs to an isolated registered location",
+    "installed older edition completes a real transfer",
+    "older completed file contains the expected bytes",
+    "compact installer upgrades the same registered location",
+    "upgraded installed application reads encrypted history and original appearance/settings",
+    "migration backup preserves the original encrypted Realm byte-for-byte",
+    "upgrade preserves the actual completed file",
+    "repair reinstalls the compact edition while retaining history and preferences",
+    "uninstall removes the application and retains its encrypted library and completed file",
+    "rollback to the full edition reads the same encrypted library",
+    "isolated QA installation is removed without touching the real Flow registration"
+  ],
+  "isolatedAppId": "local.flow.validation.compact20261025",
+  "realUserInstallationChanged": false,
+  "bytes": 1048576
+}

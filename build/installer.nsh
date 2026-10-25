@@ -5,6 +5,9 @@
     SetErrorLevel 1633
     Quit
   ${EndIf}
+  !ifmacrodef flowPrerequisiteCheck
+    !insertmacro flowPrerequisiteCheck
+  !endif
 !macroend
 
 ; Author credit is shown on the installer welcome, wizard footer and finish page.

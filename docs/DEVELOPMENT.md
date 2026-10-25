@@ -33,7 +33,15 @@ npm audit --omit=dev
 
 Tests use isolated temporary databases and local HTTP/FTP fixtures. They check actual bytes, pause/resume, errors, authorized handoff, quotas, rescue and media. Windows native tests need the compiled host. Local tests do not prove live website or personal-browser behavior.
 
-## Project map
+## Optional compact Windows build
+
+Run `./scripts/build-compact-windows.ps1` after `npm ci` and `npm run native`. It downloads pinned official build inputs, verifies their SHA-256 fingerprints, compiles the Windows host with its DPI manifest, and stages all production dependencies. Existing stage directories are never overwritten. The package uses complete official Node, FFmpeg, aria2 and yt-dlp tools; Windows packages omit only the duplicate standalone extractor and mobile Realm development archives.
+
+Build the compact portable launcher with `node scripts/build-compact-portable.cjs <staged directory> <makensis.exe> <output.exe>`. Its versioned cache remains present while the independent engine runs. The optional GitHub workflow builds both compact packages into an existing draft and fails if either exceeds 70,000,000 bytes.
+
+Compact Preview requires shared Microsoft WebView2 and .NET Framework 4.8. Those prerequisites are checked before replacing an existing installation. Keep the complete Electron edition available; see [preservation and validation](COMPACT-WINDOWS-PREVIEW.md).
+
+## Project responsibilities
 
 | Path | Responsibility |
 | --- | --- |

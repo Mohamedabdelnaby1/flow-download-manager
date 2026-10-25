@@ -1,0 +1,60 @@
+name: Optional compact Windows packages
+on:
+  workflow_dispatch:
+    inputs:
+      releaseTag:
+        description: Existing draft release tag
+        required: true
+        default: v2.7.0
+permissions:
+  contents: read
+jobs:
+  compact:
+    runs-on: windows-2022
+    timeout-minutes: 30
+    permissions:
+      contents: write
+    env:
+      ELECTRON_BUILDER_CACHE: ${{ github.workspace }}\.flow-builder
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.14.0'
+          cache: npm
+      - run: npm ci
+      - name: Full service regression suite
+        run: node --test --test-concurrency=1 test/*.test.cjs
+      - name: Build the unchanged full-tool payload and compact installer
+        shell: pwsh
+        run: ./scripts/build-compact-windows.ps1 -CachePath "$env:RUNNER_TEMP/flow-upstream-cache" -StagePath "$env:GITHUB_WORKSPACE/release-compact/staged"
+      - name: Build persistent-cache portable launcher
+        shell: pwsh
+        run: |
+          $compiler=Get-ChildItem -LiteralPath $env:ELECTRON_BUILDER_CACHE -Recurse -Filter makensis.exe | Select-Object -First 1 -ExpandProperty FullName
+          if(!$compiler){throw 'NSIS compiler unavailable'}
+          $version=node -p "require('./package.json').version"
+          node scripts/build-compact-portable.cjs release-compact/staged $compiler "release-compact/Flow-$version-Compact-Preview-Portable.exe"
+          if($LASTEXITCODE -ne 0){throw 'Portable build failed'}
+      - name: Verify draft and upload optional packages
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ inputs.releaseTag }}
+        shell: pwsh
+        run: |
+          $version=node -p "require('./package.json').version"
+          if($env:RELEASE_TAG -ne "v$version"){throw 'Release version mismatch'}
+          if((gh release view $env:RELEASE_TAG --json isDraft --jq .isDraft) -ne 'true'){throw 'Only a draft can receive candidate packages'}
+          $files=@(Get-ChildItem release-compact -File | Where-Object Name -in @("Flow-$version-Compact-Preview-Setup.exe","Flow-$version-Compact-Preview-Portable.exe"))
+          if($files.Count -ne 2){throw 'Both optional Windows editions are required'}
+          if($files.Where({$_.Length -gt 70000000}).Count){throw 'Compact package exceeds the accepted size budget'}
+          @{version=$version;sharedPrerequisites=@('Microsoft WebView2 Runtime','.NET Framework 4.8');fullNode=$true;mediaToolsIncluded=$true;packages=@($files|ForEach-Object{[pscustomobject]@{name=$_.Name;bytes=$_.Length;sha256=(Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash.ToLowerInvariant()}})}|ConvertTo-Json -Depth 4|Set-Content release-compact/Windows-Compact-CI.json
+          gh release upload $env:RELEASE_TAG @($files.FullName) --clobber
+          if($LASTEXITCODE -ne 0){throw 'Compact upload failed'}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: compact-build-receipt
+          path: |
+            release-compact/Windows-Compact-CI.json
+            release-compact/*Portable.exe.json
+          retention-days: 14

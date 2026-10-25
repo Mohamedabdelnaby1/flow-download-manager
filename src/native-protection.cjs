@@ -1,0 +1,11 @@
+const fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto'),{spawnSync}=require('node:child_process');
+// Preserve Electron's existing Windows OSCrypt v10 envelope and encrypted Realm key.
+function dpapi(executable,mode,bytes){const r=spawnSync(executable,['--os-crypt-'+mode],{input:Buffer.from(bytes).toString('base64'),encoding:'utf8',windowsHide:true,timeout:15000,maxBuffer:1024*1024});if(r.error||r.status!==0)throw Error('Windows could not unlock the Flow key. Your encrypted library has been kept.');return Buffer.from(r.stdout.trim(),'base64');}
+function protection(profile,executable){
+ const localState=path.join(profile,'Local State');let data={};if(fs.existsSync(localState))data=JSON.parse(fs.readFileSync(localState,'utf8'));let key;
+ if(data.os_crypt?.encrypted_key){const wrapped=Buffer.from(data.os_crypt.encrypted_key,'base64');if(wrapped.subarray(0,5).toString()!=='DPAPI')throw Error('The existing Windows key format is not supported. Keep the current Flow edition and library.');key=dpapi(executable,'unprotect',wrapped.subarray(5));}
+ else{if(fs.existsSync(path.join(profile,'FlowData','realm-key.protected')))throw Error('The original Windows key metadata is missing. Restore its backup before opening this library.');key=crypto.randomBytes(32);data.os_crypt={...(data.os_crypt||{}),encrypted_key:Buffer.concat([Buffer.from('DPAPI'),dpapi(executable,'protect',key)]).toString('base64')};fs.mkdirSync(profile,{recursive:true});const temporary=localState+'.'+process.pid+'.tmp';fs.writeFileSync(temporary,JSON.stringify(data),{mode:0o600});fs.renameSync(temporary,localState);}
+ if(key.length!==32)throw Error('The Windows encryption key is invalid.');
+ return {encrypt(value){const nonce=crypto.randomBytes(12),cipher=crypto.createCipheriv('aes-256-gcm',key,nonce);return Buffer.concat([Buffer.from('v10'),nonce,cipher.update(String(value),'utf8'),cipher.final(),cipher.getAuthTag()]);},decrypt(value){const b=Buffer.from(value);if(b.subarray(0,3).toString()!=='v10'||b.length<31)throw Error('The encrypted library key format is invalid.');const cipher=crypto.createDecipheriv('aes-256-gcm',key,b.subarray(3,15));cipher.setAuthTag(b.subarray(-16));return Buffer.concat([cipher.update(b.subarray(15,-16)),cipher.final()]).toString('utf8');}};
+}
+module.exports={protection,dpapi};

@@ -47,6 +47,7 @@ class Service{
     this.updates=new (require('./updates.cjs').UpdateChecker)({version:require('../package.json').version,store:this.store,fetch:options.updateFetch,openExternal:this.desktop?.openUpdateRelease,onAvailable:()=>this.desktop?.updateAvailable?.()});
     this.remote=new (require('./remote.cjs').RemoteControl)(this);
     this.peers=new (require('./peers.cjs').PeerDownloads)(this);
+    this.engine.externalActiveCount=()=>this.peers.activeCount();
     this.downloadTools=new (require('./download-tools.cjs').DownloadTools)(this);
     this.smart=new (require('./smart.cjs').SmartTools)(this);this.connectionHealth=new (require('./connection-health.cjs').ConnectionHealth)(this);
     this.power=new (require('./power.cjs').Power)(this);this.library=new (require('./library.cjs').Library)(this);
@@ -143,8 +144,8 @@ class Service{
       case'settings':{
         if((e.active.size||e.maintenance.size)&&(['tempDir','downloadDir'].some(k=>data[k]!==undefined&&data[k]!==s.settings[k])))throw Error('أوقف التحميلات وانتظر انتهاء الفحص قبل تغيير مجلدات الحفظ');
         if(data.tempDir&&data.tempDir!==s.settings.tempDir&&s.list().some(d=>d.downloaded>0&&d.status!=='complete'))throw Error('لا يمكن تغيير مجلد الأجزاء قبل إكمال أو إزالة التحميلات غير المكتملة');
-        const patch=validateSettings(data);if(patch.startAtLogin!==undefined){if(!this.desktop&&patch.startAtLogin)throw Error('التشغيل مع النظام متاح داخل Electron');await this.desktop?.startup(patch.startAtLogin);}
-        const result=s.saveSettings(patch);if(patch.textScale!==undefined)this.desktop?.scale?.(Math.max(.8,Math.min(1.5,patch.textScale/100)));return result;
+        const patch=validateSettings(data);if(patch.startAtLogin!==undefined){if(!this.desktop&&patch.startAtLogin)throw Error('التشغيل مع النظام متاح في نسخة Flow لسطح المكتب');await this.desktop?.startup(patch.startAtLogin);}
+        const result=s.saveSettings(patch);if(patch.simultaneous!==undefined||patch.connections!==undefined){await this.peers.applyLimits();await e.enforceLimits();if(e.workerClient?.session)await e.workerClient.syncPending();}if(patch.textScale!==undefined)this.desktop?.scale?.(Math.max(.8,Math.min(1.5,patch.textScale/100)));return result;
       }
       case'queue':{
         const id=data.id||crypto.randomUUID(),old=s.queues().find(q=>q.id===id);
@@ -185,7 +186,7 @@ class Service{
       }
       case'chooseDirectory':if(!this.desktop)throw Error('اكتب مسار المجلد في نسخة المتصفح');return this.desktop.chooseDirectory();
       case'chooseSound':if(!this.desktop)throw Error('اكتب مسار WAV في نسخة المتصفح');return this.desktop.chooseSound();
-      case'playSound':if(!this.desktop)throw Error('معاينة ملف صوتي محلي تحتاج Electron');return this.desktop.playSound(String(data.path||''),data.event||'complete');
+      case'playSound':if(!this.desktop)throw Error('معاينة ملف صوتي محلي تحتاج نسخة Flow لسطح المكتب');return this.desktop.playSound(String(data.path||''),data.event||'complete');
       case'cancel':if(!s.find(data.id))return true;if(e.maintenance.has(data.id))throw Error('انتظر انتهاء الفحص أو العملية الحالية');await e.remove(data.id,false);return true;
       case'vpnConnect':if(!this.desktop)throw Error('هذه الوظيفة تحتاج نسخة ويندوز Electron');return this.desktop.vpnConnect(s.settings.vpnName);
       case'vpnDisconnect':if(!this.desktop)throw Error('هذه الوظيفة تحتاج نسخة ويندوز Electron');return this.desktop.vpnDisconnect(s.settings.vpnName);
@@ -193,6 +194,6 @@ class Service{
     }
   }
   close(){if(this.closePromise)return this.closePromise;this.closed=true;this.closePromise=this.closeOnce();return this.closePromise;}
-  async closeOnce(){await this.connectionHealth.close();for(const c of this.probeJobs.values())c.abort();this.updates.stop();clearInterval(this.timer);for(const c of this.browserControllers)c.abort();await Promise.allSettled([...this.browserPending.values()]);await Promise.allSettled([...this.library.removing.values()]);await this.remote.close();await this.peers.close();await this.downloadTools.close();await this.power.close();await this.smart.close();for(const id of this.grabber.running)this.grabber.cancel(id);while(this.grabber.running.size)await new Promise(r=>setTimeout(r,50));await this.engine.close();this.store.close();}
+  async closeOnce(){await this.connectionHealth.close();for(const c of this.probeJobs.values())c.abort();this.updates.stop();clearInterval(this.timer);for(const c of this.browserControllers)c.abort();await Promise.allSettled([...this.browserPending.values()]);await Promise.allSettled([...this.library.removing.values()]);await this.remote.close();await this.peers.close();await this.downloadTools.close();await this.power.close();await this.smart.close();for(const id of this.grabber.running)this.grabber.cancel(id);while(this.grabber.running.size)await new Promise(r=>setTimeout(r,50));await this.engine.close();await this.engineHost?.close();this.store.close();}
 }
 module.exports={Service,validateAdd,validateSettings};

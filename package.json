@@ -1,6 +1,6 @@
 {
   "name": "flow-download-manager",
-  "version": "2.6.1",
+  "version": "2.7.0",
   "description": "Local-first download manager with Realm and an Electron shell",
   "main": "src/electron.cjs",
   "private": true,

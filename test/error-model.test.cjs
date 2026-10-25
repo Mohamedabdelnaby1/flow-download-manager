@@ -4,6 +4,12 @@ for(const [message,code] of cases)test('friendly bilingual classification: '+cod
 test('technical reports redact credentials and signed URL queries',()=>{const raw='Authorization: Bearer secret123\nCookie: session=secretvalue\nx-flow-token: fixture-token\nhttps://user:pass@site.test/video?token=signed-secret#fragment';const report=E.report(E.encode(Error(raw),'browserInstall','F-12345678'),'en');for(const value of ['secret123','secretvalue','fixture-token','signed-secret','user:pass'])assert.ok(!report.includes(value),value);assert.ok(report.includes('F-12345678'));assert.ok(report.includes('https://site.test/video'));});
 test('IPC envelopes survive Electron prefixes without exposing source text as the main message',()=>{const packet=E.encode(Error('spawn UNKNOWN'),'browserInstall','F-1');const e=E.describe("Error invoking remote method 'flow:action': Error: "+packet,'ar');assert.equal(e.code,'HELPER_START');assert.equal(e.incident,'F-1');assert.ok(e.technical.includes('UNKNOWN'));assert.ok(!e.message.includes('UNKNOWN'));});
 test('desktop and companion share the identical error catalog',()=>assert.ok(fs.readFileSync(path.join(__dirname,'../ui/error-model.js')).equals(fs.readFileSync(path.join(__dirname,'../extension/error-model.js')))));
+test('an unavailable quality is not mislabeled as a missing video',()=>{
+ for(const language of ['en','ar']){
+  assert.equal(E.describe('This video quality is unavailable. Choose Best available and try again.\nERROR: Requested format is not available.',language).code,'QUALITY');
+  assert.equal(E.describe('This video is unavailable or has been removed.',language).code,'NOT_FOUND');
+ }
+});
 test('Windows system utilities resolve without relying on PATH',()=>{assert.equal(W.systemFile('reg.exe',{SystemRoot:'C:\\Windows'}),'C:\\Windows\\System32\\reg.exe');});
 test('synchronous spawn failures become rejected promises',async()=>{await assert.rejects(W.run('fixture.exe',[], '',{spawn:()=>{const e=Error('spawn UNKNOWN');e.code='UNKNOWN';throw e;}}),/fixture.exe.*UNKNOWN/);});
 test('broken setup stdin is handled without an uncaught EPIPE',async()=>{const child=new EventEmitter();child.stdout=new PassThrough();child.stderr=new PassThrough();child.stdin=new PassThrough();child.kill=()=>{};const task=W.run('fixture.exe',[],'fixture',{spawn:()=>child});const error=Error('broken pipe');error.code='EPIPE';child.stdin.emit('error',error);child.emit('error',Object.assign(Error('spawn UNKNOWN'),{code:'UNKNOWN'}));await assert.rejects(task,/UNKNOWN/);});

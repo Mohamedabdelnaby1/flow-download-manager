@@ -2,13 +2,14 @@ const fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypt
 const {fileName}=require('./engine.cjs');
 const COLUMNS=['name','queueId','size','status','time','speed','updatedAt','description'];
 const FONTS=['system','Segoe UI','Arial','Tahoma','Noto Sans'];
-const DEFAULT={columns:COLUMNS,font:'system',retentionDays:0,slowEnabled:false,slowKB:32,slowSeconds:90,slowHoldSeconds:120};
-const ACTIONS=new Set(['toolsPreferences','toolsSnapshot','duplicatePlan','duplicateClean','historyCleanup','relocateStart','relocateCancel','renameCompleted','zipExtract']);
+const DEFAULT={columns:COLUMNS,font:'system',pinnedTools:[],accent:'sage',density:'comfortable',corners:'soft',motion:'system',sidebarWidth:232,toolbarLabels:true,retentionDays:0,slowEnabled:false,slowKB:32,slowSeconds:90,slowHoldSeconds:120};
+const ACTIONS=new Set(['toolsPreferences','toolsSnapshot','duplicatePlan','duplicateClean','historyCleanup','relocateStart','relocateCancel','renameCompleted','zipExtract','appearanceReset']);
 function preferences(data={}){
  const out={...DEFAULT,...data};if(!Array.isArray(out.columns)||out.columns.some(k=>!COLUMNS.includes(k))||new Set(out.columns).size!==out.columns.length||!out.columns.includes('name')||!out.columns.includes('status'))throw Error('Keep the file name and status columns; choose valid columns.');
+ for(const [key,values]of Object.entries({accent:['sage','blue','violet','rose','sand','teal'],density:['compact','comfortable','spacious'],corners:['soft','crisp'],motion:['system','reduced']}))if(!values.includes(out[key]))throw Error('Choose a supported appearance.');
  if(!FONTS.includes(out.font))throw Error('Choose a supported font');
- for(const [key,min,max]of [['retentionDays',0,3650],['slowKB',1,1000000],['slowSeconds',30,3600],['slowHoldSeconds',30,3600]])if(!Number.isInteger(Number(out[key]))||Number(out[key])<min||Number(out[key])>max)throw Error('Invalid '+key);
- return {columns:out.columns,font:out.font,retentionDays:Number(out.retentionDays),slowEnabled:out.slowEnabled===true,slowKB:Number(out.slowKB),slowSeconds:Number(out.slowSeconds),slowHoldSeconds:Number(out.slowHoldSeconds)};
+ for(const [key,min,max]of [['sidebarWidth',160,320],['retentionDays',0,3650],['slowKB',1,1000000],['slowSeconds',30,3600],['slowHoldSeconds',30,3600]])if(!Number.isInteger(Number(out[key]))||Number(out[key])<min||Number(out[key])>max)throw Error('Invalid '+key);
+ return {columns:out.columns,font:out.font,sidebarWidth:Number(out.sidebarWidth),toolbarLabels:out.toolbarLabels!==false,accent:out.accent,density:out.density,corners:out.corners,motion:out.motion,pinnedTools:require('./workspace-tools.cjs').pinnedTools(out.pinnedTools),retentionDays:Number(out.retentionDays),slowEnabled:out.slowEnabled===true,slowKB:Number(out.slowKB),slowSeconds:Number(out.slowSeconds),slowHoldSeconds:Number(out.slowHoldSeconds)};
 }
 function canonical(value){const u=new URL(value);u.hash='';return u.href;}
 class DownloadTools{
@@ -49,8 +50,9 @@ class DownloadTools{
   for(const [key,value]of this.jobs)if(this.jobs.size>30&&!['copying'].includes(value.state))this.jobs.delete(key);return {id:job.id};
  }
  async action(type,data){switch(type){
+  case'appearanceReset':{const p={...this.config(),font:DEFAULT.font,accent:DEFAULT.accent,density:DEFAULT.density,corners:DEFAULT.corners,motion:DEFAULT.motion,sidebarWidth:DEFAULT.sidebarWidth,toolbarLabels:DEFAULT.toolbarLabels,columns:[...DEFAULT.columns]};this.service.store.set('downloadTools',p);return p;}
   case'toolsSnapshot':return this.snapshot();
-  case'toolsPreferences':{const value=preferences({...this.config(),...data});this.service.store.set('downloadTools',value);return value;}
+  case'toolsPreferences':{const value=preferences({...this.config(),...data}),appearance={};for(const key of ['theme','textScale'])if(data[key]!==undefined)appearance[key]=data[key];const patch=require('./service.cjs').validateSettings(appearance);this.service.store.set('downloadTools',value);if(Object.keys(patch).length)this.service.store.saveSettings(patch);if(patch.textScale!==undefined)this.service.desktop?.scale?.(patch.textScale/100);return value;}
   case'duplicatePlan':return this.duplicatePlan();
   case'duplicateClean':{if(!Array.isArray(data.ids)||!data.ids.length||data.ids.length>500)throw Error('Select up to 500 duplicate records');const valid=new Set(this.duplicatePlan().flatMap(g=>g.remove.map(d=>d.id)));if(data.ids.some(id=>!valid.has(id)))throw Error('Duplicate list changed; preview again');for(const id of data.ids)await this.service.library.trash(id);return {count:data.ids.length};}
   case'historyCleanup':{const days=Number(data.days);if(!Number.isInteger(days)||days<1||days>3650)throw Error('Choose 1–3650 days');return this.cleanup(days);}
