@@ -55,12 +55,5 @@ handleAction=async(name,el)=>{
   return nativeHandleAction(name,el);
 };
 function isSiteVideo(url){try{return /(^|\.)(youtube\.com|youtu\.be|vimeo\.com|tiktok\.com|dailymotion\.com|instagram\.com|facebook\.com|fb\.watch)$/i.test(new URL(url).hostname);}catch{return false;}}
-function legacyVideoQualities(info){
-  const values={best:t('أفضل جودة متاحة — دمج الصوت تلقائيًا','Best available — audio merged automatically'),audio:t('صوت فقط MP3','Audio only MP3')};
-  for(const f of info.formats||[])values[f.id]=`${f.height||'?'}p${f.fps>30?' · '+f.fps+'fps':''} · ${f.ext} · ${f.codec.split('.')[0]}${f.size?' · ~'+size(f.size):''}${f.hasAudio?' · A/V':''}`;
-  $('#video-qualities').innerHTML=select('quality',t('جودة الفيديو','Video quality'),values,'best');
-  const name=$('#add-form [name=name]'),pending=state.downloads.find(d=>d.id===windowArgs.get('id'));if(name&&(!name.value||pending&&JSON.parse(pending.meta).autoName&&name.value===pending.name))name.value=info.title+'.mp4';
-  $('#add-form [name=category]').value='video';$('#add-form [name=mode]').value='site';
-  $('#probe-result').innerHTML=`<div class="info-box"><strong>${h(info.title)}</strong><br>${duration(info.duration)} · ${info.formats.length} ${t('صيغة متاحة','available formats')} · ${h(info.extractor)}</div>`;
-}
+
 init();

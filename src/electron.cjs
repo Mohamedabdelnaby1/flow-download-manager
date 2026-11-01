@@ -5,13 +5,11 @@ const {app,BrowserWindow,ipcMain,dialog,shell,safeStorage,clipboard,Notification
 const path=require('node:path');
 const fs=require('node:fs');
 const {execFile}=require('node:child_process');
-const {Service}=require('./service.cjs');
 const {StartupManager,WindowRecovery,rotatingLog,safeSend}=require('./lifecycle.cjs');
 // Flow uses a 2D interface. Prefer software rendering for idle/driver compatibility.
 if(!process.argv.includes('--flow-hardware-acceleration'))app.disableHardwareAcceleration();
 const {BrowserBridge}=require('./browser.cjs');
 const {ToolWindows}=require('./windows.cjs');
-const {createServer}=require('./server.cjs');
 const {validateURL}=require('./network.cjs');
 function writeLog(error){try{const folder=process.env.FLOW_SMOKE_DIR||app.getPath('userData');rotatingLog(path.join(folder,'desktop.log'),require('../ui/error-model.js').redact(error?.stack||String(error)));}catch{}}
 console.error=(...args)=>writeLog(args.map(v=>v?.stack||String(v)).join(' '));
@@ -22,7 +20,7 @@ function rememberTrayWindow(window){if(!window||window.isDestroyed())return;tray
 async function restoreTrayWindow(){if(quitting)return;if(trayTarget&&toolsWindows&&service.store.find(trayTarget.id)){await toolsWindows.open(trayTarget.kind,{id:trayTarget.id});return;}trayTarget=null;await showMain();}
 function runtimeEvent(event){const folder=process.env.FLOW_SMOKE_DIR||app.getPath('userData');rotatingLog(path.join(folder,'desktop-events.jsonl'),JSON.stringify(event));}
 let fatalErrorPending=false;
-async function showFatalError(error){if(fatalErrorPending)return;fatalErrorPending=true;writeLog(error);const model=require('../ui/error-model.js'),language=service?.store?.settings?.language||'en',packet=model.encode(error,'application'),info=model.describe(packet,language);try{await app.whenReady();const choice=await dialog.showMessageBox({type:'error',title:'Flow Download Manager',message:info.message,detail:language==='ar'?'أعد تشغيل Flow للمتابعة بأمان. قد تتوقف التحميلات لحين فتحه مجددًا.':'Restart Flow to continue safely. Downloads may pause until it reopens.',buttons:language==='ar'?['إعادة تشغيل Flow','نسخ التقرير وإغلاق','إغلاق']:['Restart Flow','Copy report and close','Close'],defaultId:0,cancelId:2});if(choice.response===1)clipboard.writeText(model.report(packet,language));if(choice.response===0)app.relaunch();app.quit();}catch{app.exit(1);}}
+async function showFatalError(error){if(fatalErrorPending)return;fatalErrorPending=true;writeLog(error);const plan=require('./startup-failure.cjs').presentation(error,service?.store?.settings?.language||'en');try{await app.whenReady();const choice=await dialog.showMessageBox(plan.options);if(choice.response===(plan.blocked?0:1))clipboard.writeText(plan.report);if(!plan.blocked&&choice.response===0)app.relaunch();app.quit();}catch{app.exit(1);}}
 process.on('uncaughtException',error=>{showFatalError(error).catch(()=>app.exit(1));});
 process.on('unhandledRejection',error=>{writeLog(error);const packet=service?.describeError(error,'background')?.message||require('../ui/error-model.js').encode(error,'background');safeSend(win,'flow:error',packet);});
 app.on('child-process-gone',(_event,details)=>runtimeEvent({event:'child-process-gone',type:details.type,reason:details.reason,exitCode:details.exitCode}));
@@ -75,6 +73,8 @@ if(!app.requestSingleInstanceLock({version:app.getVersion()})){
 }else{
   app.on('second-instance',(_event,args)=>{if(!service||!toolsWindows){pendingCLI.push(args);return;}cli(args).catch(writeLog);if(!args.includes('--background'))showMain().catch(writeLog);});
   app.whenReady().then(async()=>{
+    // Native loading failures must reach Flow's error UI, including policy blocks.
+    const {Service}=require('./service.cjs'),{createServer}=require('./server.cjs');
     const protectedStorage=safeStorage.isEncryptionAvailable()&&!(process.platform==='linux'&&safeStorage.getSelectedStorageBackend()==='basic_text')?{encrypt:v=>safeStorage.encryptString(v),decrypt:v=>safeStorage.decryptString(v)}:undefined;
     if(!protectedStorage&&process.platform!=='linux')throw Error('تعذر الوصول إلى مخزن مفاتيح النظام الآمن');
     startup=new StartupManager(app,{portable:process.env.PORTABLE_EXECUTABLE_FILE||process.env.APPIMAGE});

@@ -7,6 +7,10 @@
 - Separate Firefox native manifest and strict caller validation by registered manifest path plus fixed add-on identity.
 - Download creation/filename fallbacks handle browsers with different interception timing, retain authorized sessions, prevent duplicate handoff and keep browser downloads when handoff fails.
 - Firefox signing remains an explicit external prerequisite: the supplied Firefox ZIP is an unsigned temporary-test bundle, with preparation/signing instructions.
+- Audit the running interface in 76 English/Arabic screen states. Remove a duplicate Ctrl+K handler, unused legacy rendering code and an unloaded stylesheet; keep intentional stylesheet layers.
+- Preserve sidebar/footer nodes and keyboard focus across unchanged background snapshots. Save the bundled Tajawal preference correctly, show the actual About version, serve phone-control design assets, and retain the selected companion folder.
+- Use one download-dialog cleanup listener instead of accumulating listeners when rebuilding the form.
+- Catch native database loading failures during startup. Explain Windows application-control blocks separately from database corruption, avoid restart loops, and fail Compact startup promptly if its backend exits.
 
 
 ## 2.9.0 — Material You workspace and AMOLED

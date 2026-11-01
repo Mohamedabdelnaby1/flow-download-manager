@@ -17,7 +17,6 @@ function duration(sec){if(!Number.isFinite(sec)||sec<=0)return'—';if(sec<60)re
 function date(s){return new Date(s).toLocaleDateString(state?.settings.language==='en'?'en-GB':'ar-EG',{day:'numeric',month:'short'});}
 function button(action,label,ico,cls='',extra=''){return `<button type="button" class="btn ${cls}" data-action="${action}" ${extra}>${ico?icon(ico):''}${h(label)}</button>`;}
 function ib(action,label,ico,extra=''){return `<button type="button" class="icon-button" data-action="${action}" title="${h(label)}" aria-label="${h(label)}" ${extra}>${icon(ico)}</button>`;}
-function badge(d){return `<span class="status-badge ${d.status}" title="${h(d.error)}">${icon(d.status==='complete'?'check':d.status==='paused'?'pause':d.status==='error'?'info':d.status==='queued'?'clock':'activity')}${h(statusText(d.status))}</span>`;}
 async function api(type,data={}){
   if(window.desktopAPI){try{return await window.desktopAPI.action(type,data);}catch(e){throw Error(String(e.message).replace(/^Error invoking remote method '[^']+': (?:Error: )?/,''));}}
   const r=await fetch('/api/action',{method:'POST',headers:{'content-type':'application/json','x-flow-token':session},body:JSON.stringify({type,data})});

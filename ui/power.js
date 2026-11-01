@@ -87,6 +87,5 @@ handleAction=async(name,el)=>{
  }catch(e){powerError(e);}finally{powerBusy=false;for(const [b,disabled]of buttons)if(b.isConnected)b.disabled=disabled;}
 };
 document.addEventListener('change',e=>{if(e.target.dataset.powerLink){e.target.checked?powerLinkChosen.add(e.target.dataset.powerLink):powerLinkChosen.delete(e.target.dataset.powerLink);}});
-document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='k'){e.preventDefault();openPower();}});
 
 window.desktopAPI?.onToolContext?.(data=>{if(windowContext==='power'&&data.tab)openPower(data.tab,data.url||'');});

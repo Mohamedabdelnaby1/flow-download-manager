@@ -1,5 +1,5 @@
 // Windows pilot: the existing Node/Realm services run outside the WebView UI.
-const fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto'),{Service}=require('./service.cjs'),{createServer}=require('./server.cjs'),{protection,dpapi}=require('./native-protection.cjs');
+const fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto'),{protection,dpapi}=require('./native-protection.cjs');
 const args=Object.fromEntries(process.argv.slice(2).reduce((out,v,i,a)=>v.startsWith('--')?[...out,[v.slice(2),a[i+1]]]:out,[])),profile=path.resolve(args.profile||''),executable=path.resolve(args.shell||'');
 let service,web,releaseProfile,power,quitTimer,shellLauncher,closing=false,events=[],nativeStatus={connected:false},lastPoll=0,serial=0,wakeKeeper,wakeState=false;const requests=new Map(),version=require('../package.json').version;
 function syncWake(){const needed=!!service?.store.settings.preventSleep&&service.engine.active.size+service.peers.activeCount()>0;if(!wakeKeeper&&needed){wakeKeeper=require('node:child_process').spawn(executable,['--keep-awake'],{windowsHide:true,stdio:['pipe','ignore','ignore']});wakeKeeper.on('error',()=>{wakeKeeper=null;wakeState=false;});wakeKeeper.on('exit',()=>{wakeKeeper=null;wakeState=false;});wakeKeeper.stdin.on('error',()=>{});}if(wakeKeeper&&needed!==wakeState){wakeKeeper.stdin.write(needed?'1\n':'0\n');wakeState=needed;}return wakeState;}
@@ -11,6 +11,7 @@ for(const stream of [process.stdout,process.stderr])stream.on('error',()=>{});
 process.on('uncaughtException',error=>{try{fs.appendFileSync(path.join(profile,'native-backend.log'),require('../ui/error-model.js').redact(error.stack)+'\n');}catch{}close().catch(()=>process.exit(1));});
 process.on('unhandledRejection',error=>{event('error',require('../ui/error-model.js').encode(error,'background'));});
 async function main(){
+ const {Service}=require('./service.cjs'),{createServer}=require('./server.cjs');
  if(!path.isAbsolute(args.profile||'')||!fs.existsSync(executable))throw Error('Invalid desktop launch paths.');
  releaseProfile=require('./native-profile.cjs').acquireProfile(profile);
  require('./native-profile.cjs').backupBeforeNative(profile);

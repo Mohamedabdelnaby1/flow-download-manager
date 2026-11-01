@@ -179,7 +179,7 @@ class Service{
       case'grabDownload':return this.grabber.download(data.id,data.urls||[]);
       case'extensionRotate':this.extensionToken=crypto.randomBytes(32).toString('hex');s.set('extensionToken',this.extensionToken);await this.browserBridge?.configure();return this.extensionToken;
       case'browserInstall':if(!this.browserBridge)throw Error('افتح نسخة سطح المكتب لإعداد الربط');if(data.browser){require('./browser-targets.cjs').target(data.browser);this.store.set('browserPreferred',data.browser);}return this.browserBridge.install();
-      case'browserFolder':if(!this.browserBridge)throw Error('افتح نسخة سطح المكتب');if(!require('node:fs').existsSync(this.browserBridge.folder(data.browser||this.store.get('browserPreferred','chrome'))))throw Error('جهّز ربط المتصفح أولاً');return this.desktop.open(this.browserBridge.folder(data.browser));
+      case'browserFolder':if(!this.browserBridge)throw Error('افتح نسخة سطح المكتب');if(!require('node:fs').existsSync(this.browserBridge.folder(data.browser||this.store.get('browserPreferred','chrome'))))throw Error('جهّز ربط المتصفح أولاً');return this.desktop.open(this.browserBridge.folder(data.browser||this.store.get('browserPreferred','chrome')));
       case'browserExtensions':if(!this.desktop)throw Error('افتح chrome://extensions يدويًا');return this.desktop.browserExtensions(data.browser||this.store.get('browserPreferred','chrome'));
       case'quit':if(!this.desktop)throw Error('هذه الوظيفة لسطح المكتب');return this.desktop.quit();
       case'dragFile':{if(!this.desktop?.dragFile)throw Error('File dragging is available in the desktop app.');return this.desktop.dragFile(require('./completed-file.cjs').completedFile(s,data.id));}

@@ -1,7 +1,7 @@
 const fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto');
 const {fileName}=require('./engine.cjs');
 const COLUMNS=['name','queueId','size','status','time','speed','updatedAt','description'];
-const FONTS=['system','Segoe UI','Arial','Tahoma','Noto Sans'];
+const FONTS=['system','Tajawal','Segoe UI','Arial','Tahoma','Noto Sans'];
 const DEFAULT={columns:COLUMNS,font:'system',pinnedTools:[],accent:'sage',density:'comfortable',corners:'soft',motion:'system',sidebarWidth:232,toolbarLabels:true,retentionDays:0,slowEnabled:false,slowKB:32,slowSeconds:90,slowHoldSeconds:120};
 const ACTIONS=new Set(['toolsPreferences','toolsSnapshot','duplicatePlan','duplicateClean','historyCleanup','relocateStart','relocateCancel','renameCompleted','zipExtract','appearanceReset']);
 function preferences(data={}){

@@ -1,5 +1,5 @@
 // Small task-first confirmation windows. Technical controls remain in Advanced.
-let downloadCollection=null,collectionRequest=0,inspectionTimer;
+let downloadCollection=null,collectionRequest=0,inspectionTimer,addDialogActive=false;
 const originalOpenAdd=openAdd,originalSubmitAdd=submitAdd,originalDownloadAction=handleAction;
 const originalDownloadFormError=formError;
 formError=function(error){originalDownloadFormError(error);const info=FlowErrors.describe(error,state?.settings.language||'en'),url=$('#f-url')?.value;if(window.desktopAPI&&/^https?:/i.test(url||'')&&['LOGIN_REQUIRED','FORBIDDEN','VIDEO_EXTRACT'].includes(info.code)&&!$('#form-error [data-error-source]')){const button=document.createElement('button');button.type='button';button.className='btn';button.textContent=t('فتح المصدر في المتصفح','Open source in browser');button.onclick=()=>api('sourceOpen',{url}).catch(e=>toast(e,true));$('#form-error .flow-error-card')?.append(button);}};
@@ -15,11 +15,11 @@ function prepareVideoChoice(){
 }
 openAdd=function(url=''){
  originalOpenAdd(url);if(!$('#add-form')||(!windowContext&&window.desktopAPI))return;
- downloadCollection=null;collectionRequest++;prepareVideoChoice();const form=$('#add-form');
+ addDialogActive=true;downloadCollection=null;collectionRequest++;prepareVideoChoice();const form=$('#add-form');
  const qualities=$('#video-qualities');$('#probe-result').before(qualities);
  const pending=state.downloads.find(d=>d.id===windowArgs.get('id'));const quality=pending&&JSON.parse(pending.meta).quality;if(quality&&$('#f-quality'))$('#f-quality').value=quality;
  form.addEventListener('input',event=>{if(event.target.name!=='url')return;form.dataset.inspectedUrl='';setDownloadReady(false);clearTimeout(inspectionTimer);downloadCollection=null;collectionRequest++;api('collectionCancel').catch(()=>{});$('#form-error').replaceChildren();$('#probe-result').replaceChildren();$('#video-qualities').replaceChildren();prepareVideoChoice();const probe=$('[data-action=probeAdd]');if(probe)probe.disabled=false;if(/^https?:\/\//i.test(event.target.value))inspectionTimer=setTimeout(()=>inspectDownload(),400);else if(/^(magnet:|ftp:)/i.test(event.target.value))setDownloadReady(true);});
- $('#dialog').addEventListener('close',()=>{clearTimeout(inspectionTimer);collectionRequest++;api('collectionCancel').catch(()=>{});},{once:true});
+
  form.addEventListener('input',event=>{if(!['cookie','referer','username','password'].includes(event.target.name))return;cancelProbe();clearTimeout(inspectionTimer);form.dataset.inspectedUrl='';setDownloadReady(false);inspectionTimer=setTimeout(()=>inspectDownload(),500);});
  form.addEventListener('input',event=>{if(event.target.name==='url')$('#add-form [name=mode]').value=isSiteVideo(event.target.value)?'site':'file';});
  form.addEventListener('change',event=>{if(event.target.name!=='mode')return;cancelProbe();form.dataset.inspectedUrl='';setDownloadReady(false);inspectDownload();});
@@ -70,3 +70,6 @@ handleAction=async function(name,el){
 };
 document.addEventListener('dragstart',event=>{const file=event.target.closest('[data-drag-file]');if(!file)return;event.preventDefault();if(window.desktopAPI?.startDrag)window.desktopAPI.startDrag(file.dataset.dragFile);else if(window.desktopAPI)api('dragFile',{id:file.dataset.dragFile}).catch(e=>toast(e,true));});
 document.addEventListener('change',event=>{if(event.target.name!=='quality')return;const name=$('#f-name');if(name?.value){if(event.target.value==='audio')name.value=name.value.replace(/\.(mp4|mkv|webm)$/i,'.mp3');else name.value=name.value.replace(/\.mp3$/i,'.mp4');}});
+
+// One dialog lifecycle listener, independent of how often the form is rebuilt.
+$('#dialog').addEventListener('close',()=>{if(!addDialogActive)return;addDialogActive=false;clearTimeout(inspectionTimer);collectionRequest++;downloadCollection=null;api('collectionCancel').catch(()=>{});});
