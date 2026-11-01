@@ -9,7 +9,7 @@ using System.Web.Script.Serialization;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
-// Chrome Native Messaging host. Stdout is reserved exclusively for framed JSON.
+// Browser Native Messaging host. Stdout is reserved exclusively for framed JSON.
 class FlowNativeHost {
   [StructLayout(LayoutKind.Sequential, CharSet=CharSet.Unicode)] struct StartupInfo { public int cb; public string reserved, desktop, title; public int x,y,xSize,ySize,xCountChars,yCountChars,fillAttribute,flags; public short showWindow,reserved2; public IntPtr reservedPtr,stdInput,stdOutput,stdError; }
   [StructLayout(LayoutKind.Sequential)] struct ProcessInfo { public IntPtr process,thread; public int processId,threadId; }
@@ -64,7 +64,9 @@ class FlowNativeHost {
     Stream input = Console.OpenStandardInput(), output = Console.OpenStandardOutput();
     try {
       config = json.Deserialize<Dictionary<string, object>>(File.ReadAllText(configFile));
-      if (args.Length < 1 || args[0].TrimEnd('/') != "chrome-extension://" + Value(config, "extensionId")) throw new Exception("Untrusted extension origin");
+      bool chromium=args.Length>=1&&args[0].TrimEnd('/')=="chrome-extension://"+Value(config,"extensionId");
+      bool firefox=false;if(args.Length>=2&&!String.IsNullOrEmpty(Value(config,"firefoxExtensionId"))&&args[1]==Value(config,"firefoxExtensionId")&&config.ContainsKey("firefoxManifestPaths")){var paths=config["firefoxManifestPaths"]as System.Collections.IEnumerable;if(paths!=null)foreach(var manifest in paths)if(String.Equals(Path.GetFullPath(args[0]),Path.GetFullPath(Convert.ToString(manifest)),StringComparison.OrdinalIgnoreCase))firefox=true;}
+      if(!chromium&&!firefox)throw new Exception("Untrusted extension origin");
       token = Encoding.UTF8.GetString(ProtectedData.Unprotect(Convert.FromBase64String(Value(config, "protectedToken")), null, DataProtectionScope.CurrentUser));
       while (true) {
         byte[] size = ReadBytes(input, 4); if (size == null) return;

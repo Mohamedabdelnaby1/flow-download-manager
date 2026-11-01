@@ -23,6 +23,12 @@ jobs:
       - run: npm ci
       - name: Source and integration tests
         run: node --test --test-concurrency=1 test/*.test.cjs
+      - name: Validate Firefox companion
+        shell: pwsh
+        run: |
+          node scripts/package-firefox.cjs release/firefox-companion
+          npm exec --yes --package web-ext@10.8.0 -- web-ext --no-config-discovery lint --source-dir release/firefox-companion --warnings-as-errors
+          if($LASTEXITCODE -ne 0){throw 'Firefox companion validation failed'}
       - name: Build installer and portable editions
         run: node node_modules/electron-builder/cli.js --win portable nsis --publish=never
       - name: Verify the draft and upload Windows packages

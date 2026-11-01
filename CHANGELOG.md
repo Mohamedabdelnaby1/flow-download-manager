@@ -1,5 +1,14 @@
 # Changelog
 
+## 2.10.0 — More browsers, one Flow
+
+- Browser selection and browser-specific setup/opening for Chrome, Edge, Firefox, Opera, Opera GX, Brave, Vivaldi and Chromium.
+- Dedicated Firefox MV3 event-page package, promise-based browser APIs and supported request-header observation.
+- Separate Firefox native manifest and strict caller validation by registered manifest path plus fixed add-on identity.
+- Download creation/filename fallbacks handle browsers with different interception timing, retain authorized sessions, prevent duplicate handoff and keep browser downloads when handoff fails.
+- Firefox signing remains an explicit external prerequisite: the supplied Firefox ZIP is an unsigned temporary-test bundle, with preparation/signing instructions.
+
+
 ## 2.9.0 — Material You workspace and AMOLED
 
 - A shared design system across the main workspace, download confirmation/progress/completion, settings, queues, tools, reports, browser integration, recovery and companion popup.
