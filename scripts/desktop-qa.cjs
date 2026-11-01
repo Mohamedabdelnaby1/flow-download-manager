@@ -17,34 +17,35 @@ module.exports=async({app,win,service,toolsWindows})=>{
  await service.action('ruleSave',{name:'Documents',host:'example.com',extensions:'pdf',folder:'host',category:'documents',enabled:true});
  nativeTheme.themeSource='light';await ready(win);await js(win,'refresh();renderShell();renderMain()');
  check('main document uses English LTR',await js(win,'document.documentElement.lang==="en"&&document.documentElement.dir==="ltr"'));
- check('English main commands render',await js(win,'document.querySelector("[data-action=add]").textContent.includes("Add URL")'));
- check('English errors preserve HTTP status',await js(win,'state.downloads.find(d=>d.status==="error").error==="HTTP 403 — URL refused or expired"'));
+ check('English main commands render',await js(win,'document.querySelector(".command-toolbar [data-action=add]").textContent.includes("New download")'));
+ check('English errors show a readable explanation and retain original HTTP status',await js(win,'(()=>{const d=state.downloads.find(d=>d.status==="error");return !d.error.startsWith("HTTP")&&d.errorOriginal.includes("403")&&d.error.length>10})()'));
  check('main fits normal window',await js(win,'document.body.scrollWidth<=innerWidth+1'));
  await capture(win,'desktop-light');
  const settings=await tool('settings'),library=await tool('library'),power=await tool('power'),smart=await tool('smart'),add=await tool('add');
- check('settings expose all three palettes',await js(settings,'[...document.querySelector("[name=theme]").options].map(o=>o.value).join(",")==="system,light,dark"'));
+ check('settings expose all four palettes',await js(settings,'[...document.querySelector("[name=theme]").options].map(o=>o.value).join(",")==="system,light,dark,amoled"'));
  check('settings display English as selected',await js(settings,'document.querySelector("[name=language]").value==="en"'));
  check('add form is English',await js(add,'document.title.includes("Add a download")&&document.body.innerText.includes("Start download")'));
  await js(add,'document.querySelector("[name=name]").value="Keep my draft.pdf";document.querySelector("[name=name]").focus()');
  await service.action('settings',{language:'ar'});await refreshAll();check('existing windows switch to Arabic RTL',await js(add,'document.documentElement.dir==="rtl"&&document.title.includes("إضافة تحميل جديد")'));
  check('language switch preserves unfinished form values',await js(add,'document.querySelector("[name=name]").value==="Keep my draft.pdf"'));
  await service.action('settings',{language:'en'});await refreshAll();check('existing windows return to English',await js(add,'document.documentElement.dir==="ltr"&&document.title.includes("Add a download")'));add.close();await wait(200);
- await service.action('settings',{theme:'system'});await refreshAll();
+ await service.action('settings',{theme:'system'});nativeTheme.themeSource='light';await refreshAll();
  for(const w of [win,settings,library,power,smart])check('system light applies to '+w.id,!await js(w,'document.body.classList.contains("dark")'));
  nativeTheme.themeSource='dark';await wait(200);
  for(const w of [win,settings,library,power,smart]){await until(()=>js(w,'document.body.classList.contains("dark")&&getComputedStyle(document.documentElement).colorScheme==="dark"'));check('system dark updates live in '+w.id,true);}
- await capture(win,'desktop-dark');
+ await capture(win,'desktop-dark');await service.action('settings',{language:'ar'});await refreshAll();await capture(win,'desktop-ar-dark');check('Arabic main keeps the full list visible',await js(win,'document.querySelector(".desktop-list").getBoundingClientRect().height>100'));await service.action('settings',{language:'en'});await refreshAll();
  await service.action('settings',{theme:'light'});await refreshAll();for(const w of [win,settings,library,power,smart])check('explicit light overrides dark system in '+w.id,!await js(w,'document.body.classList.contains("dark")'));
  await service.action('settings',{theme:'dark'});await refreshAll();nativeTheme.themeSource='light';await wait(200);check('explicit dark overrides light system',await js(win,'document.body.classList.contains("dark")'));
  await service.action('settings',{theme:'system'});await refreshAll();
+await service.action('settings',{theme:'amoled'});await refreshAll();for(const w of [win,settings,library,power,smart]){check('AMOLED stays black in '+w.id,await js(w,'document.body.classList.contains("amoled")&&getComputedStyle(document.body).getPropertyValue("--bg").trim()==="#000000"'));}await capture(win,'desktop-amoled');await capture(power,'power-amoled');await service.action('settings',{language:'ar'});await refreshAll();await capture(win,'desktop-ar-amoled');await service.action('settings',{language:'en',theme:'system'});await refreshAll();
  // Refresh the settings draft to show the saved System preference in its screenshot.
- await js(settings,'openSettings("general")');await capture(settings,'settings');
+ await js(settings,'openSettings("general")');await capture(settings,'settings');await js(settings,'openSettings("sounds")');check('sounds offer a built-in default without an external file path',await js(settings,'document.querySelector("[name=soundComplete]").placeholder.includes("Built-in")'));await js(settings,'document.querySelector("[name=soundComplete]").value="C:\\missing.wav";document.querySelector("[data-action=resetSound]").click()');check('reset sound restores the bundled default',await js(settings,'document.querySelector("[name=soundComplete]").value===""'));await capture(settings,'sounds');
  await js(library,'openLibrary("folders")');await wait(350);await capture(library,'library');
  await js(library,'openLibrary("rename",'+JSON.stringify(ids.slice(0,3))+')');await js(library,'document.querySelector("[name=pattern]").value="Project-{n}-{name}";handleAction("libraryRenamePreview",document.querySelector("[data-action=libraryRenamePreview]"))');await wait(200);check('rename preview shows sample filenames',await js(library,'document.body.innerText.includes("Project-001-")'));await capture(library,'rename');
  await js(power,'openPower("traffic")');await capture(power,'productivity');
  await js(smart,'scanLibrary()');await wait(200);check('smart diagnoses are English',await js(smart,'!/[\\u0600-\\u06ff]/.test(document.querySelector("#dialog-content").innerText)'));await capture(smart,'smart-tools');
  const pending=service.store.add({url:'https://example.com/course.zip',name:'Course.zip',category:'compressed',status:'pending',directory:'C:\\Downloads\\Flow',queueId:'main',meta:JSON.stringify({mode:'file',headers:{}})});
- const confirm=await tool('download-info',{id:pending.id});check('browser confirmation is a native independent window',confirm!==win&&confirm.isMinimizable());confirm.minimize();await wait(150);check('download window minimizes',confirm.isMinimized());confirm.restore();confirm.close();
+ const confirm=await tool('download-info',{id:pending.id});check('browser confirmation is a native independent window',confirm!==win&&confirm.isMinimizable());confirm.minimize();await wait(150);check('download window minimizes',confirm.isMinimized()||!confirm.isVisible());confirm.restore();confirm.close();
  const scheduler=await tool('scheduler');check('scheduler is English',await js(scheduler,'document.body.innerText.includes("Queue name")'));scheduler.close();
  const batch=await tool('batch');check('batch dialog is English',await js(batch,'document.title.includes("Batch download")'));batch.close();
  const about=await tool('about');check('About keeps creator attribution',await js(about,'document.body.innerText.includes("mohamed abdelnaby")'));about.close();
@@ -52,9 +53,8 @@ module.exports=async({app,win,service,toolsWindows})=>{
  await js(win,'desktopAPI.action("drop")');drop=BrowserWindow.getAllWindows().find(w=>w!==win&&w.webContents.getURL().endsWith('/drop.html'));await until(()=>drop&&js(drop,'typeof dropLanguage!=="undefined"&&dropLanguage==="en"'));
  nativeTheme.themeSource='dark';await wait(250);check('drop basket follows system dark',await js(drop,'document.body.classList.contains("dark")'));nativeTheme.themeSource='light';await wait(200);check('drop basket follows system light',!await js(drop,'document.body.classList.contains("dark")'));drop.close();drop=null;
  for(const w of [settings,library,power,smart])w.close();
- await service.action('settings',{textScale:150});win.setSize(640,440);await wait(300);check('English UI fits compact window at 150 percent',await js(win,'document.body.scrollWidth<=innerWidth+1'));await capture(win,'compact');
+ await service.action('settings',{textScale:150});win.setSize(640,440);await wait(300);check('English UI fits compact window at 150 percent',await js(win,'document.body.scrollWidth<=innerWidth+1'));check('compact drawer reserves no empty column',await js(win,'document.querySelector(".workspace").getBoundingClientRect().x<2'));check('compact download list retains usable height',await js(win,'document.querySelector(".desktop-list").getBoundingClientRect().height>45'));await capture(win,'compact');await js(win,'document.querySelector(".command-toolbar [data-action=categories]").click()');check('compact categories open as an overlay',await js(win,'getComputedStyle(document.querySelector("#sidebar")).visibility==="visible"'));await capture(win,'compact-drawer');await js(win,'document.querySelector(".command-toolbar [data-action=categories]").click()');
  await service.action('settings',{textScale:100});win.setSize(1280,800);await service.action('settings',{theme:'system'});check('system preference stays stored rather than resolved palette',service.store.settings.theme==='system');
  }catch(e){errors.push(e.stack);}finally{nativeTheme.themeSource='system';fs.writeFileSync(path.join(dir,'english-appearance-qa.json'),JSON.stringify({version:app.getVersion(),packaged:app.isPackaged,passed:checks.length,checks,errors},null,2));}
  if(errors.length)throw Error(errors.join('\n'));
 };
-

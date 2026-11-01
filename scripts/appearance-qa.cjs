@@ -22,14 +22,14 @@ module.exports=async({app,win,service,toolsWindows})=>{
  check('main fits normal window',await js(win,'document.body.scrollWidth<=innerWidth+1'));
  await capture(win,'desktop-light');
  const settings=await tool('settings'),library=await tool('library'),power=await tool('power'),smart=await tool('smart'),add=await tool('add');
- check('settings expose all three palettes',await js(settings,'[...document.querySelector("[name=theme]").options].map(o=>o.value).join(",")==="system,light,dark"'));
+ check('settings expose all four palettes',await js(settings,'[...document.querySelector("[name=theme]").options].map(o=>o.value).join(",")==="system,light,dark,amoled"'));
  check('settings display English as selected',await js(settings,'document.querySelector("[name=language]").value==="en"'));
  check('add form is English',await js(add,'document.title.includes("Add a download")&&document.body.innerText.includes("Start download")'));
  await js(add,'document.querySelector("[name=name]").value="Keep my draft.pdf";document.querySelector("[name=name]").focus()');
  await service.action('settings',{language:'ar'});await refreshAll();check('existing windows switch to Arabic RTL',await js(add,'document.documentElement.dir==="rtl"&&document.title.includes("إضافة تحميل جديد")'));
  check('language switch preserves unfinished form values',await js(add,'document.querySelector("[name=name]").value==="Keep my draft.pdf"'));
  await service.action('settings',{language:'en'});await refreshAll();check('existing windows return to English',await js(add,'document.documentElement.dir==="ltr"&&document.title.includes("Add a download")'));add.close();await wait(200);
- await service.action('settings',{theme:'system'});await refreshAll();
+ await service.action('settings',{theme:'system'});nativeTheme.themeSource='light';await refreshAll();
  for(const w of [win,settings,library,power,smart])check('system light applies to '+w.id,!await js(w,'document.body.classList.contains("dark")'));
  nativeTheme.themeSource='dark';await wait(200);
  for(const w of [win,settings,library,power,smart]){await until(()=>js(w,'document.body.classList.contains("dark")&&getComputedStyle(document.documentElement).colorScheme==="dark"'));check('system dark updates live in '+w.id,true);}
@@ -37,6 +37,7 @@ module.exports=async({app,win,service,toolsWindows})=>{
  await service.action('settings',{theme:'light'});await refreshAll();for(const w of [win,settings,library,power,smart])check('explicit light overrides dark system in '+w.id,!await js(w,'document.body.classList.contains("dark")'));
  await service.action('settings',{theme:'dark'});await refreshAll();nativeTheme.themeSource='light';await wait(200);check('explicit dark overrides light system',await js(win,'document.body.classList.contains("dark")'));
  await service.action('settings',{theme:'system'});await refreshAll();
+await service.action('settings',{theme:'amoled'});await refreshAll();for(const w of [win,settings,library,power,smart]){check('AMOLED stays black in '+w.id,await js(w,'document.body.classList.contains("amoled")&&getComputedStyle(document.body).getPropertyValue("--bg").trim()==="#000000"'));}await capture(win,'desktop-amoled');await capture(power,'power-amoled');await service.action('settings',{language:'ar'});await refreshAll();await capture(win,'desktop-ar-amoled');await service.action('settings',{language:'en',theme:'system'});await refreshAll();
  // Refresh the settings draft to show the saved System preference in its screenshot.
  await js(settings,'openSettings("general")');await capture(settings,'settings');await js(settings,'openSettings("sounds")');check('sounds offer a built-in default without an external file path',await js(settings,'document.querySelector("[name=soundComplete]").placeholder.includes("Built-in")'));await js(settings,'document.querySelector("[name=soundComplete]").value="C:\\missing.wav";document.querySelector("[data-action=resetSound]").click()');check('reset sound restores the bundled default',await js(settings,'document.querySelector("[name=soundComplete]").value===""'));await capture(settings,'sounds');
  await js(library,'openLibrary("folders")');await wait(350);await capture(library,'library');

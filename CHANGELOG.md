@@ -1,5 +1,14 @@
 # Changelog
 
+## 2.9.0 — Material You workspace and AMOLED
+
+- A shared design system across the main workspace, download confirmation/progress/completion, settings, queues, tools, reports, browser integration, recovery and companion popup.
+- Four coordinated dashboard tones, colorful file-type treatments, clearer navigation and a six-accent palette chooser.
+- Separate System, Light, Dark and AMOLED preferences. AMOLED uses a true-black base and remains distinct from ordinary tonal Dark.
+- Visual appearance choices, persistent unsaved previews, bundled Tajawal for Arabic, native frame/background synchronization and a compact zoomed layout.
+- Existing download actions, tray behavior, queues, local Realm data and independent transfer engine are retained.
+
+
 ## 2.8.0
 
 - Replace the finished progress window with one completion window. Opening a completed task reuses completion instead of spawning a second 100% view. Native completion dialogs suppress the extra operating-system toast.

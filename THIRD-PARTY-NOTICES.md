@@ -35,3 +35,7 @@ The complete official unpacked `yt-dlp_win.zip` release replaces the duplicate s
 ## aria2 distribution
 
 Flow 2.6 includes aria2 1.37.0 as a separate executable, licensed GPL-2.0-or-later with its OpenSSL exception and notices. Windows binary provenance, AUTHORS, COPYING, LICENSE.OpenSSL and build README are in `vendor/aria2/`. Corresponding upstream source: https://github.com/aria2/aria2/releases/download/release-1.37.0/aria2-1.37.0.tar.xz . Linux builds use the distribution aria2 package and bundle its linked libraries with copyright files and version provenance under `vendor/aria2/`. Flow original application code remains MIT; do not remove third-party license/source obligations.
+
+## Tajawal
+
+Bundled Regular, Medium and Bold fonts are licensed under the SIL Open Font License 1.1. The full notice is included in `ui/fonts/OFL.txt`. Source: https://github.com/google/fonts/tree/main/ofl/tajawal.

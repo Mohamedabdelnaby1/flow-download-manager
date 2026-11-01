@@ -1,5 +1,14 @@
 # Inside Flow
 
+## Material You and AMOLED in 2.9
+
+![New Light workspace](screenshots/v2.9/workspace-light.png)
+
+![Arabic RTL AMOLED workspace](screenshots/v2.9/workspace-ar-amoled.png)
+
+[All four appearances and new tool screens](MATERIAL-YOU-2.9.md). These are real application captures with isolated example records.
+
+
 ## New download dialogs in 2.8
 
 ![Compact progress](screenshots/v2.8/progress-en.png)

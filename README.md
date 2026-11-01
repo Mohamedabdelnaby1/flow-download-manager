@@ -10,11 +10,17 @@
 
 **Free to use. Open to improve. Built around your workflow.**
 
-**New in 2.8:** one completion window, direct file opening and dragging, native copy/paste menus, clearer quality checks and redesigned download dialogs. [See the new flow →](docs/DOWNLOAD-EXPERIENCE-2.8.md)
+**New in 2.9:** a colorful Material You workspace, a shared design system across tools and dialogs, six accents and a separate true-black AMOLED appearance. [Explore the redesign →](docs/MATERIAL-YOU-2.9.md)
 
 </div>
 
-### A clearer download flow in 2.8
+### A new atmosphere. Four ways to make it yours.
+
+<table><tr><td width="50%"><img src="docs/screenshots/v2.9/workspace-light.png" width="100%" alt="Flow 2.9 Material You in Light"></td><td width="50%"><img src="docs/screenshots/v2.9/workspace-ar-amoled.png" width="100%" alt="Flow 2.9 Arabic RTL in AMOLED"></td></tr></table>
+
+System · Light · Dark · **AMOLED**. [Open the full redesign gallery →](docs/MATERIAL-YOU-2.9.md)
+
+### The download flow introduced in 2.8
 
 <table><tr><td width="55%"><img src="docs/screenshots/v2.8/progress-en.png" width="100%" alt="Flow 2.8 download progress in a compact Material-inspired dialog"></td><td width="45%"><img src="docs/screenshots/v2.8/completion-en.png" width="100%" alt="One completion window with direct Open file and a draggable file card"></td></tr></table>
 
@@ -66,7 +72,7 @@ Progress, speed, remaining time, pause, cancel and tray access. Details are ther
 
 <a href="docs/demos/appearance-live.gif"><img src="docs/demos/appearance-live.gif" width="100%" alt="Continuous screen recording: open preferences, select light appearance and save it"></a>
 
-Choose your accent, density, corners, fonts, columns and motion. Follow your system or keep your own appearance.
+Choose your accent, density, corners, fonts, columns and motion. Follow your system, choose tonal Dark, or keep a true-black AMOLED workspace.
 
 <p align="center"><sub>Recorded in an isolated example library, with a synchronized cursor overlay. The transfer GIF shows a completed 3 MiB local download; it is not an internet-speed benchmark. <a href="docs/demos/capture-notes.json">Capture notes</a>.</sub></p>
 

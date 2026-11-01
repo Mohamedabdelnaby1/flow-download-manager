@@ -31,7 +31,7 @@ async function createServer(service,port=17863){
       if((url.pathname==='/api/action'||url.pathname==='/extension/add'||url.pathname==='/extension/ping')&&req.method==='POST'){
         let bytes=0;const chunks=[];for await(const chunk of req){bytes+=chunk.length;if(bytes>4*1024*1024){send(413,{error:'الطلب كبير جداً'});return;}chunks.push(chunk);}
         const body=JSON.parse(Buffer.concat(chunks).toString()||'{}');
-        if(url.pathname==='/extension/ping'){service.browserSeen(body.client,body.extensionVersion);const {fileTypes,excludedSites,videoPanel,panelMode}=service.store.settings;send(200,{app:'Flow',version:require('../package.json').version,settings:{fileTypes,excludedSites,videoPanel,panelMode}});return;}
+        if(url.pathname==='/extension/ping'){service.browserSeen(body.client,body.extensionVersion);const {fileTypes,excludedSites,videoPanel,panelMode,theme}=service.store.settings;send(200,{app:'Flow',version:require('../package.json').version,settings:{fileTypes,excludedSites,videoPanel,panelMode,theme}});return;}
         if(isExt){service.browserSeen(body.client,body.extensionVersion);const item=await service.browserAdd(body);send(200,{result:{id:item.id,name:item.name,status:item.status}});return;}
         send(200,{result:await service.action(body.type,body.data)});return;
       }

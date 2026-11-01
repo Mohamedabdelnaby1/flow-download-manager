@@ -29,7 +29,7 @@ function validateSettings(patch){
   }
   if('textScale'in result)result.textScale=Math.max(80,Math.min(150,result.textScale));
   if(result.language&&!['ar','en'].includes(result.language))throw Error('لغة غير صالحة');
-  if('theme'in result&&!['system','light','dark'].includes(result.theme))throw Error('مظهر غير صالح');
+  if('theme'in result&&!['system','light','dark','amoled'].includes(result.theme))throw Error('مظهر غير صالح');
   if(result.panelMode&&!['full','mini'].includes(result.panelMode))throw Error('حجم لوحة غير صالح');
   if('connections'in result)result.connections=Math.max(1,Math.min(32,Math.floor(result.connections)));
   if('simultaneous'in result)result.simultaneous=Math.max(1,Math.min(16,Math.floor(result.simultaneous)));
@@ -146,7 +146,7 @@ class Service{
         if((e.active.size||e.maintenance.size)&&(['tempDir','downloadDir'].some(k=>data[k]!==undefined&&data[k]!==s.settings[k])))throw Error('أوقف التحميلات وانتظر انتهاء الفحص قبل تغيير مجلدات الحفظ');
         if(data.tempDir&&data.tempDir!==s.settings.tempDir&&s.list().some(d=>d.downloaded>0&&d.status!=='complete'))throw Error('لا يمكن تغيير مجلد الأجزاء قبل إكمال أو إزالة التحميلات غير المكتملة');
         const patch=validateSettings(data);if(patch.startAtLogin!==undefined){if(!this.desktop&&patch.startAtLogin)throw Error('التشغيل مع النظام متاح في نسخة Flow لسطح المكتب');await this.desktop?.startup(patch.startAtLogin);}
-        const result=s.saveSettings(patch);if(patch.simultaneous!==undefined||patch.connections!==undefined){await this.peers.applyLimits();await e.enforceLimits();if(e.workerClient?.session)await e.workerClient.syncPending();}if(patch.textScale!==undefined)this.desktop?.scale?.(Math.max(.8,Math.min(1.5,patch.textScale/100)));return result;
+        const result=s.saveSettings(patch);if(patch.theme!==undefined)this.desktop?.appearance?.();if(patch.simultaneous!==undefined||patch.connections!==undefined){await this.peers.applyLimits();await e.enforceLimits();if(e.workerClient?.session)await e.workerClient.syncPending();}if(patch.textScale!==undefined)this.desktop?.scale?.(Math.max(.8,Math.min(1.5,patch.textScale/100)));return result;
       }
       case'queue':{
         const id=data.id||crypto.randomUUID(),old=s.queues().find(q=>q.id===id);

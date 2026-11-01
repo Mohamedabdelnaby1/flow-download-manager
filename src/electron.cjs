@@ -1,7 +1,7 @@
 // Desktop launches can outlive the shell that created their stdio pipes.
 // Never turn a detached logging pipe into an uncaught main-process exception.
 for(const stream of [process.stdout,process.stderr])stream?.on('error',error=>{if(error.code!=='EPIPE')writeLog(error);});
-const {app,BrowserWindow,ipcMain,dialog,shell,safeStorage,clipboard,Notification,Menu,Tray,nativeImage,screen,powerSaveBlocker}=require('electron');
+const {app,BrowserWindow,ipcMain,dialog,shell,safeStorage,clipboard,Notification,Menu,Tray,nativeImage,screen,powerSaveBlocker,nativeTheme}=require('electron');
 const path=require('node:path');
 const fs=require('node:fs');
 const {execFile}=require('node:child_process');
@@ -26,7 +26,9 @@ async function showFatalError(error){if(fatalErrorPending)return;fatalErrorPendi
 process.on('uncaughtException',error=>{showFatalError(error).catch(()=>app.exit(1));});
 process.on('unhandledRejection',error=>{writeLog(error);const packet=service?.describeError(error,'background')?.message||require('../ui/error-model.js').encode(error,'background');safeSend(win,'flow:error',packet);});
 app.on('child-process-gone',(_event,details)=>runtimeEvent({event:'child-process-gone',type:details.type,reason:details.reason,exitCode:details.exitCode}));
-function guardWindow(window,url,kind){window.webContents.on('context-menu',(_event,params)=>{const items=require('./edit-menu.cjs').editMenu(params,service.store.settings.language);if(items.length)Menu.buildFromTemplate(items).popup({window});});const fallback=new URL('/recovery.html',web.origin);fallback.searchParams.set('lang',service.store.settings.language);window.flowRecovery=new WindowRecovery(window,{url,fallback:fallback.href,stopping:()=>quitting,log:event=>runtimeEvent({window:kind,...event})});window.on('minimize',()=>rememberTrayWindow(window));const visibility=()=>safeSend(window,'flow:visibility',{visible:window.isVisible()&&!window.isMinimized()});for(const name of ['show','hide','minimize','restore'])window.on(name,visibility);window.webContents.on('did-finish-load',visibility);}
+function syncAppearance(updateSource=true){const mode=service?.store.settings.theme||"system",source=mode==="amoled"?"dark":mode;if(updateSource&&nativeTheme.themeSource!==source)nativeTheme.themeSource=source;const background=mode==="amoled"?"#000000":nativeTheme.shouldUseDarkColors?"#101217":"#f5f6fa";for(const w of BrowserWindow.getAllWindows())if(!w.isDestroyed())w.setBackgroundColor(background);}
+nativeTheme.on("updated",()=>{if(app.isReady())syncAppearance(false);});
+function guardWindow(window,url,kind){syncAppearance(false);window.webContents.on('context-menu',(_event,params)=>{const items=require('./edit-menu.cjs').editMenu(params,service.store.settings.language);if(items.length)Menu.buildFromTemplate(items).popup({window});});const fallback=new URL('/recovery.html',web.origin);fallback.searchParams.set('lang',service.store.settings.language);window.flowRecovery=new WindowRecovery(window,{url,fallback:fallback.href,stopping:()=>quitting,log:event=>runtimeEvent({window:kind,...event})});window.on('minimize',()=>rememberTrayWindow(window));const visibility=()=>safeSend(window,'flow:visibility',{visible:window.isVisible()&&!window.isMinimized()});for(const name of ['show','hide','minimize','restore'])window.on(name,visibility);window.webContents.on('did-finish-load',visibility);}
 async function showMain(){if(quitting)return;if(!win||win.isDestroyed())await ensureMain(true);if(win.webContents.isCrashed())await win.flowRecovery?.retry();if(win.isMinimized())win.restore();win.show();win.focus();}
 function ensureMain(background=process.argv.includes('--background')){if(win&&!win.isDestroyed())return Promise.resolve(win);if(mainPromise)return mainPromise;mainPromise=createWindow(background).finally(()=>mainPromise=null);return mainPromise;}
 const tr=(ar,en)=>service?.store.settings.language==='ar'?ar:en;
@@ -50,7 +52,7 @@ async function cli(args){const a=parseCLI(args);if(a['/d']){
   if(a['/h'])service.store.log('notice','/h غير متاح: لا يتم قطع اتصال النظام تلقائياً');
 }if(a['/s'])await service.action('queue',{id:'main',running:true});}
 function runFile(exe,args){return new Promise((resolve,reject)=>execFile(exe,args,{windowsHide:true,timeout:30000},(err,out,stderr)=>err?reject(Error(stderr||err.message)):resolve(out)));}
-async function createWindow(background=process.argv.includes('--background')){
+async function createWindow(background=process.argv.includes('--background')){syncAppearance();
   win=new BrowserWindow({width:Math.min(1280,screen.getPrimaryDisplay().workAreaSize.width),height:Math.min(800,screen.getPrimaryDisplay().workAreaSize.height),minWidth:640,minHeight:440,show:false,backgroundColor:'#f3f5f7',title:'Flow — Download Manager',icon:path.join(__dirname,'../ui/logo.png'),autoHideMenuBar:true,
     webPreferences:{preload:path.join(__dirname,'preload.cjs'),contextIsolation:true,nodeIntegration:false,sandbox:true,backgroundThrottling:false}});
   const mainWindow=win;guardWindow(win,web.origin,'main');if(toolsWindows)toolsWindows.main=win;
@@ -80,6 +82,7 @@ if(!app.requestSingleInstanceLock({version:app.getVersion()})){
       runtimeStatus:()=>({version:app.getVersion(),engine:service?.engineHost?.snapshot()||null,shutdown:completionPower?.snapshot()||null,platform:process.platform,keyProtection:protectedStorage?'system-keyring':'local-private-key',startup:startup.status(),trayResident:!!tray&&!tray.isDestroyed(),softwareRendering:!process.argv.includes('--flow-hardware-acceleration'),rendererRecoveries:win?.flowRecovery?.recovered||0}),
       downloadInfo:async (id,status='pending')=>{for(let n=0;n<200&&!toolsWindows;n++)await new Promise(r=>setTimeout(r,50));if(!toolsWindows)throw Error('نافذة التطبيق لم تجهز بعد');return toolsWindows.open(status==='pending'?'download-info':'details',{id});},
       peerInfo:()=>toolsWindows?.open('tools',{tab:'torrent'}),
+      appearance:()=>syncAppearance(),
       scale:value=>{if(win&&!win.isDestroyed())win.webContents.setZoomFactor(value);toolsWindows?.scale(value);},
       browserFallback:async url=>{validateURL(url,['http:','https:']);await shell.openExternal(url);return true;},
       wakeStatus:()=>syncWake(),
