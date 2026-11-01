@@ -25,3 +25,17 @@ The implementation follows [Electron's native file-drag API](https://www.electro
 Source tests, controlled UI tests, full public video downloads, playlist inspection/import, packaged tests and installer verification are separate checks. The native drag IPC and validated file payload were exercised; a physical Explorer drop is not represented as a completed automated test. Public video successes on the test connection do not prove unrestricted access on every user's connection. The full 25-video playlist was inspected and imported; all 25 video payloads were not downloaded for this audit.
 
 Windows 10/11 x64 remain the supported platforms. Compact Preview still requires WebView2 and .NET Framework 4.8. Signing and Linux packaging have not changed in this update.
+
+## Actual interface captures
+
+Captured from a packaged 2.8 application in an isolated profile. The quality preview uses controlled example metadata; progress/completion use a real local fixture. These images are not public-website or speed evidence.
+
+![Compact confirmation and grouped quality choice](screenshots/v2.8/quality-en.png)
+
+![Progress with optional details](screenshots/v2.8/progress-en.png)
+
+![One completion window with direct file actions](screenshots/v2.8/completion-en.png)
+
+![Arabic RTL completion in dark mode](screenshots/v2.8/completion-ar.png)
+
+[Exact validation results](../VALIDATION.md)

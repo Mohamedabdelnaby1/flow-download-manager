@@ -1,5 +1,13 @@
 # Inside Flow
 
+## New download dialogs in 2.8
+
+![Compact progress](screenshots/v2.8/progress-en.png)
+
+![Completion with direct file actions](screenshots/v2.8/completion-en.png)
+
+[Quality confirmation and Arabic RTL gallery](DOWNLOAD-EXPERIENCE-2.8.md). Packaged application captures with isolated controlled examples; the existing live GIFs below remain labeled as 2.7.1 recordings.
+
 ## Three tasks, three live GIFs
 
 ### Search and pin a tool

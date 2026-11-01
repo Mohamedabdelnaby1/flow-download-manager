@@ -1,0 +1,26 @@
+{
+  "version": "2.8.0",
+  "packaged": true,
+  "checks": [
+    "quality presets appear immediately in an independent compact window",
+    "Download is disabled with a visible status while inspecting",
+    "even a programmatic early submit cannot add an unchecked download",
+    "actual qualities are grouped by resolution",
+    "right click reaches the native clipboard menu for a real input",
+    "successful inspection enables download and retains UTF-8 title",
+    "changing URL immediately disables Download and invalidates prior metadata",
+    "failed inspection leaves Download disabled with a readable collapsed report",
+    "sign-in error has a source button",
+    "only one completion window remains and progress is closed",
+    "controlled real download bytes match their source",
+    "Open file uses the file action directly",
+    "drag uses the completed file and native icon through the guarded IPC bridge",
+    "completion controls localize in Arabic RTL",
+    "completed task cannot open a second progress window"
+  ],
+  "errors": [],
+  "passed": 15,
+  "physicalExplorerDropTested": false,
+  "exactInstalledGitHubPayload": true,
+  "fixtures": "Controlled local server and isolated library; website metadata mocked for UI state tests."
+}

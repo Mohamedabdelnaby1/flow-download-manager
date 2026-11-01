@@ -1,3 +1,28 @@
+# Validation - Flow 2.8.0
+
+Checks dated 1 November 2026. Build commit: `3ad86febf51168f6b143ed1d66be908dc95743bf`. Later documentation and evidence changes do not alter production code.
+
+| Gate | Result | Evidence |
+| --- | --- | --- |
+| Source regressions in both Windows package jobs | **255 passed, 0 failed** per job | [CI and source record](docs/validation/source-suite-v2.8.0.json) |
+| Exact GitHub-built complete installer on the existing real installation | Same location, one registration; all four records, settings and four completed-file hashes retained | [Upgrade](docs/validation/installed-upgrade-v2.8.0.json) |
+| Same installed payload: download UX, cancellation, early-submit rejection, native copy/paste, single completion, open file, Arabic RTL and guarded drag IPC | **15 passed** | [Interface](docs/validation/download-experience-v2.8.0.json) |
+| Same installed payload: public YouTube video reported by the user | 33 formats; inspection 4,788 ms; cached check 1 ms; **25,666,820 bytes**, full decode; remained minimized | [Public video](docs/validation/public-video-v2.8.0.json) |
+| User-supplied public playlist | **25 entries inspected and queued**, duplicate imports skipped | [Playlist](docs/validation/playlist-v2.8.0.json) |
+| Exact downloaded compact setup payload | **3,139 SHA-256 values match** | [Payload](docs/validation/compact-payload-v2.8.0.json) |
+| Same compact payload: startup, sounds, real Native Messaging, UI recovery and verified transfer | **14 passed** | [Integration](docs/validation/compact-integration-v2.8.0.json) |
+| Exact downloaded compact portable | **6 passed**; 8 MiB transfer survives whole-interface termination | [Portable](docs/validation/compact-portable-v2.8.0.json) |
+
+The real installed upgrade retained an encrypted library backup and did not interrupt active transfers. Browser repair replaced its protected configuration twice; a real framed Native Messaging handshake verified 2.8.0. Startup preferences and tray residency were checked, but Windows was not rebooted.
+
+UI metadata tests use controlled responses to reproduce loading, success and sign-in failure consistently. The public-video download is a separate real-network test against the exact installed package. Timings describe this connection, not a speed comparison or guarantee. All 25 playlist payloads were **not** downloaded. Native drag IPC and the completed-file payload were checked; a physical drop into Explorer remains a manual check. Existing unrelated tool coverage is recorded under prior versions below and is not presented as a repeated 2.8 full-tool sweep.
+
+Windows 10/11 x64 only. Executables remain unsigned. Compact Preview remains optional and requires WebView2 and .NET Framework 4.8. Linux packages remain deferred. Website account/network restrictions can still require authorized browser sign-in or verification.
+
+[Download experience](docs/DOWNLOAD-EXPERIENCE-2.8.md) · [Updating](docs/UPDATING.md)
+
+---
+
 # Validation - Flow 2.7.1 maintenance
 
 Checks dated 25 October 2026. This update changes Windows browser-configuration replacement and version metadata; the 2.7 interface and transfer implementation are unchanged.
