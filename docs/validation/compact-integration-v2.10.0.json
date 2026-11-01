@@ -17,7 +17,7 @@
     "Exit Flow closes both UI and service cleanly"
   ],
   "bytes": 2097152,
-  "executable": "C:\\Users\\MR.ROPOT\\Documents\\Codex\\2026-10-23\\html-css-js-realm-db-electron\\work\\flow2100-audit-compact-extracted\\Flow.exe",
-  "profile": "C:\\Users\\MR.ROPOT\\Documents\\Codex\\2026-10-23\\html-css-js-realm-db-electron\\work\\system-audit-compact-integration\\compact-integration-gZ5sXM\\Profile مساحة",
+  "executable": "%USERPROFILE%\\Documents\\Codex\\2026-10-23\\html-css-js-realm-db-electron\\work\\flow2100-audit-compact-extracted\\Flow.exe",
+  "profile": "%USERPROFILE%\\Documents\\Codex\\2026-10-23\\html-css-js-realm-db-electron\\work\\system-audit-compact-integration\\compact-integration-gZ5sXM\\Profile مساحة",
   "installed": false
 }
