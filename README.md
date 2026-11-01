@@ -10,6 +10,8 @@
 
 **Free to use. Open to improve. Built around your workflow.**
 
+**New in 2.8:** one completion window, direct file opening and dragging, native copy/paste menus, clearer quality checks and redesigned download dialogs. [See the new flow →](docs/DOWNLOAD-EXPERIENCE-2.8.md)
+
 </div>
 
 <img src="docs/brand/chapter-motion.svg" width="100%" alt="01 — See Flow in motion. Real application, real controls.">

@@ -18,7 +18,7 @@ async function main(){
   runtimeStatus:()=>({version,platform:process.platform,keyProtection:'system-keyring',engine:{independent:true,connected:true},interface:{connected:Date.now()-lastPoll<5000,pid:nativeStatus.uiPid||null},trayResident:!!nativeStatus.trayResident,softwareRendering:false,startup:{supported:true,enabled:!!nativeStatus.startupEnabled,launchInTray:true},shell:'webview2-pilot'}),
   downloadInfo:(id,status='pending')=>host('window',{kind:status==='pending'?'download-info':'details',id}),
   peerInfo:()=>host('window',{kind:'tools',tab:'torrent'}),scale:value=>host('scale',{value},false),
-  browserFallback:url=>host('external',{url}),browserExtensions:()=>host('chromeExtensions'),open:file=>host('open',{file}),folder:file=>host('folder',{file}),
+  browserFallback:url=>host('external',{url}),browserExtensions:()=>host('chromeExtensions'),open:file=>host('open',{file}),folder:file=>host('folder',{file}),dragFile:file=>host('dragFile',{file}),
   chooseDirectory:()=>host('chooseDirectory'),chooseSound:()=>host('chooseSound'),playSound:(file,event)=>require('./sounds.cjs').playSound(file,event),
   startup:enabled=>host('startup',{enabled}),wakeStatus:()=>syncWake(),
   updateAvailable:()=>host('window',{kind:'updates'}),openUpdateRelease:url=>host('external',{url}),authorProfile:()=>host('external',{url:'https://www.facebook.com/mohamedabdelnaby190'}),

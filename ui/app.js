@@ -134,7 +134,7 @@ async function handleAction(name,el){const id=el.dataset.id;
   case'pause':case'start':await action(name,{id});break;
   case'pauseAll':await action(name,{},t('تم إيقاف التحميلات والقوائم','Downloads and queues paused'));break;
   case'detail':openDetail(id);break;
-  case'detailToggle':{const d=state.downloads.find(d=>d.id===id);await action(d.status==='complete'?'folder':isActive(d)?'pause':'start',{id});break;}
+  case'detailToggle':{const d=state.downloads.find(d=>d.id===id);await action(d.status==='complete'?'open':isActive(d)?'pause':'start',{id});break;}
   case'saveDetail':{try{const d=readForm('#detail-form');await api('update',{id,...d});closeModal();await refresh();toast(t('تم الحفظ','Saved'));}catch(e){formError(e);}break;}
   case'delete':confirmDelete([id]);break;
   case'confirmDelete':{el.disabled=true;const ids=el.dataset.ids.split(',');for(const item of ids)await action('remove',{id:item,deleteFile:$('[name="deleteFile"]').checked});selected.clear();closeModal();await refresh();break;}

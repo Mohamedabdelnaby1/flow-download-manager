@@ -1,5 +1,16 @@
 # Changelog
 
+## 2.8.0
+
+- Replace the finished progress window with one completion window. Opening a completed task reuses completion instead of spawning a second 100% view. Native completion dialogs suppress the extra operating-system toast.
+- Open completed files directly and add a draggable file card. Desktop hosts resolve a completed task ID to an existing file; renderer-supplied file paths are not accepted.
+- Redesign download confirmation, progress and completion with consistent compact Material-inspired surfaces, readable labels, calm colors and details that expand on demand.
+- Add native right-click editing menus for text fields and selected text. Restore standard edit menus in Compact Preview.
+- Keep Start download and Download later disabled until inspection succeeds. Editing a URL invalidates its previous result immediately; failed and cancelled checks remain explicit. Group actual video formats by resolution instead of listing duplicate codecs.
+- Inspect playlists inside the confirmation window, retain authorized browser-session headers, select videos and queue the collection without switching to the large tools page.
+- Inspect video metadata in the independent download engine so confirmation and transfer share one short-lived in-memory cache. Improve cancellation, UTF-8 output decoding, progress accounting and cache invalidation after extractor failure.
+- Refresh an existing unfinished video's session when it is sent again after browser sign-in, including canonical YouTube share/watch URLs. Authentication challenges remain subject to the source website.
+
 ## 2.7.1
 
 - Fix replacement of an existing encrypted browser-bridge configuration on Windows PowerShell during upgrades and reconnects. Preserve atomic writes and protected tokens instead of treating a missing backup path as an empty filename.

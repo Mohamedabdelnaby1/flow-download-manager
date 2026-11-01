@@ -7,12 +7,12 @@ class VideoResolver{
   constructor(store){this.store=store;this.cache=new Map();this.pending=new Map();this.children=new Set();this.tools=new VideoTools(store.dir);}
   async command(url,headers={},extra=[],options={}){
     validateURL(url,['http:','https:']);const exe=await this.tools.ensure(options);
-    const args=['--ignore-config','--no-playlist','--no-color','--socket-timeout','20','--retries','2','--extractor-retries','1','--no-js-runtimes','--js-runtimes','node:'+process.execPath,'--cache-dir',path.join(this.store.dir,'VideoCache')];
+    const args=['--ignore-config','--no-playlist','--no-color','--socket-timeout','12','--retries','1','--extractor-retries','1','--no-js-runtimes','--js-runtimes','node:'+process.execPath,'--cache-dir',path.join(this.store.dir,'VideoCache')];
     if(headers['user-agent'])args.push('--user-agent',headers['user-agent']);if(headers.referer)args.push('--referer',headers.referer);
     const proxy=this.store.settings.proxy;if(proxy)args.push('--proxy',proxy);
     let cookieFile;
     if(headers.cookie){const host=new URL(url).hostname;cookieFile=path.join(this.store.dir,'video-cookies-'+crypto.randomUUID()+'.txt');const rows=headers.cookie.split(';').map(p=>{const split=p.indexOf('=');return split>0?[host,'FALSE','/','TRUE','0',p.slice(0,split).trim(),p.slice(split+1).trim()].join('\t'):'';}).filter(Boolean);fs.writeFileSync(cookieFile,'# Netscape HTTP Cookie File\n'+rows.join('\n')+'\n',{mode:0o600});args.push('--cookies',cookieFile);}
-    const env={...process.env,...(process.versions.electron?{ELECTRON_RUN_AS_NODE:'1'}:{})};
+    const env={...process.env,PYTHONIOENCODING:'utf-8',PYTHONUTF8:'1',...(process.versions.electron?{ELECTRON_RUN_AS_NODE:'1'}:{})};
     // Reuse fresh extraction in memory. No signed URLs or session metadata are written to disk.
     const child=spawn(exe,[...args,...extra,...(options.info?['--load-info-json','-']:['--',canonicalURL(url)])],{windowsHide:true,env,stdio:[options.info?'pipe':'ignore','pipe','pipe']});
     if(options.info){child.stdin.on('error',()=>{});child.stdin.end(JSON.stringify(options.info));}
@@ -25,6 +25,7 @@ class VideoResolver{
     const p=await this.command(url,headers,args,{signal});
     if(signal?.aborted){await this.stop(p);throw signal.reason||Error('Cancelled');}
     return new Promise((resolve,reject)=>{
+      p.stdout.setEncoding?.('utf8');p.stderr.setEncoding?.('utf8');
       let output='',error='',settled=false;
       const finish=(err,value)=>{if(settled)return;settled=true;clearTimeout(timer);signal?.removeEventListener('abort',abort);if(err){this.stop(p).catch(()=>{});reject(err);}else resolve(value);};
       const abort=()=>finish(signal.reason||Error('Cancelled'));
@@ -46,7 +47,7 @@ class VideoResolver{
   }
   async inspect(url,headers={},options={}){return (await this.resolve(url,headers,options)).value;}
   async extract(url,headers,options){
-    const data=await this.json(canonicalURL(url),headers,['--skip-download','--dump-single-json','--no-warnings','--no-write-comments'],options);
+    const data=await this.json(canonicalURL(url),headers,['--skip-download','--dump-single-json','--no-warnings','--no-write-comments','--no-write-thumbnail'],options);
     if(data.is_drm)throw Error('الفيديو محمي ولا يمكن تنزيله');
     const formats=(data.formats||[]).filter(f=>f.vcodec&&!['none','images'].includes(f.vcodec)&&f.protocol!=='mhtml'&&!f.has_drm&&/^[a-z0-9_.-]{1,80}$/i.test(f.format_id)).map(f=>({id:f.format_id,height:f.height||0,fps:f.fps||0,ext:f.ext,codec:f.vcodec,size:f.filesize||f.filesize_approx||0,note:f.format_note||'',hasAudio:!!f.acodec&&f.acodec!=='none'}));
     const value={video:true,title:data.title||data.id,id:data.id,duration:data.duration||0,formats:formats.sort((a,b)=>b.height-a.height||b.fps-a.fps),extractor:data.extractor_key||data.extractor,type:'video/site',size:0,resumable:true};
@@ -57,7 +58,7 @@ class VideoResolver{
     limit=Math.min(10000,Math.max(1,Math.trunc(Number(limit)||10000)));
     const canonical='https://www.youtube.com/playlist?list='+encodeURIComponent(u.searchParams.get('list'));
     // Fetch one extra entry so large playlists never appear silently complete.
-    const data=await this.json(canonical,{},['--yes-playlist','--flat-playlist','--playlist-end',String(limit+1),'--dump-single-json','--no-warnings'],{...options,timeout:300000,max:48*1024*1024});
+    const data=await this.json(canonical,options.headers||{},['--yes-playlist','--flat-playlist','--playlist-end',String(limit+1),'--dump-single-json','--no-warnings','--extractor-args','youtubetab:skip=authcheck'],{...options,timeout:120000,max:48*1024*1024});
     const entries=Array.isArray(data.entries)?data.entries:[],seen=new Set(),items=[];
     for(const [i,e]of entries.slice(0,limit).entries()){
       if(!e||!/^[a-z0-9_-]{11}$/i.test(e.id||'')||seen.has(e.id)||['private','premium_only','subscriber_only','needs_auth'].includes(e.availability)||/^\[(Private|Deleted) video\]$/i.test(e.title||''))continue;
@@ -69,7 +70,7 @@ class VideoResolver{
     const headers=engine.authHeaders(ctx.item.url,meta),controller=new AbortController();ctx.controllers.add(controller);let resolved;try{resolved=await this.resolve(ctx.item.url,headers,{signal:controller.signal});}finally{ctx.controllers.delete(controller);}if(ctx.stopped)return;const info=resolved.value;
     const quality=meta.quality||'best';if(!/^(best|audio|[a-z0-9_.-]{1,80})$/i.test(quality))throw Error('جودة فيديو غير صالحة');
     const ffmpeg=require('ffmpeg-static').replace('app.asar'+path.sep,'app.asar.unpacked'+path.sep);
-    const format=quality==='audio'?'bestaudio/best':/^max(480|720|1080)$/.test(quality)?`bv*[height<=${quality.slice(3)}][ext=mp4]+ba[ext=m4a]/b[height<=${quality.slice(3)}][ext=mp4]/b[height<=${quality.slice(3)}]/b[ext=mp4]/b`:quality==='best'?'bv*[ext=mp4]+ba[ext=m4a]/b[ext=mp4]/b':info.formats.find(f=>f.id===quality)?.hasAudio?quality:`${quality}+ba/${quality}`;
+    const format=quality==='audio'?'bestaudio/best':/^max(360|480|720|1080|1440|2160|4320)$/.test(quality)?`bv*[height<=${quality.slice(3)}][ext=mp4]+ba[ext=m4a]/b[height<=${quality.slice(3)}][ext=mp4]/b[height<=${quality.slice(3)}]/b[ext=mp4]/b`:quality==='best'?'bv*[ext=mp4]+ba[ext=m4a]/b[ext=mp4]/b':info.formats.find(f=>f.id===quality)?.hasAudio?quality:`${quality}+ba/${quality}`;
     const args=['--newline','--progress','--progress-delta','0.25','--no-simulate','--no-warnings','--continue','--concurrent-fragments',String(Math.max(1,Math.min(4,engine.settings().connections))),'--fragment-retries','5','--abort-on-unavailable-fragments','--http-chunk-size','10M','--ffmpeg-location',ffmpeg,'--format',format,'--output',path.join(engine.settings().tempDir,ctx.id+'.%(ext)s'),'--print','post_process:FLOW_PROCESS','--print','after_move:FLOW_FILE:%(filepath)s','--progress-template','download:FLOW_PROGRESS:%(info.format_id)s:%(progress)j'];
     if(quality==='audio')args.push('--extract-audio','--audio-format','mp3');else args.push('--merge-output-format',meta.format==='mkv'?'mkv':'mp4');
     const rate=meta.speedLimit||engine.settings().speedLimit;if(rate)args.push('--limit-rate',rate+'K');
@@ -78,15 +79,16 @@ class VideoResolver{
     let outputFile;const p=await this.command(ctx.item.url,headers,args,{info:resolved.data});ctx.process=p;ctx.stopProcess=()=>this.stop(p);
     if(ctx.stopped){await this.stop(p);return;}
     await new Promise((resolve,reject)=>{
-      let line='',error='',lastBytes=ctx.item.downloaded||0,lastActivity=Date.now(),timedOut=false;const streams=new Map(),samples=[];const watchdog=setInterval(()=>{if(!ctx.stopped&&Date.now()-lastActivity>120000){timedOut=true;this.stop(p).catch(()=>{});}else if(!ctx.stopped&&Date.now()-lastActivity>3000)engine.store.update(ctx.id,{speed:0});},1000);watchdog.unref();
+      let line='',error='',lastBytes=0,lastActivity=Date.now(),timedOut=false;const streams=new Map(),samples=[];const watchdog=setInterval(()=>{if(!ctx.stopped&&Date.now()-lastActivity>120000){timedOut=true;this.stop(p).catch(()=>{});}else if(!ctx.stopped&&Date.now()-lastActivity>3000)engine.store.update(ctx.id,{speed:0});},1000);watchdog.unref();
       const consume=value=>{
         if(value.startsWith('FLOW_FILE:')){outputFile=value.slice(10).trim();return;}
         if(value==='FLOW_PROCESS'){lastActivity=Date.now();engine.store.update(ctx.id,{status:'processing',speed:0});return;}
         const match=/^FLOW_PROGRESS:([^:]+):(.*)$/.exec(value);if(!match)return;
-        try{const progress=JSON.parse(match[2]),old=streams.get(match[1])||{};streams.set(match[1],{bytes:Math.max(old.bytes||0,Number(progress.downloaded_bytes)||0),total:Number(progress.total_bytes||progress.total_bytes_estimate)||old.total||0});const downloaded=[...streams.values()].reduce((n,s)=>n+s.bytes,0),total=[...streams.values()].reduce((n,s)=>n+s.total,0),now=Date.now();const delta=Math.max(0,downloaded-lastBytes);if(delta>0||progress.status==='finished')lastActivity=now;lastBytes=Math.max(lastBytes,downloaded);samples.push({time:now,bytes:downloaded});while(samples.length>2&&samples[1].time<now-3000)samples.shift();const measured=samples.length>1?(downloaded-samples[0].bytes)/Math.max(.001,(now-samples[0].time)/1000):0;ctx.received=downloaded;ctx.speed=Number(progress.speed)>0?Number(progress.speed):measured;engine.usage.bytes+=delta;engine.usage.total+=delta;engine.store.update(ctx.id,{status:'downloading',downloaded:Math.max(ctx.item.downloaded||0,downloaded),size:Math.max(total,downloaded),speed:ctx.speed});engine.store.set('usage',engine.usage);if(engine.quotaReached()&&!ctx.stopped)engine.pause(ctx.id,'limited').catch(()=>{});}catch{}
+        try{const progress=JSON.parse(match[2]),old=streams.get(match[1])||{};streams.set(match[1],{bytes:Math.max(old.bytes||0,Number(progress.downloaded_bytes)||0),total:Number(progress.total_bytes||progress.total_bytes_estimate)||old.total||0});const downloaded=[...streams.values()].reduce((n,s)=>n+s.bytes,0),total=[...streams.values()].reduce((n,s)=>n+s.total,0),now=Date.now();const delta=Math.max(0,downloaded-lastBytes);if(delta>0||progress.status==='finished')lastActivity=now;lastBytes=Math.max(lastBytes,downloaded);samples.push({time:now,bytes:downloaded});while(samples.length>2&&samples[1].time<now-3000)samples.shift();const measured=samples.length>1?(downloaded-samples[0].bytes)/Math.max(.001,(now-samples[0].time)/1000):0;ctx.received=downloaded;ctx.speed=Number(progress.speed)>0?Number(progress.speed):measured;engine.usage.bytes+=delta;engine.usage.total+=delta;engine.store.update(ctx.id,{status:'downloading',downloaded,size:Math.max(total,downloaded),speed:ctx.speed});engine.store.set('usage',engine.usage);if(engine.quotaReached()&&!ctx.stopped)engine.pause(ctx.id,'limited').catch(()=>{});}catch{}
       };
+      p.stdout.setEncoding?.('utf8');p.stderr.setEncoding?.('utf8');
       p.stdout.on('data',b=>{line+=b;let index;while((index=line.indexOf('\n'))>=0){consume(line.slice(0,index).trim());line=line.slice(index+1);}});p.stderr.on('data',b=>error=(error+b).slice(-4000));
-      p.on('error',e=>{clearInterval(watchdog);reject(e);});p.on('close',code=>{clearInterval(watchdog);if(line)consume(line.trim());if(ctx.stopped)resolve();else if(timedOut)reject(Error('انتهت مهلة تنزيل الفيديو دون تقدم؛ أعد المحاولة أو حدّث الرابط'));else if(code===0)resolve();else reject(Error(videoError(error)));});
+      p.on('error',e=>{clearInterval(watchdog);reject(e);});p.on('close',code=>{clearInterval(watchdog);if(line)consume(line.trim());if(ctx.stopped)resolve();else if(timedOut)reject(Error('انتهت مهلة تنزيل الفيديو دون تقدم؛ أعد المحاولة أو حدّث الرابط'));else if(code===0)resolve();else{this.cache.delete(this.key(ctx.item.url,headers));reject(Error(videoError(error)));}});
     });
     if(ctx.stopped)return;
     if(!outputFile||!path.resolve(outputFile).startsWith(path.resolve(engine.settings().tempDir)+path.sep)||!path.basename(outputFile).startsWith(ctx.id+'.')||!fs.existsSync(outputFile))throw Error('لم يُنتج محرك المواقع ملفًا صالحًا');

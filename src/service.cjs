@@ -65,8 +65,8 @@ class Service{
     const requestId=String(data.requestId||'');if(requestId&&!/^[a-z0-9:-]{1,100}$/i.test(requestId))throw Error('Invalid handoff identifier');
     const recent=this.store.get('browserRequests',[]),existing=recent.find(r=>r.id===requestId);if(existing&&this.store.find(existing.downloadId))return this.store.find(existing.downloadId);
     if(String(data.url).startsWith('magnet:')){const result=await this.peers.action('torrentAdd',{url:data.url});await this.desktop?.peerInfo?.();return {...result,name:'Torrent download',status:'active'};}
-    const validated=validateAdd({url:data.url,name:data.name,headers:data.headers,sourcePage:data.sourcePage,later:!!data.later,mode:data.mode},this.store);
-    if(this.store.settings.preventDuplicates){const duplicate=this.library.duplicates(validated.url)[0];if(duplicate){if(this.desktop){await this.desktop.downloadInfo?.(duplicate.id,duplicate.status);}return duplicate;}}
+    const validated=validateAdd({url:data.url,name:data.name,headers:data.headers,sourcePage:data.sourcePage,later:!!data.later,mode:data.mode,quality:data.quality},this.store);
+    if(this.store.settings.preventDuplicates){const duplicate=this.library.duplicates(validated.url)[0];if(duplicate){if(validated.mode==='site'&&!['downloading','probing','processing','complete'].includes(duplicate.status)){const meta=JSON.parse(duplicate.meta);this.store.update(duplicate.id,{status:'pending',error:'',meta:JSON.stringify({...meta,headers:validated.headers,sourcePage:validated.sourcePage||meta.sourcePage,...(data.quality?{quality:validated.quality}:{})})});}const current=this.store.find(duplicate.id);if(this.desktop){await this.desktop.downloadInfo?.(current.id,current.status);}return current;}}
     let info;
     if(this.desktop&&!['media','site'].includes(validated.mode)&&/^https?:/.test(validated.url)){
       const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),15000);timer.unref();this.browserControllers.add(controller);
@@ -118,6 +118,7 @@ class Service{
         this.library.remember(validated.directory||item.directory);if(data.later)s.update(item.id,{status:'queued'});else e.start(item.id).catch(()=>{});return {id:item.id};
       }
       case'authorProfile':if(!this.desktop)throw Error('افتح الرابط من نسخة سطح المكتب');return this.desktop.authorProfile();
+      case'sourceOpen':if(!this.desktop?.browserFallback)throw Error('Open this page in your browser.');return this.desktop.browserFallback(net.validateURL(data.url,['http:','https:']).href);
       case'browserFallback':{const item=s.find(data.id);if(!item||!this.desktop?.browserFallback)throw Error('افتح رابط المصدر في المتصفح');const meta=JSON.parse(item.meta);return this.desktop.browserFallback(meta.sourcePage||item.url);}
       case'batch':{
         if(!Array.isArray(data.urls)||data.urls.length>500)throw Error('الحد الأقصى 500 رابط');
@@ -125,7 +126,7 @@ class Service{
         return items.map(item=>e.add(item));
       }
       case'probeCancel':{this.probeJobs.get(data.requestId)?.abort(Error('Inspection cancelled'));return true;}
-      case'videoInfo':case'probe':{net.validateURL(data.url,['http:','https:']);const stored=data.id&&s.find(data.id),headers=e.authHeaders(data.url,{headers:{...(stored&&new URL(stored.url).origin===new URL(data.url).origin?JSON.parse(stored.meta).headers:{}),...cleanHeaders(data.headers)}});const controller=new AbortController(),key=String(data.requestId||crypto.randomUUID());if(this.probeJobs.size>=16)throw Error('Too many video inspections. Close another inspection and try again.');this.probeJobs.get(key)?.abort();this.probeJobs.set(key,controller);try{if(type==='videoInfo'||data.mode==='site'||require('./video.cjs').isVideoPage(data.url))return await e.video.inspect(data.url,headers,{signal:controller.signal});return await net.probe(data.url,{headers,settings:s.settings,signal:controller.signal});}finally{if(this.probeJobs.get(key)===controller)this.probeJobs.delete(key);}}
+      case'videoInfo':case'probe':{net.validateURL(data.url,['http:','https:']);const stored=data.id&&s.find(data.id),headers=e.authHeaders(data.url,{headers:{...(stored&&new URL(stored.url).origin===new URL(data.url).origin?JSON.parse(stored.meta).headers:{}),...cleanHeaders(data.headers)}});const controller=new AbortController(),key=String(data.requestId||crypto.randomUUID());if(this.probeJobs.size>=16)throw Error('Too many video inspections. Close another inspection and try again.');this.probeJobs.get(key)?.abort();this.probeJobs.set(key,controller);try{if(type==='videoInfo'||data.mode==='site'||require('./video.cjs').isVideoPage(data.url))return await (e.workerClient?e.workerClient.inspectVideo(data.url,headers,{signal:controller.signal}):e.video.inspect(data.url,headers,{signal:controller.signal}));return await net.probe(data.url,{headers,settings:s.settings,signal:controller.signal});}finally{if(this.probeJobs.get(key)===controller)this.probeJobs.delete(key);}}
       case'zip':return net.zipPreview(data.url,{headers:e.authHeaders(data.url),settings:s.settings});
       case'start':{const item=s.find(data.id);if(!item)throw Error('التحميل غير موجود');if(item.status==='pending'&&this.desktop?.downloadInfo)return this.desktop.downloadInfo(item.id);e.start(data.id).catch(()=>{});return true;}
       case'pause':await e.pause(data.id);return true;
@@ -181,8 +182,9 @@ class Service{
       case'browserFolder':if(!this.browserBridge)throw Error('افتح نسخة سطح المكتب');if(!require('node:fs').existsSync(this.browserBridge.extensionPath))throw Error('جهّز ربط المتصفح أولاً');return this.desktop.open(this.browserBridge.extensionPath);
       case'browserExtensions':if(!this.desktop)throw Error('افتح chrome://extensions يدويًا');return this.desktop.browserExtensions();
       case'quit':if(!this.desktop)throw Error('هذه الوظيفة لسطح المكتب');return this.desktop.quit();
+      case'dragFile':{if(!this.desktop?.dragFile)throw Error('File dragging is available in the desktop app.');return this.desktop.dragFile(require('./completed-file.cjs').completedFile(s,data.id));}
       case'open':case'folder':{
-        const d=s.find(data.id),file=d&&JSON.parse(d.meta).filePath;if(!file||d.status!=='complete')throw Error('الملف لم يكتمل بعد');if(!this.desktop)throw Error('فتح الملفات متاح داخل تطبيق Electron');return this.desktop[type](file);
+        const d=s.find(data.id),file=d&&JSON.parse(d.meta).filePath;if(!file||d.status!=='complete')throw Error('الملف لم يكتمل بعد');if(!this.desktop)throw Error('Open files from Flow Download Manager.');if(type==='open')require('./completed-file.cjs').completedFile(s,data.id);return this.desktop[type](file);
       }
       case'chooseDirectory':if(!this.desktop)throw Error('اكتب مسار المجلد في نسخة المتصفح');return this.desktop.chooseDirectory();
       case'chooseSound':if(!this.desktop)throw Error('اكتب مسار WAV في نسخة المتصفح');return this.desktop.chooseSound();

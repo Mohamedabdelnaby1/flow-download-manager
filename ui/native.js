@@ -22,8 +22,8 @@ function renderNativeWindow(){
     case'shutdown':renderShutdown();break;
     case'tools':openTools(windowArgs.get('tab')||'home');break;
     case'smart':openSmart(windowArgs.get('tab')||'health',id||'');break;
-    case'add':case'download-info':openAdd(windowArgs.get('url')||state.downloads.find(d=>d.id===id)?.url||'');if(isSiteVideo($('#f-url')?.value)||isPlaylistURL($('#f-url')?.value))queueMicrotask(()=>handleAction('probeAdd',$('[data-action=probeAdd]')));break;
-    case'details':openDetail(id);break;case'complete':showComplete(id);break;
+    case'add':case'download-info':openAdd(windowArgs.get('url')||state.downloads.find(d=>d.id===id)?.url||'');if(/^https?:/i.test($('#f-url')?.value||''))queueMicrotask(()=>inspectDownload());break;
+    case'details':if(state.downloads.find(d=>d.id===id)?.status==='complete')showComplete(id);else openDetail(id);break;case'complete':showComplete(id);break;
     case'scheduler':renderQueues();break;case'batch':openBatch();break;
     case'grabber':view='grabber';renderGrabber();document.title=t('ساحب المواقع','Site grabber')+' — Flow';document.body.classList.add('native-page');break;
     case'integration':view='integration';renderIntegration();document.title=t('تكامل المتصفح','Browser integration')+' — Flow';document.body.classList.add('native-page');break;
@@ -55,7 +55,7 @@ handleAction=async(name,el)=>{
   return nativeHandleAction(name,el);
 };
 function isSiteVideo(url){try{return /(^|\.)(youtube\.com|youtu\.be|vimeo\.com|tiktok\.com|dailymotion\.com|instagram\.com|facebook\.com|fb\.watch)$/i.test(new URL(url).hostname);}catch{return false;}}
-function showVideoQualities(info){
+function legacyVideoQualities(info){
   const values={best:t('أفضل جودة متاحة — دمج الصوت تلقائيًا','Best available — audio merged automatically'),audio:t('صوت فقط MP3','Audio only MP3')};
   for(const f of info.formats||[])values[f.id]=`${f.height||'?'}p${f.fps>30?' · '+f.fps+'fps':''} · ${f.ext} · ${f.codec.split('.')[0]}${f.size?' · ~'+size(f.size):''}${f.hasAudio?' · A/V':''}`;
   $('#video-qualities').innerHTML=select('quality',t('جودة الفيديو','Video quality'),values,'best');

@@ -29,7 +29,7 @@ async function sendDownload(data){
   const desktop=await transport({type:'ping'});requireCurrentDesktop(desktop);
   const url=new URL(data.url);if(!['http:','https:'].includes(url.protocol))throw Error('Only direct HTTP/HTTPS files can be transferred.');
   const {headers,method}=await downloadHeaders(url.href,data.sourcePage);if(method&&method!=='GET')throw Error('POST downloads must stay in the browser.');
-  const out=await transport({type:'download',requestId:data.requestId||crypto.randomUUID(),...data,headers,mode:data.mode||(/\.(m3u8|mpd)(\?|$)/i.test(url.href)?'media':'file')});
+  const out=await transport({type:'download',requestId:data.requestId||crypto.randomUUID(),...data,headers,mode:data.mode||(/\.(m3u8|mpd)(\?|$)/i.test(url.href)?'media':'file'),quality:data.quality});
   if(!out.result?.id)throw Error('Flow did not confirm this download.');await chrome.action.setBadgeText({text:'✓'});await chrome.action.setBadgeBackgroundColor({color:'#298b64'});return out.result;
 }
 async function refreshContentScripts(){
