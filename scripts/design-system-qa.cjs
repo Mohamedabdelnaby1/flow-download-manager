@@ -18,6 +18,7 @@ module.exports=async({app,win,service,toolsWindows})=>{
   await capture(win,'workspace-light');
   const tools=await toolsWindows.open('tools',{tab:'preferences'}),preferences=toolsWindows.windows.get(tools.key);await ready(preferences);
   check('four visual appearance choices are available',await js(preferences,'document.querySelectorAll("[data-theme-choice]").length===4'));
+  check('replaced native selects do not create invisible keyboard stops',await js(preferences,'[...document.querySelectorAll(".theme-select-fallback")].every(s=>s.tabIndex===-1)'));
   check('six named accent palettes are available',await js(preferences,'document.querySelectorAll("[data-accent-choice]").length===6'));
   await js(preferences,'document.querySelector("[data-theme-choice=amoled]").click();document.querySelector("[data-accent-choice=violet]").click()');
   await wait(1200);await js(preferences,'refresh()');
