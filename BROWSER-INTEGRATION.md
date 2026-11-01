@@ -45,3 +45,7 @@ Windows uses a protected per-user configuration. Chromium manifests contain the 
 Linux registration paths are prepared in source, including Firefox's native-messaging-hosts directory, but Linux packages and a real Linux browser run remain deferred.
 
 Official references: [Mozilla native messaging](https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/Native_messaging), [Firefox background pages](https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/manifest.json/background), [Mozilla signing](https://extensionworkshop.com/documentation/publish/signing-and-distribution-overview/), [Opera native messaging](https://help.opera.com/en/extensions/message-passing/), [Vivaldi extensions](https://help.vivaldi.com/desktop/appearance-customization/extensions/).
+
+## Release evidence
+
+[Firefox live test](docs/validation/firefox-live-v2.10.0.json) · [Opera live test](docs/validation/opera-live-v2.10.0.json) · [Setup screenshots](docs/SCREENSHOTS.md) · [Full validation](VALIDATION.md)

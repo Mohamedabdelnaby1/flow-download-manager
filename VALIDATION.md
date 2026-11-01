@@ -1,3 +1,34 @@
+# Validation — Flow 2.10.0
+
+Checks dated 1 November 2026. Production build commit: `075cb198e959394e08204f61db946dcabeca4fc5`. Final documentation, test-harness maintenance and evidence changes do not change the production services or UI.
+
+| Gate | Result | Evidence |
+| --- | --- | --- |
+| Both Windows package jobs | **272 passed, 0 failed** per job | [Source/CI](docs/validation/source-suite-v2.10.0.json) |
+| Actual installed GitHub payload: system coherence | **163 checks across 76 English/Arabic screen states** | [Coherence](docs/validation/system-coherence-v2.10.0.json) |
+| Same installed payload: appearance and OS theme behavior | **50 passed** | [Appearance](docs/validation/appearance-v2.10.0.json) |
+| Same installed payload: all 21 tool destinations in both languages | **42 passed** | [Tool windows](docs/validation/tool-windows-v2.10.0.json) |
+| Same installed payload: shared design system and window kinds | **57 passed** | [Design](docs/validation/design-system-v2.10.0.json) |
+| Same installed payload: confirmation, completion, direct file actions and transfer | **15 passed** | [Downloads](docs/validation/downloads-v2.10.0.json) |
+| Same installed payload: background transfer, cancellable shutdown, phone pairing, tool actions and floating controls | **25 passed** | [Tools](docs/validation/tools-v2.10.0.json) |
+| Same installed payload: browser selection/routing/localization | **14 passed**; browser-opening actions stubbed in this UI suite | [Browser UI](docs/validation/multibrowser-ui-v2.10.0.json) |
+| Existing installation retained | Same location, one registration, all four records/settings/completed-file hashes preserved; actual Chrome and Firefox host handshakes | [Upgrade](docs/validation/installed-upgrade-v2.10.0.json) |
+| Actual complete portable executable | **57 passed** | [Portable](docs/validation/complete-portable-v2.10.0.json) |
+| Exact compact setup payload | **3,149 file SHA-256 values match**; audited service sources match | [Payload](docs/validation/compact-payload-v2.10.0.json) |
+| Compact runtime / appearance / actual portable | **14 / 8 / 6 passed**, including independent-engine continuity | [Integration](docs/validation/compact-integration-v2.10.0.json), [Appearance](docs/validation/compact-appearance-v2.10.0.json), [Portable](docs/validation/compact-portable-v2.10.0.json) |
+| Actual Firefox 159, temporary unsigned add-on | **5 passed**, authorized 1 MiB handoff and browser fallback | [Firefox](docs/validation/firefox-live-v2.10.0.json) |
+| Actual Opera 137 | **5 passed**, authorized 1 MiB handoff and browser fallback | [Opera](docs/validation/opera-live-v2.10.0.json) |
+| Simulated native module policy refusal in real Electron startup | **4 passed**, no uncaught JavaScript dialog or restart loop | [Startup](docs/validation/startup-policy-v2.10.0.json) |
+| Compact backend policy-refusal response | **3 passed**, structured explanation before service startup | [Backend startup](docs/validation/startup-policy-compact-v2.10.0.json) |
+| Firefox package lint | **0 errors, 0 warnings, 0 notices** | [Mozilla lint](docs/validation/firefox-lint-v2.10.0.json) |
+| Production dependency advisories | **0 known advisories** at audit time; not a general security guarantee | [Dependency audit](docs/validation/dependency-audit-v2.10.0.json) |
+
+[Audit findings and removed legacy paths](docs/SYSTEM-AUDIT-2.10.md). Runtime suites use isolated profiles; the installer exercise separately backs up and preserves the real library. The initial 2.9-to-2.10 upgrade and the final audited same-version candidate replacement are both recorded. Screenshot fixtures are controlled examples.
+
+**Boundaries:** Firefox requires Mozilla signing for permanent installation. Opera/Firefox were tested in isolated browser copies; the other six targets have setup/source coverage, not eight separate live-browser claims. Windows packages and the bundled Realm native module remain unsigned. The startup test simulates Windows refusal; it does not bypass Windows policies or prove publisher trust. [Trusted signing prerequisites](docs/WINDOWS-SIGNING.md). Linux packages remain deferred. No universal video-access or faster-than-IDM claim, real reboot test or physical Explorer drag/drop claim is made.
+
+---
+
 # Validation - Flow 2.9.0
 
 Checks dated 1 November 2026. Production build commit: `7bc1c5a2f7816831f9592732065b913e4d3b7fb1`. Later documentation/evidence changes do not alter production code.

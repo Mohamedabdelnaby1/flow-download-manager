@@ -1,0 +1,10 @@
+{
+  "version": "2.10.0",
+  "buildCommit": "075cb198e959394e08204f61db946dcabeca4fc5",
+  "exactGitHubSetupPayload": true,
+  "filesVerified": 3149,
+  "allSHA256Match": true,
+  "nativeHostMatchesFirefoxAndOperaTestedBinary": true,
+  "auditedServiceSourcesMatch": true,
+  "nodeVersion": "22.14.0"
+}

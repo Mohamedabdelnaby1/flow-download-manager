@@ -1,0 +1,18 @@
+{
+  "version": "2.10.0",
+  "browserVersion": "159.0",
+  "addonId": "flow-companion@mohamedabdelnaby1.github.io",
+  "temporaryAddon": true,
+  "permanentSigningTested": false,
+  "isolatedProfile": true,
+  "renamedTestExecutableAvoidedThirdPartyDownloadInterception": true,
+  "passed": 5,
+  "checks": [
+    "real Firefox installs the generated temporary MV3 add-on",
+    "Firefox reaches the DPAPI-protected native host with its own ID and manifest arguments",
+    "automatic Firefox download handoff transfers authorized cookies and produces exact bytes",
+    "Firefox cancels its browser copy only after Flow acknowledges",
+    "Firefox resumes and completes its own download when native handoff fails"
+  ],
+  "bytes": 1048576
+}

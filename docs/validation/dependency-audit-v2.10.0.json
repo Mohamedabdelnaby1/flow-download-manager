@@ -1,0 +1,20 @@
+{
+  "date": "2026-11-01",
+  "scope": "npm audit --omit=dev",
+  "vulnerabilities": {
+    "info": 0,
+    "low": 0,
+    "moderate": 0,
+    "high": 0,
+    "critical": 0,
+    "total": 0
+  },
+  "dependencies": {
+    "prod": 107,
+    "dev": 261,
+    "optional": 22,
+    "peer": 13,
+    "peerOptional": 0,
+    "total": 367
+  }
+}

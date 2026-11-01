@@ -1,0 +1,9 @@
+{
+  "passed": 3,
+  "checks": [
+    "Compact backend catches a native dependency loading refusal",
+    "structured policy explanation reaches the host",
+    "no raw Node loader exception escapes"
+  ],
+  "errors": []
+}

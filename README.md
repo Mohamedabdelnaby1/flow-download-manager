@@ -2,7 +2,7 @@
 
 <img src="docs/brand/hero.png" width="100%" alt="Flow Download Manager — Downloads. On your terms. Created by mohamed abdelnaby.">
 
-<a href="https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/download/v2.9.0/Flow-2.9.0-Setup.exe"><img src="docs/brand/download-setup.svg" width="322" alt="Download Flow for Windows — Setup, updates your installed copy"></a> <a href="https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/download/v2.9.0/Flow-2.9.0-Portable.exe"><img src="docs/brand/download-portable.svg" width="238" alt="Download Portable — Run without installing"></a> <a href="https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/download/v2.9.0/Flow-Companion-2.9.0.zip"><img src="docs/brand/download-companion.svg" width="266" alt="Get the browser extension for Chrome, Edge and Brave"></a>
+<a href="https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/download/v2.10.0/Flow-2.10.0-Setup.exe"><img src="docs/brand/download-setup.svg" width="322" alt="Download Flow for Windows — Setup, updates your installed copy"></a> <a href="https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/download/v2.10.0/Flow-2.10.0-Portable.exe"><img src="docs/brand/download-portable.svg" width="238" alt="Download Portable — Run without installing"></a> <a href="https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/download/v2.10.0/Flow-Companion-2.10.0.zip"><img src="docs/brand/download-companion.svg" width="266" alt="Get the Chromium companion for Chrome, Edge, Opera, Opera GX, Brave and Vivaldi"></a>
 
 [Explore the tools](docs/TOOLS.md) · [Browser setup](BROWSER-INTEGRATION.md) · [Full gallery](docs/SCREENSHOTS.md) · [What's new](CHANGELOG.md) · [Report a problem](https://github.com/Mohamedabdelnaby1/flow-download-manager/issues/new?template=bug_report.yml)
 
@@ -10,9 +10,17 @@
 
 **Free to use. Open to improve. Built around your workflow.**
 
-**New in 2.9:** a colorful Material You workspace, a shared design system across tools and dialogs, six accents and a separate true-black AMOLED appearance. [Explore the redesign →](docs/MATERIAL-YOU-2.9.md)
+**New in 2.10:** choose your browser in Flow, with a dedicated Firefox adapter and setup for Opera, Opera GX, Vivaldi and the existing Chromium browsers. [Connect your browser →](BROWSER-INTEGRATION.md) · [Firefox signing status →](docs/FIREFOX-SIGNING.md)
 
 </div>
+
+### Your browser. Your downloads. One Flow.
+
+**Chrome · Edge · Opera · Opera GX · Brave · Vivaldi · Chromium** use the Chromium companion. **Firefox** has a separate adapter and unsigned temporary-test bundle; permanent installation needs Mozilla signing. [Setup and signing guide →](BROWSER-INTEGRATION.md)
+
+**System reliability audit:** duplicate shortcut handling, stale version labels, missing phone assets, font persistence, companion-folder selection and idle interface rebuilding have been corrected and regression-tested. [Read the findings →](docs/SYSTEM-AUDIT-2.10.md)
+
+[Firefox unsigned test bundle →](https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/download/v2.10.0/Flow-Companion-Firefox-2.10.0-Unsigned.zip) · [Permanent Firefox signing →](docs/FIREFOX-SIGNING.md)
 
 ### A new atmosphere. Four ways to make it yours.
 
@@ -46,19 +54,21 @@ Actual packaged UI captures from isolated, controlled examples. [Quality selecti
 <a id="choose-your-flow"></a>
 <img src="docs/brand/chapter-downloads.svg" width="100%" alt="02 — Pick your Flow. One complete toolkit, two hosts.">
 
+**Windows signing:** these packages are unsigned. Application-control policies can block the installer or an internal native module. Flow now explains this startup error; publisher trust still requires a trusted signed build. [Signing status and requirements →](docs/WINDOWS-SIGNING.md)
+
 ### Complete · the main Windows edition
 
-Everything bundled in the Electron edition. **Setup: 150.0 MB · Portable: 149.8 MB.**
+Everything bundled in the Electron edition. **Setup: 150.0 MB · Portable: 149.7 MB.**
 
-[![Download Windows Setup](https://img.shields.io/badge/%E2%86%93_Download-Setup-c7ff5e?style=for-the-badge&labelColor=141c31)](https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/download/v2.9.0/Flow-2.9.0-Setup.exe) [![Download Portable](https://img.shields.io/badge/%E2%86%93_Download-Portable-62e3fa?style=for-the-badge&labelColor=141c31)](https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/download/v2.9.0/Flow-2.9.0-Portable.exe)
+[![Download Windows Setup](https://img.shields.io/badge/%E2%86%93_Download-Setup-c7ff5e?style=for-the-badge&labelColor=141c31)](https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/download/v2.10.0/Flow-2.10.0-Setup.exe) [![Download Portable](https://img.shields.io/badge/%E2%86%93_Download-Portable-62e3fa?style=for-the-badge&labelColor=141c31)](https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/download/v2.10.0/Flow-2.10.0-Portable.exe)
 
 ### Compact Preview · a smaller optional host
 
 The same interface and full Node, FFmpeg, aria2 and video-extraction tools, using shared **Microsoft WebView2 + .NET Framework 4.8**. These system prerequisites are outside the reported download size. This remains an optional preview. [Compare editions →](docs/COMPACT-WINDOWS-PREVIEW.md)
 
-<a href="https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/download/v2.9.0/Flow-2.9.0-Compact-Preview-Setup.exe"><img src="docs/brand/download-compact.svg" width="320" alt="Download Compact Preview Setup — 59.6 MB"></a> <a href="https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/download/v2.9.0/Flow-2.9.0-Compact-Preview-Portable.exe"><img src="docs/brand/compact-portable.svg" width="320" alt="Download Compact Preview Portable — 62.2 MB"></a>
+<a href="https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/download/v2.10.0/Flow-2.10.0-Compact-Preview-Setup.exe"><img src="docs/brand/download-compact.svg" width="320" alt="Download Compact Preview Setup — 59.6 MB"></a> <a href="https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/download/v2.10.0/Flow-2.10.0-Compact-Preview-Portable.exe"><img src="docs/brand/compact-portable.svg" width="320" alt="Download Compact Preview Portable — 62.2 MB"></a>
 
-**Updating? Use Setup to replace the existing installation.** Portable opens separately. Exit Flow from the tray before updating. [Update walkthrough](docs/UPDATING.md) · [All release files](https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/latest) · [Checksums](https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/download/v2.9.0/SHA256SUMS.txt)
+**Updating? Use Setup to replace the existing installation.** Portable opens separately. Exit Flow from the tray before updating. [Update walkthrough](docs/UPDATING.md) · [All release files](https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/latest) · [Checksums](https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/download/v2.10.0/SHA256SUMS.txt)
 
 <img src="docs/brand/chapter-workspace.svg" width="100%" alt="03 — A workspace that feels like you. Light, dark and six accent palettes.">
 
@@ -103,10 +113,10 @@ Also included: queue scheduling, completion actions with cancellable shutdown, e
 ### Get connected in three steps
 
 1. **Open Flow.** Paste a link into **New download**, choose a destination and start or queue it.
-2. **Connect the browser.** Open **Browser integration**, prepare the connection and load the companion once in Chrome, Edge or Brave. [Illustrated instructions →](BROWSER-INTEGRATION.md)
+2. **Connect the browser.** Open **Browser integration**, select your browser, prepare the connection and follow its companion instructions. [Illustrated instructions →](BROWSER-INTEGRATION.md)
 3. **Make it comfortable.** Pin your usual tools, set your download limits and pick an appearance.
 
-The companion currently needs a manual **Load unpacked** step because it is not in a browser store. Portable editions save data in your Windows profile; they are not zero-footprint USB applications.
+Chromium companions currently need a manual **Load unpacked** step because they are not in a browser store. Firefox permanent installation requires Mozilla signing; its current unsigned bundle is for temporary developer testing. Portable editions save data in your Windows profile; they are not zero-footprint USB applications.
 
 <img src="docs/brand/chapter-open.svg" width="100%" alt="04 — Built in the open. MIT source, clear documentation and contributions.">
 
@@ -114,7 +124,7 @@ Flow is an independent, AI-assisted project by **mohamed abdelnaby**. The origin
 
 | Explore | Build & contribute |
 | :--- | :--- |
-| [Feature reference](FEATURES.md) · [Changelog](CHANGELOG.md) | [Development guide](docs/DEVELOPMENT.md) · [Source ZIP](https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/download/v2.9.0/Flow-2.9.0-Source.zip) |
+| [Feature reference](FEATURES.md) · [Changelog](CHANGELOG.md) | [Development guide](docs/DEVELOPMENT.md) · [Source ZIP](https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/download/v2.10.0/Flow-2.10.0-Source.zip) |
 | [Validation evidence](VALIDATION.md) · [Known boundaries](docs/LIMITATIONS.md) | [Report a bug](https://github.com/Mohamedabdelnaby1/flow-download-manager/issues/new?template=bug_report.yml) · [Suggest a feature](https://github.com/Mohamedabdelnaby1/flow-download-manager/issues/new?template=feature_request.yml) |
 | [Privacy and security](SECURITY.md) · [Third-party notices](THIRD-PARTY-NOTICES.md) | [Contributing](CONTRIBUTING.md) · [MIT license](LICENSE) |
 

@@ -1,0 +1,23 @@
+{
+  "version": "2.10.0",
+  "buildCommit": "075cb198e959394e08204f61db946dcabeca4fc5",
+  "local": {
+    "passed": 272,
+    "failed": 0,
+    "skipped": 0
+  },
+  "ci": [
+    {
+      "run": 41310433288,
+      "passed": 272,
+      "failed": 0
+    },
+    {
+      "run": 41310436263,
+      "passed": 272,
+      "failed": 0
+    }
+  ],
+  "javascriptSyntaxFiles": 144,
+  "startupLoaderRefusalChecks": 4
+}

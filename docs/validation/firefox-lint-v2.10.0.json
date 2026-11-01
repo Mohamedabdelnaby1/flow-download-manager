@@ -1,0 +1,12 @@
+{
+  "tool": "web-ext 10.8.0",
+  "version": "2.10.0",
+  "summary": {
+    "errors": 0,
+    "notices": 0,
+    "warnings": 0
+  },
+  "addonId": "flow-companion@mohamedabdelnaby1.github.io",
+  "minimumFirefox": "142.0",
+  "ciRun": "https://github.com/Mohamedabdelnaby1/flow-download-manager/actions/runs/41310433288"
+}

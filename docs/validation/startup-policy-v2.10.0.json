@@ -1,0 +1,10 @@
+{
+  "passed": 4,
+  "checks": [
+    "native loader refusal exercised",
+    "friendly Flow dialog replaces uncaught JavaScript dialog",
+    "no restart loop for policy blocks",
+    "technical path omitted from main guidance"
+  ],
+  "errors": []
+}

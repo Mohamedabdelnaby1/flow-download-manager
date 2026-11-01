@@ -1,0 +1,15 @@
+{
+  "version": "2.10.0",
+  "browserVersion": "137.0.0.0",
+  "passed": 5,
+  "checks": [
+    "real Opera loads the Chromium MV3 companion",
+    "Opera uses its Chrome-compatible native registration with an authenticated handshake",
+    "Opera attachment capture transfers authorized cookies and exact file bytes",
+    "Opera browser copy is cancelled after desktop acknowledgement",
+    "Opera resumes and finishes its own download when native handoff fails"
+  ],
+  "bytes": 1048576,
+  "isolatedProfile": true,
+  "renamedTestExecutableAvoidedThirdPartyDownloadInterception": true
+}

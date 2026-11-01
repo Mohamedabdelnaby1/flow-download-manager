@@ -1,0 +1,24 @@
+{
+  "exit": 0,
+  "version": "2.10.0",
+  "packaged": true,
+  "passed": 14,
+  "checks": [
+    "browser picker contains all eight supported targets",
+    "connection screen displays the running version rather than a hard-coded legacy version",
+    "firefox uses the selected browser launch action",
+    "opera uses the selected browser launch action",
+    "opera-gx uses the selected browser launch action",
+    "edge uses the selected browser launch action",
+    "brave uses the selected browser launch action",
+    "vivaldi uses the selected browser launch action",
+    "chromium uses the selected browser launch action",
+    "chrome uses the selected browser launch action",
+    "Firefox opens its own generated companion folder",
+    "Firefox signing boundary is clearly visible",
+    "browser setup switches to Arabic RTL and AMOLED",
+    "browser setup fits without document-level horizontal overflow"
+  ],
+  "errors": [],
+  "launchesStubbed": true
+}

@@ -1,5 +1,13 @@
 # Inside Flow
 
+## Browser-specific integration in 2.10
+
+![Opera setup in Light](screenshots/v2.10/opera-setup-light.png)
+
+![Firefox setup in Arabic AMOLED](screenshots/v2.10/firefox-setup-ar-amoled.png)
+
+Captured from the actual installed release in isolated QA profiles. These show setup; live Firefox and Opera transfer evidence is listed in [Validation](../VALIDATION.md). Firefox permanent installation still needs Mozilla signing.
+
 ## Material You and AMOLED in 2.9
 
 ![New Light workspace](screenshots/v2.9/workspace-light.png)
