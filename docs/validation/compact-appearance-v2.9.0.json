@@ -1,0 +1,44 @@
+{
+  "passed": 8,
+  "results": [
+    {
+      "step": "AMOLED main workspace",
+      "value": {
+        "overview": 4,
+        "theme": "amoled"
+      }
+    },
+    {
+      "step": "open preferences",
+      "value": true
+    },
+    {
+      "step": "four visual modes and six accents",
+      "value": {
+        "accents": 6,
+        "modes": 4
+      }
+    },
+    {
+      "step": "native AMOLED preview",
+      "value": true
+    },
+    {
+      "step": "AMOLED preview remains stable after refresh",
+      "value": "#e4b5c5"
+    },
+    {
+      "step": "discard unsaved palette",
+      "value": true
+    },
+    {
+      "step": "ordinary Dark remains separate",
+      "value": true
+    },
+    {
+      "step": "Arabic AMOLED",
+      "value": "Tajawal, \"Segoe UI\", sans-serif"
+    }
+  ],
+  "exactGitHubSetupPayload": true
+}

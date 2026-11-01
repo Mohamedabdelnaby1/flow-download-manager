@@ -2,7 +2,7 @@
 
 <img src="docs/brand/hero.png" width="100%" alt="Flow Download Manager — Downloads. On your terms. Created by mohamed abdelnaby.">
 
-<a href="https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/download/v2.8.0/Flow-2.8.0-Setup.exe"><img src="docs/brand/download-setup.svg" width="322" alt="Download Flow for Windows — Setup, updates your installed copy"></a> <a href="https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/download/v2.8.0/Flow-2.8.0-Portable.exe"><img src="docs/brand/download-portable.svg" width="238" alt="Download Portable — Run without installing"></a> <a href="https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/download/v2.8.0/Flow-Companion-2.8.0.zip"><img src="docs/brand/download-companion.svg" width="266" alt="Get the browser extension for Chrome, Edge and Brave"></a>
+<a href="https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/download/v2.9.0/Flow-2.9.0-Setup.exe"><img src="docs/brand/download-setup.svg" width="322" alt="Download Flow for Windows — Setup, updates your installed copy"></a> <a href="https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/download/v2.9.0/Flow-2.9.0-Portable.exe"><img src="docs/brand/download-portable.svg" width="238" alt="Download Portable — Run without installing"></a> <a href="https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/download/v2.9.0/Flow-Companion-2.9.0.zip"><img src="docs/brand/download-companion.svg" width="266" alt="Get the browser extension for Chrome, Edge and Brave"></a>
 
 [Explore the tools](docs/TOOLS.md) · [Browser setup](BROWSER-INTEGRATION.md) · [Full gallery](docs/SCREENSHOTS.md) · [What's new](CHANGELOG.md) · [Report a problem](https://github.com/Mohamedabdelnaby1/flow-download-manager/issues/new?template=bug_report.yml)
 
@@ -48,17 +48,17 @@ Actual packaged UI captures from isolated, controlled examples. [Quality selecti
 
 ### Complete · the main Windows edition
 
-Everything bundled in the Electron edition. **Setup: 149.4 MB · Portable: 149.1 MB.**
+Everything bundled in the Electron edition. **Setup: 150.0 MB · Portable: 149.8 MB.**
 
-[![Download Windows Setup](https://img.shields.io/badge/%E2%86%93_Download-Setup-c7ff5e?style=for-the-badge&labelColor=141c31)](https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/download/v2.8.0/Flow-2.8.0-Setup.exe) [![Download Portable](https://img.shields.io/badge/%E2%86%93_Download-Portable-62e3fa?style=for-the-badge&labelColor=141c31)](https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/download/v2.8.0/Flow-2.8.0-Portable.exe)
+[![Download Windows Setup](https://img.shields.io/badge/%E2%86%93_Download-Setup-c7ff5e?style=for-the-badge&labelColor=141c31)](https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/download/v2.9.0/Flow-2.9.0-Setup.exe) [![Download Portable](https://img.shields.io/badge/%E2%86%93_Download-Portable-62e3fa?style=for-the-badge&labelColor=141c31)](https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/download/v2.9.0/Flow-2.9.0-Portable.exe)
 
 ### Compact Preview · a smaller optional host
 
 The same interface and full Node, FFmpeg, aria2 and video-extraction tools, using shared **Microsoft WebView2 + .NET Framework 4.8**. These system prerequisites are outside the reported download size. This remains an optional preview. [Compare editions →](docs/COMPACT-WINDOWS-PREVIEW.md)
 
-<a href="https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/download/v2.8.0/Flow-2.8.0-Compact-Preview-Setup.exe"><img src="docs/brand/download-compact.svg" width="320" alt="Download Compact Preview Setup — 59.5 MB"></a> <a href="https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/download/v2.8.0/Flow-2.8.0-Compact-Preview-Portable.exe"><img src="docs/brand/compact-portable.svg" width="320" alt="Download Compact Preview Portable — 62.1 MB"></a>
+<a href="https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/download/v2.9.0/Flow-2.9.0-Compact-Preview-Setup.exe"><img src="docs/brand/download-compact.svg" width="320" alt="Download Compact Preview Setup — 59.6 MB"></a> <a href="https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/download/v2.9.0/Flow-2.9.0-Compact-Preview-Portable.exe"><img src="docs/brand/compact-portable.svg" width="320" alt="Download Compact Preview Portable — 62.2 MB"></a>
 
-**Updating? Use Setup to replace the existing installation.** Portable opens separately. Exit Flow from the tray before updating. [Update walkthrough](docs/UPDATING.md) · [All release files](https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/latest) · [Checksums](https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/download/v2.8.0/SHA256SUMS.txt)
+**Updating? Use Setup to replace the existing installation.** Portable opens separately. Exit Flow from the tray before updating. [Update walkthrough](docs/UPDATING.md) · [All release files](https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/latest) · [Checksums](https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/download/v2.9.0/SHA256SUMS.txt)
 
 <img src="docs/brand/chapter-workspace.svg" width="100%" alt="03 — A workspace that feels like you. Light, dark and six accent palettes.">
 
@@ -84,7 +84,7 @@ Choose your accent, density, corners, fonts, columns and motion. Follow your sys
 | Segmented HTTP/HTTPS and FTP resume | Favorite folders, tags and saved views | Up to eight pinned tool shortcuts |
 | Browser handoff with a separate confirmation | Batch rename with a preview | Simple file and connection limits |
 | Website qualities, audio merging and playlists | Verified moves and integrity checks | Six accents and layout preferences |
-| Torrents, magnets and file selection | Recovery bin and duplicate cleanup | Light, dark and system appearance |
+| Torrents, magnets and file selection | Recovery bin and duplicate cleanup | Light, dark, AMOLED and system appearance |
 | Verified same-file mirrors | Selective ZIP and local media tools | English and Arabic RTL |
 
 Also included: queue scheduling, completion actions with cancellable shutdown, expired-link rescue where identity can be verified, local-network phone control, organization rules and safe configuration backup. Open **Tools** or press **Ctrl+K**. Advanced controls stay collapsed. [Tool guide →](docs/TOOLS.md)
@@ -114,7 +114,7 @@ Flow is an independent, AI-assisted project by **mohamed abdelnaby**. The origin
 
 | Explore | Build & contribute |
 | :--- | :--- |
-| [Feature reference](FEATURES.md) · [Changelog](CHANGELOG.md) | [Development guide](docs/DEVELOPMENT.md) · [Source ZIP](https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/download/v2.8.0/Flow-2.8.0-Source.zip) |
+| [Feature reference](FEATURES.md) · [Changelog](CHANGELOG.md) | [Development guide](docs/DEVELOPMENT.md) · [Source ZIP](https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/download/v2.9.0/Flow-2.9.0-Source.zip) |
 | [Validation evidence](VALIDATION.md) · [Known boundaries](docs/LIMITATIONS.md) | [Report a bug](https://github.com/Mohamedabdelnaby1/flow-download-manager/issues/new?template=bug_report.yml) · [Suggest a feature](https://github.com/Mohamedabdelnaby1/flow-download-manager/issues/new?template=feature_request.yml) |
 | [Privacy and security](SECURITY.md) · [Third-party notices](THIRD-PARTY-NOTICES.md) | [Contributing](CONTRIBUTING.md) · [MIT license](LICENSE) |
 
@@ -123,7 +123,7 @@ Flow is an independent, AI-assisted project by **mohamed abdelnaby**. The origin
 
 Windows 10/11 x64. Windows 7/8/8.1 are unsupported, Linux packages are deferred, and executables remain unsigned. [Publisher signing](docs/WINDOWS-SIGNING.md).
 
-Both 2.8.0 package jobs passed 255 source tests. The actual installed upgrade preserved all four library records, settings and completed-file hashes. The new download dialogs passed 15 checks against that installed payload; a full public video downloaded while minimized and decoded successfully. Compact Preview has separate payload, native integration and portable lifecycle evidence. [Read the exact results →](VALIDATION.md)
+Both 2.9.0 package jobs passed 258 source tests. The actual installed upgrade preserved all four library records, settings and completed-file hashes. That installed payload passed 57 design, 50 appearance, 42 tool-destination and 15 download checks. The actual complete portable passed the 57 design checks; Compact Preview has separate payload, native appearance, integration and portable lifecycle evidence. [Read the exact results →](VALIDATION.md)
 
 Website restrictions, authentication and extractor changes can affect downloads. Flow does not decrypt DRM or promise a fixed speed multiplier. The updater announces releases and opens the official page; unattended installation/rollback, playlist subscriptions, general ZIP/7Z/RAR auto-extraction and cross-device sync remain future work.
 

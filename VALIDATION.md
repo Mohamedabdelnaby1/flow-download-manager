@@ -1,3 +1,29 @@
+# Validation - Flow 2.9.0
+
+Checks dated 1 November 2026. Production build commit: `7bc1c5a2f7816831f9592732065b913e4d3b7fb1`. Later documentation/evidence changes do not alter production code.
+
+| Gate | Result | Evidence |
+| --- | --- | --- |
+| Full regression suite in both Windows package jobs | **258 passed, 0 failed** per job | [Source and CI](docs/validation/source-suite-v2.9.0.json) |
+| Exact GitHub installer updating the real installed 2.8.0 copy | Same location, one registration; all four library records, settings and completed-file hashes preserved | [Upgrade and browser handshake](docs/validation/installed-upgrade-v2.9.0.json) |
+| Same installed payload: new design system and 15 tool-window kinds | **57 passed** | [Design system](docs/validation/design-system-v2.9.0.json) |
+| Same installed payload: System/Light/Dark/AMOLED, RTL, live OS changes, 150% text scale and compact drawer | **50 passed** | [Appearance](docs/validation/appearance-v2.9.0.json) |
+| Same installed payload: all 21 tool destinations in English and Arabic | **42 passed** | [Tool windows](docs/validation/tool-windows-v2.9.0.json) |
+| Same installed payload: inspection gate, right-click edit menu, single completion, file actions and verified local transfer | **15 passed** | [Downloads](docs/validation/downloads-v2.9.0.json) |
+| Actual complete portable executable from this release | **57 passed** across the same new design scenarios | [Complete portable](docs/validation/complete-portable-v2.9.0.json) |
+| Exact downloaded compact setup payload | **3,147 file SHA-256 values match** | [Payload](docs/validation/compact-payload-v2.9.0.json) |
+| Same compact payload: actual WebView2 appearance switching and preview controls | **8 passed** | [Compact appearance](docs/validation/compact-appearance-v2.9.0.json) |
+| Same compact payload: startup, sounds, Native Messaging and UI/engine independence | **14 passed** | [Integration](docs/validation/compact-integration-v2.9.0.json) |
+| Actual compact portable from this release | **6 passed**; 8 MiB transfer survives UI termination | [Compact portable](docs/validation/compact-portable-v2.9.0.json) |
+
+The installer exercise used the actual existing installation and retained an encrypted backup. All UI suites use isolated profiles and controlled/example records; no test records were inserted into the real library. The new screenshots were captured from the exact installed GitHub payload. Browser repair and a framed native handshake were checked; the Chrome extension's complete live browsing journey was not repeated as a new 2.9 check. The companion's new appearance listener also has a source regression.
+
+This release changes presentation, preference validation and host background/frame synchronization. Public-video network timing and full decoding are documented under 2.8 below, rather than claimed as repeated 2.9 measurements. There is no new speed multiplier or universal website-compatibility claim. Physical file drops into Explorer remain a manual check; Windows was not rebooted. Executables remain unsigned. Compact Preview needs shared WebView2/.NET Framework 4.8; Linux packaging remains deferred.
+
+[Material You and AMOLED gallery](docs/MATERIAL-YOU-2.9.md) · [Update guide](docs/UPDATING.md)
+
+---
+
 # Validation - Flow 2.8.0
 
 Checks dated 1 November 2026. Build commit: `3ad86febf51168f6b143ed1d66be908dc95743bf`. Later documentation and evidence changes do not alter production code.
