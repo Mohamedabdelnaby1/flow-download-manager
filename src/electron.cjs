@@ -134,7 +134,7 @@ if(!app.requestSingleInstanceLock({version:app.getVersion()})){
     service.engineHost=new (require('./engine-host-client.cjs').EngineHostClient)(service);service.engine.workerClient=service.engineHost;
     await ensureMain();toolsWindows=new ToolWindows({BrowserWindow,service,origin:web.origin,main:win,screen,guardWindow});
     service.engine.on('started',d=>{if(service.store.settings.showProgress)toolsWindows.open('details',{id:d.id}).catch(writeLog);});
-    await service.engineHost.attach();
+    await require('./engine-startup.cjs').reconnectEngine(service,{report:error=>{writeLog(error);safeSend(win,'flow:error',service.describeError(error,'engine').message);}});
     for(const d of service.store.list().filter(d=>d.status==='pending'))toolsWindows.open('download-info',{id:d.id}).catch(writeLog);
     wakeTimer=setInterval(syncWake,500);
     await cli(process.argv);

@@ -2,6 +2,8 @@
 
 ## 2.11.0 — Simpler downloads, dependable transfers
 
+- Retry temporary Windows locks when atomically replacing an encrypted engine session. Keep the library, interface and tray available if reconnecting an old engine fails; the next transfer can retry without requiring a desktop restart.
+
 - Simplify Companion, its settings, floating video choices and all download windows. Keep the main action visible; put file locations, graphs, connection details and advanced settings behind one disclosure. Preserve direct Open file, drag, cancel, pause and tray controls. Share the desktop appearance preferences, including AMOLED.
 
 - Update basic-ftp to 6.2.6, including the upstream MLSD parser denial-of-service fix (GHSA-5pm8-86m8-9m6r).

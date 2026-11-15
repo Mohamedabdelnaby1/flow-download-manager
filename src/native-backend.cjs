@@ -53,7 +53,7 @@ async function main(){
  service.engine.on('failure',d=>{event('error',d.error);if(service.store.settings.sounds)require('./sounds.cjs').playSound(service.store.settings.soundError,'error').catch(()=>{});});
  service.engine.on('queueComplete',()=>{if(service.store.settings.sounds)require('./sounds.cjs').playSound(service.store.settings.soundQueue,'queue').catch(()=>{});});
  service.engine.on('shutdownRequested',q=>power.request(q));service.engine.on('quitRequested',()=>desktop.quit());
- const session={origin:web.origin,token:web.token,pid:process.pid,version};const temporary=path.join(profile,'native-session.protected.tmp');fs.writeFileSync(temporary,dpapi(executable,'protect',Buffer.from(JSON.stringify(session))),{mode:0o600});fs.renameSync(temporary,path.join(profile,'native-session.protected'));
+ const session={origin:web.origin,token:web.token,pid:process.pid,version};await require('./atomic-file.cjs').atomicFile(path.join(profile,'native-session.protected'),dpapi(executable,'protect',Buffer.from(JSON.stringify(session))));
  process.stdout.write(JSON.stringify({ready:session})+'\n');lastPoll=Date.now();if(!process.env.FLOW_NATIVE_QA)service.updates.start();
 }
 main().catch(error=>{process.stderr.write(require('../ui/error-model.js').encode(error,'native-start')+'\n');process.exit(1);});
