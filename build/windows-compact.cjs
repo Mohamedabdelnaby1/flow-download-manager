@@ -5,6 +5,7 @@ module.exports={
  compression:'maximum',
  directories:{...original.directories,output:'release-compact'},
  afterPack:undefined,
+ beforePack:undefined,
  win:{...original.win,target:['nsis']},
  nsis:{...original.nsis,differentialPackage:false,artifactName:'Flow-${version}-Compact-Preview-Setup.${ext}',include:'build/compact-installer.nsh'}
 };

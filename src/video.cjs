@@ -71,7 +71,7 @@ class VideoResolver{
     const quality=meta.quality||'best';if(!/^(best|audio|[a-z0-9_.-]{1,80})$/i.test(quality))throw Error('جودة فيديو غير صالحة');
     const ffmpeg=require('ffmpeg-static').replace('app.asar'+path.sep,'app.asar.unpacked'+path.sep);
     const format=quality==='audio'?'bestaudio/best':/^max(360|480|720|1080|1440|2160|4320)$/.test(quality)?`bv*[height<=${quality.slice(3)}][ext=mp4]+ba[ext=m4a]/b[height<=${quality.slice(3)}][ext=mp4]/b[height<=${quality.slice(3)}]/b[ext=mp4]/b`:quality==='best'?'bv*[ext=mp4]+ba[ext=m4a]/b[ext=mp4]/b':info.formats.find(f=>f.id===quality)?.hasAudio?quality:`${quality}+ba/${quality}`;
-    const parallel=await require('./video-transport.cjs').parallelTransport(engine,ctx);if(ctx.stopped)return;
+    const parallel=await require('./video-transport.cjs').parallelTransport(engine,ctx,resolved.data);if(ctx.stopped)return;
     const args=['--newline','--progress','--progress-delta','0.25','--no-simulate','--no-warnings','--continue','--concurrent-fragments',String(Math.max(1,Math.min(16,Number(engine.settings().connections)||1))),'--fragment-retries','5','--abort-on-unavailable-fragments','--http-chunk-size','10M','--ffmpeg-location',ffmpeg,'--format',format,'--output',path.join(engine.settings().tempDir,ctx.id+'.%(format_id)s.%(ext)s'),'--print','post_process:FLOW_PROCESS','--print','after_move:FLOW_FILE:%(filepath)s','--progress-template','download:FLOW_PROGRESS:%(info.format_id)s:%(progress)j'];
     if(parallel)args.push(...parallel.args);
     if(quality==='audio')args.push('--extract-audio','--audio-format','mp3');else args.push('--merge-output-format',meta.format==='mkv'?'mkv':'mp4');

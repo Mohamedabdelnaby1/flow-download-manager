@@ -4,10 +4,10 @@ function unpacked(file){return file.replace(/app\.asar([\\/])/, 'app.asar.unpack
 class VideoTools{
  constructor(dir,options={}){this.dir=dir;this.platform=options.platform||process.platform;this.asset=this.platform==='linux'?'yt-dlp_linux':'yt-dlp.exe';this.bundled=options.bundled||unpacked(path.join(__dirname,'../vendor',this.asset));this.metadata=options.metadata||require(this.platform==='linux'?'../vendor/yt-dlp-linux.json':'../vendor/yt-dlp.json');this.fetch=options.fetch||globalThis.fetch;this.controller=null;this.pending=null;this.ready=null;}
  cached(){return path.join(this.dir,'Tools','yt-dlp-'+this.metadata.version+(this.platform==='linux'?'-linux':'.exe'));}
- available(){return fs.existsSync(this.bundled)||fs.existsSync(this.cached())||(this.platform==='win32'&&fs.existsSync(path.join(path.dirname(this.bundled),'yt-dlp-unpacked/yt-dlp.exe')));}
+ available(){return fs.existsSync(this.bundled)||fs.existsSync(this.cached())||(this.platform==='win32'&&(fs.existsSync(path.join(path.dirname(this.bundled),'yt-dlp-unpacked/yt-dlp.exe'))||fs.existsSync(path.join(path.dirname(this.bundled),'yt-dlp-unpacked-'+this.metadata.version,'yt-dlp.exe'))));}
  verifiedUnpacked(){
   if(this.platform!=='win32')return null;
-  const root=path.join(path.dirname(this.bundled),'yt-dlp-unpacked'),manifestFile=path.join(path.dirname(this.bundled),'yt-dlp-unpacked.json');
+  const preferred=path.join(path.dirname(this.bundled),'yt-dlp-unpacked-'+this.metadata.version),root=fs.existsSync(preferred)?preferred:path.join(path.dirname(this.bundled),'yt-dlp-unpacked'),manifestFile=path.join(path.dirname(this.bundled),'yt-dlp-unpacked.json');
   try{
    const manifest=JSON.parse(fs.readFileSync(manifestFile,'utf8')),entries=Object.entries(manifest.files||{});
    if(manifest.version!==this.metadata.version||!entries.length||!/^[a-f0-9]{64}$/.test(manifest.files['yt-dlp.exe']||''))return null;

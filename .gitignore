@@ -14,3 +14,5 @@ SOURCE-MANIFEST.json
 Thumbs.db
 
 /vendor/yt-dlp_linux
+
+vendor/yt-dlp-unpacked-*/

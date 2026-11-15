@@ -10,6 +10,8 @@
 - Accept valid CDN-rounded byte-range probes using the total Content-Range size. Temporary connection reductions expire and recover gradually; user global/per-host caps remain enforced. Unchanged detached-engine snapshots no longer rewrite library rows.
 - Site-extracted progressive HTTP video uses verified bundled aria2 with bounded parallel connections, authenticated loopback progress, resumable partial files and real progress/connection/block information. HLS/DASH extraction uses bounded native fragment concurrency. Existing direct-manifest FFmpeg behavior remains available.
 - Correct HTTP cookie-file security flags and resumed-video quota accounting. Windows signing and permanent Firefox signing requirements are unchanged.
+- Normalize video/audio format identities across the external downloader and progress hooks so merging does not count a stream twice. Validate real decoded audio/video output.
+- Update the pinned Windows extractor to official 2026.10.26, verify its directory distribution and prepare it at build time. The full edition avoids repeated executable self-extraction; Compact keeps one complete extractor distribution.
 
 ## 2.10.0 — More browsers, one Flow
 

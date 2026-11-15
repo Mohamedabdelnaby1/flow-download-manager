@@ -27,9 +27,9 @@ $sdkArchive=Join-Path $CachePath 'webview2-1.0.4314.35.zip'
 Get-VerifiedAsset 'https://api.nuget.org/v3-flatcontainer/microsoft.web.webview2/1.0.4314.35/microsoft.web.webview2.1.0.4314.35.nupkg' $sdkArchive '90778deb1b77e36292828b4b5833c9255c27533f40e0ddd55891ae718944edc4'
 $sdk=Join-Path $CachePath 'webview2-1.0.4314.35'
 if(-not(Test-Path -LiteralPath $sdk)){Expand-Archive -LiteralPath $sdkArchive -DestinationPath $sdk}
-$extractorArchive=Join-Path $CachePath 'yt-dlp-2026.10.21.zip'
-Get-VerifiedAsset 'https://github.com/yt-dlp/yt-dlp/releases/download/2026.10.21/yt-dlp_win.zip' $extractorArchive 'a981b50fff6e437576d1c3c8df0680af572028ca12dff5e49435d9d33c98294b'
-$extractor=Join-Path $CachePath 'yt-dlp-2026.10.21'
+$extractorArchive=Join-Path $CachePath 'yt-dlp-2026.10.26.zip'
+Get-VerifiedAsset 'https://github.com/yt-dlp/yt-dlp/releases/download/2026.10.26/yt-dlp_win.zip' $extractorArchive 'fd51b212cf8380c7a52ee08c0d6be7f3c59b2f2c832eaf7b45acfae6eab57419'
+$extractor=Join-Path $CachePath 'yt-dlp-2026.10.26'
 if(-not(Test-Path -LiteralPath $extractor)){Expand-Archive -LiteralPath $extractorArchive -DestinationPath $extractor}
 $nodeLicense=Join-Path $CachePath 'Node-LICENSE.txt'
 Get-VerifiedAsset 'https://raw.githubusercontent.com/nodejs/node/v22.14.0/LICENSE' $nodeLicense '1474fea5eff88dc92763acca3ca1f54b51fa153be1529eae74ace35957aea9ce'

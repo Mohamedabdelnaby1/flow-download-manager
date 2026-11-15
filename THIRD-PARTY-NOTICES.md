@@ -17,9 +17,9 @@ The Windows FFmpeg executable supplied by ffmpeg-static is FFmpeg 6.1.1 essentia
 Flow is provided as editable project source. No commercial publisher signing certificate is included.
 
 
-## yt-dlp — 2026.10.21
+## yt-dlp — 2026.10.26
 
-The independently executed official Windows utility is distributed in vendor/yt-dlp.exe. Its release metadata and verified SHA-256 are in vendor/yt-dlp.json. The upstream project is https://github.com/yt-dlp/yt-dlp and corresponding release sources are available at https://github.com/yt-dlp/yt-dlp/releases/tag/2026.10.21 and https://github.com/yt-dlp/yt-dlp/tree/2026.10.21 .
+The independently executed official Windows utility is distributed in vendor/yt-dlp.exe. Its release metadata and verified SHA-256 are in vendor/yt-dlp.json. The upstream project is https://github.com/yt-dlp/yt-dlp and corresponding release sources are available at https://github.com/yt-dlp/yt-dlp/releases/tag/2026.10.26 and https://github.com/yt-dlp/yt-dlp/tree/2026.10.26 .
 
 The project source is Unlicense. The official bundled executable includes third-party components and the combined executable is GPLv3+. Full upstream notices and GPL text accompany it in vendor/yt-dlp-THIRD-PARTY-LICENSES.txt and vendor/GPL-3.0.txt. It runs as a separate process; Flow source is provided with this delivery. EJS scripts are bundled by the official utility. Electron supplies the Node runtime; no separate runtime download is used.
 
@@ -30,7 +30,7 @@ The compact Windows edition uses the complete official Node.js 22.14.0 Windows x
 
 Microsoft.Web.WebView2 SDK 1.0.4314.35 assemblies and loader retain Microsoft's distribution license and notices under `licenses/`. The Evergreen WebView2 Runtime is a shared system prerequisite distributed by Microsoft, not bundled in Flow's compact download size. https://www.nuget.org/packages/Microsoft.Web.WebView2/1.0.4314.35 .
 
-The complete official unpacked `yt-dlp_win.zip` release replaces the duplicate standalone extractor in compact packages. All distribution files are verified against `vendor/yt-dlp-unpacked.json`; dependency functionality is retained. The Electron packages continue to include the standalone extractor.
+The complete official unpacked `yt-dlp_win.zip` release replaces the duplicate standalone extractor in compact packages. All distribution files are verified against `vendor/yt-dlp-unpacked.json`; dependency functionality is retained. Both Windows editions use one verified directory distribution; the source checkout retains the official standalone executable for development and repair.
 
 ## aria2 distribution
 

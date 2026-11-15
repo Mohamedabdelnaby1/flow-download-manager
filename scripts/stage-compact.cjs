@@ -7,7 +7,8 @@ function stage(config){
  if(hash(config.nodeLicense)!=='1474fea5eff88dc92763acca3ca1f54b51fa153be1529eae74ace35957aea9ce')throw Error('Node license verification failed.');
  const manifest=require('../vendor/yt-dlp-unpacked.json');for(const [file,digest]of Object.entries(manifest.files))if(hash(path.join(config.extractor,file))!==digest)throw Error('The complete extractor distribution is required: '+file);
  const copy=(from,to)=>{fs.mkdirSync(path.dirname(to),{recursive:true});fs.cpSync(from,to,{recursive:true});},app=path.join(target,'app');
- for(const name of ['src','ui','extension','vendor'])copy(path.join(source,name),path.join(app,name));
+ for(const name of ['src','ui','extension'])copy(path.join(source,name),path.join(app,name));
+ for(const name of fs.readdirSync(path.join(source,'vendor')))if(!name.startsWith('yt-dlp-unpacked-')&&name!=='yt-dlp-unpacked')copy(path.join(source,'vendor',name),path.join(app,'vendor',name));
  for(const name of fs.readdirSync(source).filter(n=>n.endsWith('.md')||['LICENSE','package.json','package-lock.json'].includes(n)))copy(path.join(source,name),path.join(app,name));
  for(const [name,entry]of Object.entries(lock.packages)){if(!name.startsWith('node_modules/')||entry.dev)continue;const from=path.join(dependencies,name.slice('node_modules/'.length));if(!fs.existsSync(from)){if(entry.optional)continue;throw Error('Missing production dependency: '+name);}copy(from,path.join(app,name));}
  copy(config.extractor,path.join(app,'vendor/yt-dlp-unpacked'));copy(path.join(source,'native/FlowNativeHost.exe'),path.join(app,'native/FlowNativeHost.exe'));
