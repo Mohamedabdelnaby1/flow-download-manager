@@ -2,6 +2,8 @@
 
 ## 2.11.0 — Companion reliability and parallel transfers
 
+- Update basic-ftp to 6.2.6, including the upstream MLSD parser denial-of-service fix (GHSA-5pm8-86m8-9m6r).
+
 - Redesign Companion around link paste, current-video/playlist handoff, simple quality/audio presets, source search, site controls, refresh and a redacted connection report.
 - Check desktop availability before pausing a browser transfer. Release Chromium filename determination immediately, share concurrent capture work, retain acknowledgements across worker restarts, preserve user-paused downloads and avoid resuming duplicate browser copies after an accepted handoff.
 - Preserve quality and Download later during manual handoff; apply source-site exclusions to CDN downloads, expire stored request headers, clear stale tab badges and retain diagnostic history separately from the current connection state.

@@ -13,5 +13,5 @@ async function prepare(project){
  execFileSync(path.join(process.env.SystemRoot,'System32/WindowsPowerShell/v1.0/powershell.exe'),['-NoProfile','-NonInteractive','-Command','Expand-Archive -LiteralPath $env:FLOW_VIDEO_ARCHIVE -DestinationPath $env:FLOW_VIDEO_DIRECTORY -Force'],{windowsHide:true,stdio:'pipe',env:{...process.env,FLOW_VIDEO_ARCHIVE:archive,FLOW_VIDEO_DIRECTORY:temporary}});
  if(!verify(temporary))throw Error('Extractor distribution files failed verification');fs.cpSync(temporary,target,{recursive:true});if(!verify(target))throw Error('Copied extractor distribution failed verification');return target;
 }
-module.exports=async context=>{if(context.electronPlatformName==='win32')await prepare(context.packager.appDir);};
+module.exports=async context=>{if(context.electronPlatformName==='win32')await prepare(path.resolve(__dirname,'..'));};
 module.exports.prepare=prepare;
