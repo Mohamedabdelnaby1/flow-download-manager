@@ -1,5 +1,16 @@
 # Changelog
 
+## 2.11.0 — Companion reliability and parallel transfers
+
+- Redesign Companion around link paste, current-video/playlist handoff, simple quality/audio presets, source search, site controls, refresh and a redacted connection report.
+- Check desktop availability before pausing a browser transfer. Release Chromium filename determination immediately, share concurrent capture work, retain acknowledgements across worker restarts, preserve user-paused downloads and avoid resuming duplicate browser copies after an accepted handoff.
+- Preserve quality and Download later during manual handoff; apply source-site exclusions to CDN downloads, expire stored request headers, clear stale tab badges and retain diagnostic history separately from the current connection state.
+- Automatic capture uses the downloads API rather than intercepting ordinary page clicks. Alt bypass and explicit Ctrl+Shift handoff remain available.
+- Bound shadow-player discovery work during page mutations, clean up reinjected controls, close menus when players disappear, ignore stale navigation responses, and suppress direct download actions for known protected players.
+- Accept valid CDN-rounded byte-range probes using the total Content-Range size. Temporary connection reductions expire and recover gradually; user global/per-host caps remain enforced. Unchanged detached-engine snapshots no longer rewrite library rows.
+- Site-extracted progressive HTTP video uses verified bundled aria2 with bounded parallel connections, authenticated loopback progress, resumable partial files and real progress/connection/block information. HLS/DASH extraction uses bounded native fragment concurrency. Existing direct-manifest FFmpeg behavior remains available.
+- Correct HTTP cookie-file security flags and resumed-video quota accounting. Windows signing and permanent Firefox signing requirements are unchanged.
+
 ## 2.10.0 — More browsers, one Flow
 
 - Browser selection and browser-specific setup/opening for Chrome, Edge, Firefox, Opera, Opera GX, Brave, Vivaldi and Chromium.

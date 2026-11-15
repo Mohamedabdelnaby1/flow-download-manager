@@ -54,9 +54,13 @@ async function probe(url,options={}) {
   if([400,403,405,416,501].includes(r.statusCode)){r.destroy();const headers={...options.headers};delete headers.range;r=await request(url,{...options,headers});}
   const code=r.statusCode;const headers=r.headers; const finalURL=r.finalURL;r.destroy();
   if(code>=400) throw Error(`HTTP ${code} — ${code===403?'الرابط مرفوض أو منتهي الصلاحية':code===401?'بيانات الدخول مطلوبة':'تعذر الوصول إلى الملف'}`);
-  const range=/bytes\s+0-0\/(\d+)/i.exec(headers['content-range']||'');
-  const size=range?Number(range[1]):Number(headers['content-length']||0);
-  return {size,resumable:code===206&&!!range,etag:headers.etag||'',modified:headers['last-modified']||'',type:headers['content-type']||'',disposition:headers['content-disposition']||'',url:finalURL,protocol:'HTTP'};
+  const range=/^bytes\s+(\d+)-(\d+)\/(\d+)$/i.exec(headers['content-range']||'');
+  // Some CDNs round the one-byte probe up to their cache-block boundary.
+  // Its Content-Length is that block, never the complete file size.
+  const confirmed=code===206&&range&&Number(range[1])===0&&Number(range[2])>=0&&Number(range[2])<Number(range[3])&&Number.isSafeInteger(Number(range[3]));
+  if(code===206&&!confirmed)throw Error('The server returned an invalid byte range during inspection.');
+  const encoded=headers['content-encoding']&&headers['content-encoding']!=='identity',size=confirmed?Number(range[3]):Number(headers['content-length']||0),resumable=!!confirmed&&!encoded;
+  return {size,resumable,rangeReason:resumable?'confirmed':encoded?'encoded':'not-supported',etag:headers.etag||'',modified:headers['last-modified']||'',type:headers['content-type']||'',disposition:headers['content-disposition']||'',url:finalURL,protocol:'HTTP'};
 }
 async function zipPreview(url,options={}){return require('./zip.cjs').list(url,options);}
 module.exports={request,buffer,probe,zipPreview,validateURL};

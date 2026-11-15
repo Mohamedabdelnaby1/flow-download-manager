@@ -2,17 +2,17 @@ var flowBrowser=typeof browser==='object'&&browser.runtime?browser:chrome;
 if(typeof importScripts==='function')importScripts('media-model.js','messages.js','error-model.js');
 const localMessage=value=>typeof FlowErrors!=='undefined'?(()=>{const e=FlowErrors.describe(value,'en');return e.message+' '+e.action;})():typeof englishMessage==='function'?englishMessage(value):value;
 /* Manifest V3: native handoff and authenticated HTTP fallback. */
-const HOST='local.flow.companion',media=new Map(),requests=new Map(),inFlight=new Set(),pausedDiscovery=new Set(),capturedDownloads=new Set();
+const HOST='local.flow.companion',media=new Map(),requests=new Map(),inFlight=new Set(),pausedDiscovery=new Set(),capturedDownloads=new Set(),captureJobs=new Map();
 flowBrowser.storage.session.get(null).then(cache=>{for(const key of Object.keys(cache))if(key.startsWith('mediaPaused:')&&cache[key])pausedDiscovery.add(Number(key.slice(12)));});
-flowBrowser.storage.session.get(null).then(cache=>{const keys=Object.keys(cache).filter(k=>k.startsWith('request:'));for(const k of keys.slice(-150))if(!requests.has(k.slice(8)))requests.set(k.slice(8),cache[k]);if(keys.length>150)flowBrowser.storage.session.remove(keys.slice(0,-150)).catch(()=>{});});
+flowBrowser.storage.session.get(null).then(cache=>{const captures=Object.keys(cache).filter(k=>k.startsWith('captured:')).sort((a,b)=>(cache[a]?.at||0)-(cache[b]?.at||0));for(const key of captures.slice(-200))capturedDownloads.add(Number(key.slice(9)));if(captures.length>200)flowBrowser.storage.session.remove(captures.slice(0,-200)).catch(()=>{});const keys=Object.keys(cache).filter(k=>k.startsWith('request:'));for(const k of keys.slice(-150))if(!requests.has(k.slice(8)))requests.set(k.slice(8),cache[k]);if(keys.length>150)flowBrowser.storage.session.remove(keys.slice(0,-150)).catch(()=>{});});
 const defaults={address:'http://127.0.0.1:17863',token:'',autoCapture:false,fileTypes:'ZIP RAR 7Z PDF DOCX XLSX MP3 MP4 MKV EXE MSI ISO',excludedSites:'',videoPanel:true,panelMode:'full',capturePausedUntil:0,captureDisabledSites:[]};
 const isFirefox=typeof flowBrowser.runtime.getBrowserInfo==='function'||/Firefox\//.test(navigator.userAgent);
 const client=isFirefox?'Firefox':/OPR\//.test(navigator.userAgent)?'Opera':/Vivaldi\//.test(navigator.userAgent)?'Vivaldi':/Edg\//.test(navigator.userAgent)?'Edge':navigator.brave?'Brave':/Chrome\//.test(navigator.userAgent)?'Chrome':'Chromium';
 async function config(){return flowBrowser.storage.local.get(defaults);}
 function excluded(url,c){const host=new URL(url).hostname.toLowerCase();return c.excludedSites.toLowerCase().split(/[\s,;]+/).filter(Boolean).some(h=>host===h.replace(/^\*\./,'')||h.startsWith('*.')&&host.endsWith(h.slice(1)));}
 function capturePaused(c,url,sourcePage){if(Date.now()<Number(c.capturePausedUntil||0))return true;const hosts=(c.captureDisabledSites||[]).map(v=>v.toLowerCase());return [url,sourcePage].filter(Boolean).some(value=>{try{return hosts.includes(new URL(value).hostname.toLowerCase());}catch{return false;}});}
-function fileMatch(url,name,c){let value=name;try{value||=decodeURIComponent(new URL(url).pathname);}catch{return false;}return c.fileTypes.toUpperCase().split(/[\s,;]+/).includes(value.split(/[\\/]/).pop().split('.').pop().toUpperCase());}
-async function fail(error){await flowBrowser.storage.session.set({lastError:error.message});await flowBrowser.action.setBadgeText({text:'!'});await flowBrowser.action.setBadgeBackgroundColor({color:'#ba4349'});}
+function fileMatch(url,name,c){let value=name;try{value||=decodeURIComponent(new URL(url).pathname);}catch{return false;}return c.fileTypes.toUpperCase().split(/[\s,;]+/).filter(Boolean).includes(value.split(/[\\/]/).pop().split('.').pop().toUpperCase());}
+async function fail(error){await flowBrowser.storage.session.set({lastError:String(error?.message||error),lastErrorAt:Date.now()});await flowBrowser.action.setBadgeText({text:'!'});await flowBrowser.action.setBadgeBackgroundColor({color:'#ba4349'});}
 async function transport(message){
   let nativeError;
   try{const out=await flowBrowser.runtime.sendNativeMessage(HOST,{...message,client,extensionVersion:flowBrowser.runtime.getManifest().version});if(out?.error)throw Error(localMessage(out.error));if(!out||message.type==='ping'&&out.app!=='Flow')throw Error('Invalid native response');await flowBrowser.storage.session.set({transport:'Native Messaging',lastConnected:Date.now(),...(message.type==='download'?{lastError:''}:{})});return out;}
@@ -21,14 +21,14 @@ async function transport(message){
   const u=new URL(c.address);if(u.protocol!=='http:'||!['127.0.0.1','localhost'].includes(u.hostname))throw Error('Use a local Flow address.');
   const r=await fetch(u.origin+(message.type==='ping'?'/extension/ping':'/extension/add'),{method:'POST',headers:{'content-type':'application/json','x-flow-token':c.token},body:JSON.stringify({...message,client,extensionVersion:flowBrowser.runtime.getManifest().version}),signal:AbortSignal.timeout(8000)});const out=await r.json();if(!r.ok)throw Error(out.error||'Flow connection failed');await flowBrowser.storage.session.set({transport:'Local HTTP',lastConnected:Date.now(),...(message.type==='download'?{lastError:''}:{})});return out;
 }
-async function requestInfo(url){return requests.get(url)||(await flowBrowser.storage.session.get('request:'+url))['request:'+url]||{method:'GET',headers:{}};}
+async function requestInfo(url){const value=requests.get(url)||(await flowBrowser.storage.session.get('request:'+url))['request:'+url];return value?.time&&Date.now()-value.time<600000?value:{method:'GET',headers:{}};}
 async function downloadHeaders(url,sourcePage){
   const info=await requestInfo(url),headers={...info.headers};if(sourcePage&&!headers.referer)headers.referer=sourcePage;
   if(!headers.cookie){try{const cookies=await flowBrowser.cookies.getAll({url});if(cookies.length)headers.cookie=cookies.map(c=>c.name+'='+c.value).join('; ');}catch{}}
   headers['user-agent']||=navigator.userAgent;return {headers,method:info.method};
 }
-async function sendDownload(data){
-  const desktop=await transport({type:'ping'});requireCurrentDesktop(desktop);
+async function sendDownload(data,desktopReady=false){
+  if(!desktopReady){const desktop=await transport({type:'ping'});requireCurrentDesktop(desktop);}
   const url=new URL(data.url);if(!['http:','https:'].includes(url.protocol))throw Error('Only direct HTTP/HTTPS files can be transferred.');
   const {headers,method}=await downloadHeaders(url.href,data.sourcePage);if(method&&method!=='GET')throw Error('POST downloads must stay in the browser.');
   const out=await transport({type:'download',requestId:data.requestId||crypto.randomUUID(),...data,headers,mode:data.mode||(/\.(m3u8|mpd)(\?|$)/i.test(url.href)?'media':'file'),quality:data.quality});
@@ -43,7 +43,7 @@ flowBrowser.runtime.onInstalled.addListener(async()=>{
 });
 flowBrowser.alarms.onAlarm.addListener(async alarm=>{if(alarm.name!=='flow-status')return;const s=await flowBrowser.storage.session.get('lastConnected');if(!s.lastConnected||Date.now()-s.lastConnected>120000)return;try{await ping();}catch{}});
 function requireCurrentDesktop(out){const version=String(out.version||'0.0.0').split('.').map(Number);if(version[0]<2||version[0]===2&&(version[1]<5||version[1]===5&&version[2]<2))throw Error('Flow '+(out.version||'legacy')+' is still running. Exit it from the tray menu, then open Flow 2.5.2 or newer. This download stays in your browser.');}
-async function ping(){const out=await transport({type:'ping'});requireCurrentDesktop(out);if(out.settings){const {preferenceOverrides={}}=await flowBrowser.storage.local.get({preferenceOverrides:{}}),patch={...out.settings};for(const key of Object.keys(preferenceOverrides))if(['videoPanel','fileTypes','excludedSites','panelMode'].includes(key))patch[key]=preferenceOverrides[key];await flowBrowser.storage.local.set(patch);}return out;}
+async function ping(){const out=await transport({type:'ping'});requireCurrentDesktop(out);if(out.settings){const {preferenceOverrides={}}=await flowBrowser.storage.local.get({preferenceOverrides:{}}),patch={...out.settings};for(const key of Object.keys(preferenceOverrides))if(['videoPanel','fileTypes','excludedSites','panelMode'].includes(key))patch[key]=preferenceOverrides[key];await flowBrowser.storage.local.set(patch);}await flowBrowser.action.setBadgeText({text:''});return out;}
 flowBrowser.contextMenus.onClicked.addListener(async(info,tab)=>{try{
   if(info.menuItemId==='flow-page'){await flowBrowser.tabs.sendMessage(tab.id,{type:'showLinkPicker'});return;}
   const urls=info.menuItemId==='flow-selection'?(info.selectionText.match(/https?:\/\/[^\s<>"']+/g)||[]):[info.linkUrl||info.srcUrl];for(const url of [...new Set(urls)].slice(0,100).filter(Boolean))await sendDownload({url,sourcePage:tab.url,later:urls.length>1});
@@ -51,7 +51,7 @@ flowBrowser.contextMenus.onClicked.addListener(async(info,tab)=>{try{
 flowBrowser.webRequest.onBeforeSendHeaders.addListener(details=>{
   if(details.url.startsWith('http://127.0.0.1:17863/'))return;
   const headers={};for(const h of details.requestHeaders||[])if(['cookie','user-agent','referer','authorization','origin'].includes(h.name.toLowerCase()))headers[h.name.toLowerCase()]=h.value;
-  const entry={headers,method:details.method};requests.set(details.url,entry);flowBrowser.storage.session.set({['request:'+details.url]:entry}).catch(()=>{});
+  if(details.incognito)return;const entry={headers,method:details.method,time:Date.now()};requests.set(details.url,entry);flowBrowser.storage.session.set({['request:'+details.url]:entry}).catch(()=>{});
   if(requests.size>150){const key=requests.keys().next().value;requests.delete(key);flowBrowser.storage.session.remove('request:'+key).catch(()=>{});}
 },{urls:['http://*/*','https://*/*']},isFirefox?['requestHeaders']:['requestHeaders','extraHeaders']);
 flowBrowser.webRequest.onHeadersReceived.addListener(details=>{
@@ -60,25 +60,28 @@ flowBrowser.webRequest.onHeadersReceived.addListener(details=>{
   if(!/video\/|audio\/|mpegurl|dash\+xml/i.test(type)&&!/\.(mp4|mkv|webm|mp3|m3u8|mpd)(\?|$)/i.test(details.url))return;
   const entry=FlowMediaModel.describe({url:details.url,type,size:details.responseHeaders?.find(h=>h.name.toLowerCase()==='content-length')?.value||'',contentRange:details.responseHeaders?.find(h=>h.name.toLowerCase()==='content-range')?.value||''});
   if(!entry)return;entry.frameId=details.frameId??0;entry.documentId=details.documentId||'';entry.seenAt=Date.now();
-  const list=FlowMediaModel.select([...(media.get(details.tabId)||[]),entry],40).reverse();media.set(details.tabId,list);flowBrowser.storage.session.set({['media:'+details.tabId]:list}).catch(()=>{});flowBrowser.action.setBadgeText({tabId:details.tabId,text:String(list.length)}).catch(()=>{});
+  const list=FlowMediaModel.select([...(media.get(details.tabId)||[]).filter(m=>!m.seenAt||Date.now()-m.seenAt<600000),entry],40).reverse();media.set(details.tabId,list);flowBrowser.storage.session.set({['media:'+details.tabId]:list}).catch(()=>{});flowBrowser.action.setBadgeText({tabId:details.tabId,text:String(list.length)}).catch(()=>{});
 },{urls:['http://*/*','https://*/*']},['responseHeaders']);
 // Chromium offers filename interception; Firefox exposes download creation instead.
-async function captureDownload(original){
+function captureDownload(original){if(captureJobs.has(original.id))return captureJobs.get(original.id);const job=captureOnce(original).finally(()=>captureJobs.delete(original.id));captureJobs.set(original.id,job);return job;}
+async function captureOnce(original){
  let item=original;if(!item.filename&&flowBrowser.downloads.search){for(let n=0;n<6&&!item.filename;n++){item=(await flowBrowser.downloads.search({id:item.id}))[0]||item;if(!item.filename)await new Promise(r=>setTimeout(r,80));}}
  const c=await config(),url=item.finalUrl||item.url;
- if(!c.autoCapture||['complete','interrupted'].includes(item.state)||capturePaused(c,url,item.referrer)||item.byExtensionId===flowBrowser.runtime.id||item.incognito||!/^https?:\/\//.test(url)||excluded(url,c)||!fileMatch(url,item.filename,c))return;
+ if(!c.autoCapture||item.paused===true||['complete','interrupted'].includes(item.state)||capturePaused(c,url,item.referrer)||item.byExtensionId===flowBrowser.runtime.id||item.incognito||!/^https?:\/\//.test(url)||(excluded(url,c)||item.referrer&&excluded(item.referrer,c))||!fileMatch(url,item.filename,c))return;
  const bypass=(await flowBrowser.storage.session.get('bypass:'+url))['bypass:'+url];if(bypass&&Date.now()-bypass<15000)return;
- if(inFlight.has(item.id)||capturedDownloads.has(item.id))return;inFlight.add(item.id);const info=await requestInfo(url);if(info.method!=='GET'){inFlight.delete(item.id);return;}
- let paused=false;
+ if(inFlight.has(item.id)||capturedDownloads.has(item.id)||(await flowBrowser.storage.session.get('captured:'+item.id))['captured:'+item.id])return;inFlight.add(item.id);const info=await requestInfo(url);if(info.method!=='GET'){inFlight.delete(item.id);return;}
+ let paused=false,acknowledged=false;
  try{
+  const desktop=await transport({type:'ping'});requireCurrentDesktop(desktop);
+  if(flowBrowser.downloads.search){const current=(await flowBrowser.downloads.search({id:item.id}))[0];if(current&&(['complete','interrupted'].includes(current.state)||current.paused))return;}
   await flowBrowser.downloads.pause(item.id);paused=true;
-  const result=await sendDownload({url,name:item.filename.split(/[\\/]/).pop(),sourcePage:item.referrer,requestId:'capture:'+client+':'+item.id+':'+String(item.startTime||'').replace(/[^0-9]/g,'')});
-  if(!result.id)throw Error('No desktop acknowledgement');await flowBrowser.downloads.cancel(item.id);capturedDownloads.add(item.id);if(capturedDownloads.size>200)capturedDownloads.delete(capturedDownloads.values().next().value);await flowBrowser.storage.session.set({lastCapture:{name:result.name,at:Date.now(),id:result.id},lastError:''});
- }catch(e){if(paused)await flowBrowser.downloads.resume(item.id).catch(()=>{});await fail(Error('Browser download kept: '+e.message));}finally{inFlight.delete(item.id);}
+  const result=await sendDownload({url,name:item.filename.split(/[\\/]/).pop(),sourcePage:item.referrer,requestId:'capture:'+client+':'+item.id+':'+String(item.startTime||'').replace(/[^0-9]/g,'')},true);
+  if(!result.id)throw Error('No desktop acknowledgement');acknowledged=true;capturedDownloads.add(item.id);await flowBrowser.storage.session.set({['captured:'+item.id]:{at:Date.now(),id:result.id}});await flowBrowser.downloads.cancel(item.id);if(capturedDownloads.size>200){const old=capturedDownloads.values().next().value;capturedDownloads.delete(old);flowBrowser.storage.session.remove('captured:'+old).catch(()=>{});}await flowBrowser.storage.session.set({lastCapture:{name:result.name,at:Date.now(),id:result.id},lastError:''});
+ }catch(e){if(paused&&!acknowledged)await flowBrowser.downloads.resume(item.id).catch(()=>{});await fail(Error(acknowledged?'Flow accepted the download. Its extra browser copy could not be removed; check the browser download list.':'Browser download kept: '+e.message));}finally{inFlight.delete(item.id);}
 }
-if(flowBrowser.downloads.onDeterminingFilename){flowBrowser.downloads.onDeterminingFilename.addListener((item,suggest)=>{captureDownload(item).catch(fail).finally(()=>suggest());return true;});}
+if(flowBrowser.downloads.onDeterminingFilename){flowBrowser.downloads.onDeterminingFilename.addListener((item,suggest)=>{captureDownload(item).catch(fail);suggest();return true;});}
 flowBrowser.downloads.onCreated?.addListener(item=>captureDownload(item).catch(fail));flowBrowser.downloads.onChanged?.addListener(async delta=>{if(!delta.filename)return;try{const item=(await flowBrowser.downloads.search({id:delta.id}))[0];if(item)await captureDownload(item);}catch(e){await fail(e);}});
-flowBrowser.tabs.onRemoved.addListener(id=>{media.delete(id);pausedDiscovery.delete(id);flowBrowser.storage.session.remove(['media:'+id,'mediaPaused:'+id]).catch(()=>{});});
+flowBrowser.tabs.onRemoved.addListener(id=>{media.delete(id);pausedDiscovery.delete(id);flowBrowser.action.setBadgeText({tabId:id,text:''}).catch(()=>{});flowBrowser.storage.session.remove(['media:'+id,'mediaPaused:'+id]).catch(()=>{});});
 flowBrowser.tabs.onUpdated.addListener((id,info)=>{if(info.status==='loading'||info.url){media.delete(id);pausedDiscovery.delete(id);flowBrowser.storage.session.remove(['media:'+id,'mediaPaused:'+id]).catch(()=>{});}});
 flowBrowser.runtime.onMessage.addListener((message,sender,respond)=>{
   if(!['media','clearMedia','resumeMedia','download','capture','ping','sync','bypass','batch','capturePause'].includes(message.type))return;
@@ -89,8 +92,8 @@ flowBrowser.runtime.onMessage.addListener((message,sender,respond)=>{
     if(message.type==='media'){const id=message.tabId??sender.tab?.id;const list=media.get(id)||(await flowBrowser.storage.session.get('media:'+id))['media:'+id]||[];return {media:FlowMediaModel.select(list.filter(item=>(sender.frameId===undefined||item.frameId===undefined||item.frameId===sender.frameId)&&(!item.seenAt||Date.now()-item.seenAt<600000))),discoveryPaused:pausedDiscovery.has(id),config:await config()};}
     if(message.type==='ping'||message.type==='sync')return ping();
     const c=await config();let tab=sender.tab;if(!tab&&message.tabId!==undefined)tab=await flowBrowser.tabs.get(message.tabId);
-    if(message.type==='batch'){if(!Array.isArray(message.urls)||message.urls.length>100)throw Error('Select up to 100 URLs');for(const url of [...new Set(message.urls)])await sendDownload({url,sourcePage:tab?.url,later:true});return {count:message.urls.length};}
-    if(message.type==='capture'){if(!message.force&&(!c.autoCapture||capturePaused(c,message.url,tab?.url)))return {skip:true};if(excluded(message.url,c)||!message.force&&!fileMatch(message.url,'',c))return {skip:true};}
-    const tabId=message.tabId??tab?.id,list=media.get(tabId)||(await flowBrowser.storage.session.get('media:'+tabId))['media:'+tabId]||[],entry=list.find(m=>m.url===message.url);return sendDownload({url:message.url,name:message.name||entry?.fileName,sourcePage:sender.url||tab?.url,mode:message.mode||(/mpegurl|dash\+xml/i.test(entry?.type||'')?'media':undefined)});
+    if(message.type==='batch'){if(!Array.isArray(message.urls)||message.urls.length>100)throw Error('Select up to 100 URLs');for(const url of [...new Set(message.urls)])await sendDownload({url,sourcePage:tab?.url,later:true});return {count:new Set(message.urls).size};}
+    if(message.type==='capture'){if(!message.force&&(!c.autoCapture||capturePaused(c,message.url,tab?.url)))return {skip:true};if(excluded(message.url,c)||tab?.url&&excluded(tab.url,c)||!message.force&&!fileMatch(message.url,'',c))return {skip:true};}
+    const tabId=message.tabId??tab?.id,list=media.get(tabId)||(await flowBrowser.storage.session.get('media:'+tabId))['media:'+tabId]||[],entry=list.find(m=>m.url===message.url);return sendDownload({url:message.url,name:message.name||entry?.fileName,sourcePage:sender.url||tab?.url,later:!!message.later,quality:message.quality,requestId:message.requestId||crypto.randomUUID(),mode:message.mode||(/mpegurl|dash\+xml/i.test(entry?.type||'')?'media':undefined)});
   })().then(result=>respond({result})).catch(e=>respond({error:localMessage(e.message)}));return true;
 });

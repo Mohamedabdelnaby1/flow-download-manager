@@ -5,14 +5,14 @@ if(typeof previous==='function')previous();
 for(const old of document.querySelectorAll('.flow-companion-panel,.flow-companion-menu,.flow-panel-host'))old.remove();
 const lifecycle=new AbortController(),timers=[],observers=[];
 const listen=(target,type,fn,options={})=>target.addEventListener(type,fn,{...options,signal:lifecycle.signal});
-globalThis.__flowCompanionCleanup=()=>{lifecycle.abort();for(const timer of timers)clearInterval(timer);for(const observer of observers)observer.disconnect();panel?.remove();};
+globalThis.__flowCompanionCleanup=()=>{lifecycle.abort();for(const timer of timers)clearInterval(timer);for(const observer of observers)observer.disconnect();panel?.remove();document.querySelector('.flow-link-picker')?.remove();for(const toast of document.querySelectorAll('.flow-companion-toast'))toast.remove();};
 let settings={autoCapture:false,videoPanel:true,panelMode:'full',panelPositions:{},panelDisabledSites:[]};
 let panel,shadow,manualPosition=null,panelHidden=false,minimized=false,lastMedia=[],menuRequest=0;
 const siteKey=location.hostname;
 let navigationURL=location.href;const encryptedVideos=new WeakSet();listen(document,'encrypted',e=>{encryptedVideos.add(e.target);closeMediaMenu();},{capture:true});
-let mediaRoots=[document],rootsScannedAt=0;
+let mediaRoots=[document],rootsScannedAt=0,rootsDirty=true;
 function mediaElements(selector='video'){
- if(Date.now()-rootsScannedAt>5000){mediaRoots=[document];rootsScannedAt=Date.now();let scanned=0;for(let n=0;n<mediaRoots.length&&n<60;n++){for(const el of mediaRoots[n].querySelectorAll('*')){if(++scanned>6000)break;if(el.shadowRoot&&el!==panel)mediaRoots.push(el.shadowRoot);}if(scanned>6000)break;}}
+ if(Date.now()-rootsScannedAt>5000||rootsDirty&&Date.now()-rootsScannedAt>1000){mediaRoots=[document];rootsScannedAt=Date.now();rootsDirty=false;let scanned=0;for(let n=0;n<mediaRoots.length&&n<60&&scanned<6000;n++){const walker=document.createTreeWalker(mediaRoots[n],NodeFilter.SHOW_ELEMENT);let el;while((el=walker.nextNode())&&++scanned<=6000)if(el.shadowRoot&&el!==panel)mediaRoots.push(el.shadowRoot);}}
  return mediaRoots.flatMap(root=>[...root.querySelectorAll(selector)]);
 }
 function visibleVideo(){return mediaElements().filter(v=>{
@@ -27,9 +27,7 @@ const onSettings=changes=>{for(const [k,v]of Object.entries(changes))settings[k]
 listen(document,'click',async e=>{
  const a=e.target.closest('a[href]');if(!a||!/^https?:/.test(a.href))return;
  if(e.altKey){flowBrowser.runtime.sendMessage({type:'bypass',url:a.href}).catch(()=>{});return;}
- const force=e.ctrlKey&&e.shiftKey;if((!force&&(!settings.autoCapture||Date.now()<Number(settings.capturePausedUntil||0)||(settings.captureDisabledSites||[]).includes(location.hostname)||(settings.captureDisabledSites||[]).includes(new URL(a.href).hostname)))||(e.ctrlKey&&!force)||e.button!==0)return;
- const ext=new URL(a.href).pathname.split('.').pop().toUpperCase();if(!force&&!(settings.fileTypes||'').split(/[ ,]+/).includes(ext))return;
- if((settings.excludedSites||'').split(/[\n, ]+/).includes(new URL(a.href).hostname))return;
+ const force=e.ctrlKey&&e.shiftKey;if(!force||e.button!==0)return;
  e.preventDefault();e.stopImmediatePropagation();
  try{const r=await flowBrowser.runtime.sendMessage({type:'capture',url:a.href,force});if(r.error)throw Error(r.error);if(r.result?.skip)location.href=a.href;else notify('Sent to Flow. Check the download confirmation window.');}
  catch(error){notify('Flow could not accept the file. The browser will continue downloading.');await flowBrowser.runtime.sendMessage({type:'bypass',url:a.href}).catch(()=>{});location.href=a.href;}
@@ -64,9 +62,9 @@ function buildPanel(){
 }
 function updatePanel(){if(panel)panel.dataset.theme=settings.theme||'system';
  for(const old of document.querySelectorAll('.flow-companion-panel,.flow-companion-menu'))old.remove();
- if(navigationURL!==location.href){navigationURL=location.href;lastMedia=[];closeMediaMenu();}
+ if(navigationURL!==location.href){navigationURL=location.href;lastMedia=[];rootsScannedAt=0;closeMediaMenu();}
  if(!settings.videoPanel||panelHidden||(settings.panelDisabledSites||[]).includes(siteKey)){if(panel){panel.hidden=true;panel.style.setProperty('display','none','important');}return;}
- if(!visibleVideo()){if(panel){panel.hidden=true;panel.style.setProperty('display','none','important');}return;}
+ if(!visibleVideo()){closeMediaMenu();if(panel){panel.hidden=true;panel.style.setProperty('display','none','important');}return;}
  if(!panel)buildPanel();panel.hidden=false;panel.style.setProperty('display','block','important');shadow.querySelector('.label').textContent=(manualPosition?minimized:settings.panelMode==='mini')?'Flow':'Download';placePanel();
 }
 function hidePagePanel(){closeMediaMenu();panelHidden=true;panel.hidden=true;panel.style.setProperty('display','none','important');notify('Panel hidden. Restore it from the Flow extension using Reset video panel.');}
@@ -91,10 +89,10 @@ async function showMediaMenu(){
  const append=(label,fn,cls='')=>{const b=document.createElement('button');b.type='button';b.textContent=label;b.className=cls;b.onclick=async()=>{try{await fn(b);}catch(e){b.disabled=false;notify(e.message);}};menu.append(b);return b;};
  append('× Close menu',closeMediaMenu,'menu-close');
  try{const r=await flowBrowser.runtime.sendMessage({type:'media'});if(request!==menuRequest||lifecycle.signal.aborted)return;if(r.error)throw Error(r.error);lastMedia=r.result.media||[];
- const page=currentVideoPage(),direct=[...mediaElements('video')].map(v=>v.currentSrc).filter(u=>/^https?:/.test(u)).map(url=>({url,type:'media',name:''}));
+ const protectedPlayer=encryptedVideos.has(visibleVideo()),page=protectedPlayer?'':currentVideoPage(),direct=[visibleVideo()].filter(Boolean).map(v=>v.currentSrc).filter(u=>/^https?:/.test(u)).map(url=>({url,type:'media',name:''}));
  const sources=FlowMediaModel.select([...lastMedia,...direct]);
  if(page){append('↓ This video — choose quality and merge audio',async b=>{b.disabled=true;const result=await flowBrowser.runtime.sendMessage({type:'download',url:page,mode:'site',name:document.title});if(result.error)throw Error(result.error);notify('Choose video quality in the Flow desktop confirmation window.');closeMediaMenu();});}
- else for(const item of sources){const b=append(item.label,async b=>{b.disabled=true;const result=await flowBrowser.runtime.sendMessage({type:'download',url:item.url,name:item.fileName,mode:item.mode});if(result.error)throw Error(result.error);notify('Check the download confirmation window in Flow.');closeMediaMenu();});b.title=item.kind==='stream'?'Full stream — Flow assembles segments automatically':item.kind==='audio'?'Direct audio source':'Direct video source — audio may be separate';const small=document.createElement('small');small.textContent=b.title;b.append(small);}
+ else if(!protectedPlayer)for(const item of sources){const b=append(item.label,async b=>{b.disabled=true;const result=await flowBrowser.runtime.sendMessage({type:'download',url:item.url,name:item.fileName,mode:item.mode});if(result.error)throw Error(result.error);notify('Check the download confirmation window in Flow.');closeMediaMenu();});b.title=item.kind==='stream'?'Full stream — Flow assembles segments automatically':item.kind==='audio'?'Direct audio source':'Direct video source — audio may be separate';const small=document.createElement('small');small.textContent=b.title;b.append(small);}
  if(!sources.length&&!page&&visibleVideo()&&!encryptedVideos.has(visibleVideo()))append('Try extracting this video page',async b=>{b.disabled=true;const result=await flowBrowser.runtime.sendMessage({type:'download',url:location.href,name:document.title||'Video',mode:'site'});if(result.error)throw Error(result.error);closeMediaMenu();});
  if(encryptedVideos.has(visibleVideo())){const note=document.createElement('div');note.className='note';note.textContent='This player uses protected media. Flow cannot download protected streams.';menu.append(note);}
  if(!sources.length&&!page){const note=document.createElement('div');note.className='note';note.textContent='No complete file source found. Partial segments and blob URLs are filtered out. Open the video on its own page, play it, and try again.';menu.append(note);}
@@ -108,12 +106,12 @@ async function showMediaMenu(){
 listen(document,'pointerdown',e=>{if(panel&&!e.composedPath().includes(panel))closeMediaMenu();},{capture:true});
 listen(document,'keydown',e=>{if(e.key==='Escape'){closeMediaMenu();document.querySelector('.flow-link-picker')?.remove();}});
 async function resetPanel(){manualPosition=null;panelHidden=false;minimized=false;const positions={...settings.panelPositions};delete positions[siteKey];settings.panelPositions=positions;settings.panelDisabledSites=(settings.panelDisabledSites||[]).filter(h=>h!==siteKey);await flowBrowser.storage.local.set({panelPositions:positions,videoPanel:true,preferenceOverrides:{...(settings.preferenceOverrides||{}),videoPanel:true},panelDisabledSites:settings.panelDisabledSites});settings.videoPanel=true;updatePanel();if(shadow)shadow.querySelector('.menu').hidden=true;}
-let scheduled=false;observers.push(new MutationObserver(records=>{if(lifecycle.signal.aborted||scheduled||records.every(record=>panel?.contains(record.target)))return;rootsScannedAt=0;scheduled=true;requestAnimationFrame(()=>{scheduled=false;if(!lifecycle.signal.aborted)updatePanel();});}));observers.at(-1).observe(document.documentElement,{childList:true,subtree:true});
+let scheduled=false;observers.push(new MutationObserver(records=>{if(lifecycle.signal.aborted||scheduled||records.every(record=>panel?.contains(record.target)))return;rootsDirty=true;scheduled=true;requestAnimationFrame(()=>{scheduled=false;if(!lifecycle.signal.aborted)updatePanel();});}));observers.at(-1).observe(document.documentElement,{childList:true,subtree:true});
 listen(document,'fullscreenchange',()=>{if(panel){const target=document.fullscreenElement;if(target&&target.tagName!=='VIDEO')target.append(panel);else document.documentElement.append(panel);placePanel();}});
 listen(window,'resize',placePanel,{passive:true});if(window.visualViewport)listen(window.visualViewport,'resize',placePanel,{passive:true});listen(document,'visibilitychange',()=>{if(document.visibilityState==='visible')updatePanel();});if(typeof ResizeObserver!=='undefined'){const observer=new ResizeObserver(()=>placePanel());observer.observe(document.documentElement);observers.push(observer);}listen(window,'scroll',()=>{if(!manualPosition)placePanel();},{passive:true});
-listen(window,'blur',closeMediaMenu);listen(document,'yt-navigate-start',closeMediaMenu);
+listen(window,'blur',closeMediaMenu);listen(document,'yt-navigate-start',()=>{lastMedia=[];closeMediaMenu();});listen(document,'visibilitychange',()=>{if(document.visibilityState!=='visible')closeMediaMenu();});
 timers.push(setInterval(()=>{if(document.visibilityState==='visible')updatePanel();},1000));
-timers.push(setInterval(async()=>{if(document.visibilityState!=='visible'||!settings.videoPanel||!visibleVideo())return;try{const r=await flowBrowser.runtime.sendMessage({type:'media'});if(!r.error){lastMedia=r.result.media||[];updatePanel();}}catch{}},4000));
+timers.push(setInterval(async()=>{if(document.visibilityState!=='visible'||!settings.videoPanel||!visibleVideo())return;try{const page=location.href,r=await flowBrowser.runtime.sendMessage({type:'media'});if(!r.error&&page===location.href&&!lifecycle.signal.aborted){lastMedia=r.result.media||[];updatePanel();}}catch{}},4000));
 const onRuntimeMessage=(message,_sender,reply)=>{if(message.type==='showPanel'){panelHidden=false;updatePanel();}if(message.type==='showLinkPicker')showLinkPicker();if(message.type==='resetPanel'){resetPanel().then(()=>reply({ok:true}));return true;}if(message.type==='flowError')notify(message.message);};flowBrowser.runtime.onMessage.addListener(onRuntimeMessage);lifecycle.signal.addEventListener('abort',()=>flowBrowser.runtime.onMessage.removeListener(onRuntimeMessage));
 function showLinkPicker(){
   document.querySelector('.flow-link-picker')?.remove();

@@ -13,3 +13,4 @@
 
 
 .complete-intro{margin-bottom:16px}.complete-file-card{padding:14px}.complete-dialog .complete-drag-hint{margin:8px 0 12px}.transfer-dialog #detail-segments .segment-map{display:none}.transfer-dialog #detail-segments:has(.segments-table:not(.hide)) .segment-map{display:flex}
+.transfer-method{color:var(--muted);font-size:10px;line-height:1.6;margin-top:9px}.transfer-blocks{display:flex;gap:2px;margin:7px 0 0;height:5px}.transfer-blocks i{flex:1;min-width:0;border-radius:2px;background:linear-gradient(90deg,var(--primary) var(--block-progress),var(--line) var(--block-progress))}.transfer-blocks[hidden]{display:none}

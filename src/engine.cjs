@@ -5,6 +5,7 @@ const { EventEmitter } = require('node:events');
 const { spawn } = require('node:child_process');
 const { Client } = require('basic-ftp');
 const { request, probe, validateURL } = require('./network.cjs');
+const transferPolicy=require('./transfer-policy.cjs');
 const delay=ms=>new Promise(r=>setTimeout(r,ms));
 const ACTIVE=['probing','downloading','processing'];
 function fileName(value) {
@@ -17,7 +18,7 @@ function category(name) {
 }
 class Engine extends EventEmitter {
   constructor(store, options={}) {
-    super();this.store=store;this.active=new Map();this.maintenance=new Set();this.globalNext=0;this.queueNext=new Map();this.closing=false;this.completedQueues=new Set();this.onComplete=options.onComplete;this.idleTimeout=options.transferIdleTimeout||30000;this.hostHints=store.get('transferHostHints',{});this.video=new (require('./video.cjs').VideoResolver)(store);
+    super();this.store=store;this.active=new Map();this.maintenance=new Set();this.globalNext=0;this.queueNext=new Map();this.closing=false;this.completedQueues=new Set();this.onComplete=options.onComplete;this.idleTimeout=options.transferIdleTimeout||30000;this.connectionRecoveryMs=options.connectionRecoveryMs||5000;this.hostHints=store.get('transferHostHints',{});this.video=new (require('./video.cjs').VideoResolver)(store);
     this.usage=store.get('usage',{start:Date.now(),bytes:0,total:0});
     this.tick=setInterval(()=>this.pump().catch(e=>this.store.log('error',e.message)),500);this.tick.unref();
   }
@@ -91,7 +92,7 @@ class Engine extends EventEmitter {
     if(!ctx.segments.length)ctx.segments=[{id:1,start:0,current:0,end:info.size||Number.MAX_SAFE_INTEGER,state:'waiting'}];
     for(const s of ctx.segments)s.state=s.current>=s.end?'complete':'waiting';
     this.store.update(item.id,{...{size:info.size,resumable:info.resumable,etag:info.etag,modified:info.modified},status:'downloading',segments:ctx.segments});
-    const configured=info.resumable?Math.min(32,this.settings().serverConnections?.[ctx.host]||this.settings().connections):1,hint=this.hostHints[ctx.host];ctx.connectionLimit=Math.min(configured,hint&&Number.isInteger(hint.connections)&&hint.connections>=1&&hint.connections<=32&&Date.now()-hint.time<86400000?hint.connections:configured);ctx.retryAt=0;
+    ctx.connectionLimit=info.resumable?transferPolicy.connectionLimit(this.settings(),ctx.host,this.hostHints[ctx.host]):1;ctx.userConnectionCap=transferPolicy.configuredConnections(this.settings(),ctx.host);ctx.retryAt=0;ctx.lastPenalty=Date.now();ctx.rangeReason=info.rangeReason;this.transferState(ctx);
     let fatal;
     const workers=new Map();ctx.rebalance=new Set();
     const launch=s=>{
@@ -99,8 +100,9 @@ class Engine extends EventEmitter {
       const p=this.worker(ctx,s,headers).catch(e=>{if(!ctx.stopped){fatal=e;ctx.stopped=true;for(const c of ctx.controllers)c.abort();}}).finally(()=>workers.delete(s.id));workers.set(s.id,p);
     };
     while(!ctx.stopped){
-      const cap=info.resumable?Math.min(32,this.settings().connections,this.settings().serverConnections?.[ctx.host]||32):1;
-      if(ctx.userConnectionCap!==cap){const saved=this.hostHints[ctx.host];ctx.connectionLimit=Math.min(cap,saved&&Date.now()-saved.time<86400000?saved.connections:cap);ctx.userConnectionCap=cap;}
+      const cap=info.resumable?transferPolicy.configuredConnections(this.settings(),ctx.host):1;
+      if(ctx.userConnectionCap!==cap){ctx.connectionLimit=Math.min(cap,transferPolicy.connectionLimit(this.settings(),ctx.host,this.hostHints[ctx.host]));ctx.userConnectionCap=cap;this.transferState(ctx);}
+      if(info.resumable&&ctx.connectionLimit<cap&&ctx.received>0&&Date.now()-ctx.lastPenalty>=this.connectionRecoveryMs&&Date.now()>=(ctx.retryAt||0)&&ctx.segments.some(s=>s.end-s.current>1048576)){ctx.connectionLimit++;ctx.lastPenalty=Date.now();this.hostHints[ctx.host]={connections:ctx.connectionLimit,http1:ctx.http1,time:Date.now(),reason:'recovery'};this.store.set('transferHostHints',this.hostHints);this.transferState(ctx);}
       for(const id of [...workers.keys()].slice(ctx.connectionLimit)){ctx.rebalance.add(id);ctx.segmentControllers?.get(id)?.abort();}
       while(workers.size<ctx.connectionLimit&&Date.now()>=(ctx.retryAt||0)){
         let s=ctx.segments.find(s=>s.state==='waiting'&&s.current<s.end);
@@ -161,19 +163,20 @@ class Engine extends EventEmitter {
       }catch(e){
         if(ctx.stopped)return;
         if(ctx.rebalance?.has(s.id)){s.state=s.current>=s.end?'complete':'waiting';return;}
-        if(e.invalidRange){if(!usedHTTP1){ctx.http1=true;this.reduceConnections(ctx,1);ctx.retryAt=Date.now()+500;s.state='waiting';return;}if(attempts<this.settings().retries){ctx.retryAttempts.set(s.id,++attempts);ctx.retryAt=Date.now()+Math.min(10000,this.settings().retryDelay*1000*attempts);s.state='waiting';this.store.log('retry',`Range confirmation retry ${attempts}; HTTP ${e.status}`,ctx.id);return;}throw e;}
+        if(e.invalidRange){if(!usedHTTP1){ctx.http1=true;this.reduceConnections(ctx,1,'range');ctx.retryAt=Date.now()+500;s.state='waiting';return;}if(attempts<this.settings().retries){ctx.retryAttempts.set(s.id,++attempts);ctx.retryAt=Date.now()+Math.min(10000,this.settings().retryDelay*1000*attempts);s.state='waiting';this.store.log('retry',`Range confirmation retry ${attempts}; HTTP ${e.status}`,ctx.id);return;}throw e;}
         if(e.status&&![408,425,429,500,502,503,504].includes(e.status))throw e;
         if(s.current>attemptStart)attempts=0;
         if(/HTTP2|GOAWAY|http2/i.test(e.code||e.message))ctx.http1=true;
         if(!ctx.resumable&&s.current>0){s.current=0;ctx.received=0;}
         if(++attempts>this.settings().retries)throw e;ctx.retryAttempts.set(s.id,attempts);
-        if(e.status===429||e.status===503||attempts>=2){this.reduceConnections(ctx,Math.max(1,Math.floor(ctx.connectionLimit/2)));const seconds=Number(e.retryAfter),date=Date.parse(e.retryAfter||'');const serverDelay=Number.isFinite(seconds)?seconds*1000:Number.isFinite(date)?date-Date.now():0;ctx.retryAt=Date.now()+Math.max(500,Math.min(120000,Math.max(serverDelay,this.settings().retryDelay*1000*2**(attempts-1))));ctx.retryNotice=true;const latest=this.store.find(ctx.id);if(latest)this.store.update(ctx.id,{speed:0,meta:JSON.stringify({...JSON.parse(latest.meta),transfer:{connections:ctx.connectionLimit,retryAt:ctx.retryAt,attempt:attempts,httpStatus:e.status||null}})});s.state='waiting';this.store.log('retry',`HTTP ${e.status||'network'}; connections=${ctx.connectionLimit}; attempt=${attempts}`,ctx.id);return;}
+        if(e.status===429||e.status===503||attempts>=2){this.reduceConnections(ctx,Math.max(1,Math.floor(ctx.connectionLimit/2)),e.status===429||e.status===503?'overload':'network');const seconds=Number(e.retryAfter),date=Date.parse(e.retryAfter||'');const serverDelay=Number.isFinite(seconds)?seconds*1000:Number.isFinite(date)?date-Date.now():0;ctx.retryAt=Date.now()+Math.max(500,Math.min(120000,Math.max(serverDelay,this.settings().retryDelay*1000*2**(attempts-1))));ctx.retryNotice=true;const latest=this.store.find(ctx.id);if(latest)this.store.update(ctx.id,{speed:0,meta:JSON.stringify({...JSON.parse(latest.meta),transfer:{connections:ctx.connectionLimit,retryAt:ctx.retryAt,attempt:attempts,httpStatus:e.status||null}})});s.state='waiting';this.store.log('retry',`HTTP ${e.status||'network'}; connections=${ctx.connectionLimit}; attempt=${attempts}`,ctx.id);return;}
         this.store.log('retry',`المحاولة ${attempts}: ${e.message}`,ctx.id);
         const retryAt=Date.now()+Math.min(10000,this.settings().retryDelay*1000*attempts);while(!ctx.stopped&&Date.now()<retryAt)await delay(Math.min(100,retryAt-Date.now()));
       }finally{clearInterval(dataTimer);response?.destroy();ctx.controllers.delete(ac);ctx.segmentControllers?.delete(s.id);if(ctx.rebalance?.delete(s.id)&&s.current<s.end)s.state='waiting';}
     }
   }
-  reduceConnections(ctx,limit){ctx.connectionLimit=Math.max(1,Math.min(ctx.connectionLimit,limit));this.hostHints[ctx.host]={connections:ctx.connectionLimit,http1:ctx.http1,time:Date.now()};this.hostHints=Object.fromEntries(Object.entries(this.hostHints).sort((a,b)=>b[1].time-a[1].time).slice(0,200));this.store.set('transferHostHints',this.hostHints);}
+  transferState(ctx){const d=this.store.find(ctx.id);if(d)this.store.update(ctx.id,{meta:JSON.stringify({...JSON.parse(d.meta),transfer:{connections:ctx.connectionLimit,configured:ctx.userConnectionCap,rangeSupported:ctx.resumable,rangeReason:ctx.rangeReason||'',http1:ctx.http1}})});}
+  reduceConnections(ctx,limit,reason='network'){ctx.lastPenalty=Date.now();ctx.connectionLimit=Math.max(1,Math.min(ctx.connectionLimit,limit));this.hostHints[ctx.host]={connections:ctx.connectionLimit,http1:ctx.http1,time:Date.now(),reason};this.hostHints=Object.fromEntries(Object.entries(this.hostHints).sort((a,b)=>b[1].time-a[1].time).slice(0,200));this.store.set('transferHostHints',this.hostHints);}
   async throttle(ctx,n){
     const now=Date.now();if(!ctx.limits||now-ctx.limits.time>=500){const item=this.store.find(ctx.id),queue=item?.queueId||'main',q=this.store.queues().find(q=>q.id===queue);ctx.limits={time:now,global:Number(this.settings().speedLimit)*1024*Math.max(1,this.active.size)/(Math.max(1,this.active.size)+(this.externalActiveCount?.()||0)),file:Number(JSON.parse(item?.meta||'{}').speedLimit)*1024,queue,queueLimit:Number(JSON.parse(q?.schedule||'{}').bandwidthKB||0)*1024};}const {global,file,queue,queueLimit}=ctx.limits;let waitUntil=now;
     if(queueLimit>0){const next=Math.max(now,this.queueNext.get(queue)||0)+n/queueLimit*1000;this.queueNext.set(queue,next);waitUntil=Math.max(waitUntil,next);}
