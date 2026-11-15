@@ -2,7 +2,7 @@
 
 <img src="docs/brand/hero.png" width="100%" alt="Flow Download Manager — Downloads. On your terms. Created by mohamed abdelnaby.">
 
-<a href="https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/download/v2.10.0/Flow-2.10.0-Setup.exe"><img src="docs/brand/download-setup.svg" width="322" alt="Download Flow for Windows — Setup, updates your installed copy"></a> <a href="https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/download/v2.10.0/Flow-2.10.0-Portable.exe"><img src="docs/brand/download-portable.svg" width="238" alt="Download Portable — Run without installing"></a> <a href="https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/download/v2.10.0/Flow-Companion-2.10.0.zip"><img src="docs/brand/download-companion.svg" width="266" alt="Get the Chromium companion for Chrome, Edge, Opera, Opera GX, Brave and Vivaldi"></a>
+<a href="https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/download/v2.11.0/Flow-2.11.0-Setup.exe"><img src="docs/brand/download-setup.svg" width="322" alt="Download Flow for Windows — Setup, updates your installed copy"></a> <a href="https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/download/v2.11.0/Flow-2.11.0-Portable.exe"><img src="docs/brand/download-portable.svg" width="238" alt="Download Portable — Run without installing"></a> <a href="https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/download/v2.11.0/Flow-Companion-2.11.0.zip"><img src="docs/brand/download-companion.svg" width="266" alt="Get the Chromium companion for Chrome, Edge, Opera, Opera GX, Brave and Vivaldi"></a>
 
 [Explore the tools](docs/TOOLS.md) · [Browser setup](BROWSER-INTEGRATION.md) · [Full gallery](docs/SCREENSHOTS.md) · [What's new](CHANGELOG.md) · [Report a problem](https://github.com/Mohamedabdelnaby1/flow-download-manager/issues/new?template=bug_report.yml)
 
@@ -10,7 +10,7 @@
 
 **Free to use. Open to improve. Built around your workflow.**
 
-**New in 2.10:** choose your browser in Flow, with a dedicated Firefox adapter and setup for Opera, Opera GX, Vivaldi and the existing Chromium browsers. [Connect your browser →](BROWSER-INTEGRATION.md) · [Firefox signing status →](docs/FIREFOX-SIGNING.md)
+**New in 2.11:** a simpler Companion, reliable browser handoff and real parallel transfers for supported HTTP files and site videos. [See the update →](docs/COMPANION-AND-TRANSFERS-2.11.md) · [Browser setup →](BROWSER-INTEGRATION.md)
 
 </div>
 
@@ -20,7 +20,19 @@
 
 **System reliability audit:** duplicate shortcut handling, stale version labels, missing phone assets, font persistence, companion-folder selection and idle interface rebuilding have been corrected and regression-tested. [Read the findings →](docs/SYSTEM-AUDIT-2.10.md)
 
-[Firefox unsigned test bundle →](https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/download/v2.10.0/Flow-Companion-Firefox-2.10.0-Unsigned.zip) · [Permanent Firefox signing →](docs/FIREFOX-SIGNING.md)
+[Firefox unsigned test bundle →](https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/download/v2.11.0/Flow-Companion-Firefox-2.11.0-Unsigned.zip) · [Permanent Firefox signing →](docs/FIREFOX-SIGNING.md)
+
+### Clear controls. Less to think about.
+
+Paste a link, choose a video/audio preset, search detected sources or adjust capture for this site. Your browser keeps the transfer until Flow accepts it.
+
+<p align="center"><img src="docs/screenshots/v2.11/companion-popup.png" width="330" alt="Flow 2.11 Companion with quick link paste, quality presets, source search and site controls"></p>
+
+The Companion screenshot uses controlled example sources.
+
+<table><tr><td width="58%"><img src="docs/screenshots/v2.11/progress-en.png" width="100%" alt="Flow 2.11: real transfer progress, clear speed/time information and visible Pause, Cancel and tray controls"></td><td width="42%"><img src="docs/screenshots/v2.11/completion-en.png" width="100%" alt="One completion window with direct Open file and a draggable file card"></td></tr></table>
+
+Parallel connections follow your limits. Servers without range support stay on one safe connection; the update makes no universal speed claim. [Measured transfer evidence →](docs/COMPANION-AND-TRANSFERS-2.11.md#evidence-and-limits)
 
 ### A new atmosphere. Four ways to make it yours.
 
@@ -58,17 +70,17 @@ Actual packaged UI captures from isolated, controlled examples. [Quality selecti
 
 ### Complete · the main Windows edition
 
-Everything bundled in the Electron edition. **Setup: 150.0 MB · Portable: 149.7 MB.**
+Everything bundled in the Electron edition. **Setup: 151.6 MB · Portable: 151.3 MB.**
 
-[![Download Windows Setup](https://img.shields.io/badge/%E2%86%93_Download-Setup-c7ff5e?style=for-the-badge&labelColor=141c31)](https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/download/v2.10.0/Flow-2.10.0-Setup.exe) [![Download Portable](https://img.shields.io/badge/%E2%86%93_Download-Portable-62e3fa?style=for-the-badge&labelColor=141c31)](https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/download/v2.10.0/Flow-2.10.0-Portable.exe)
+[![Download Windows Setup](https://img.shields.io/badge/%E2%86%93_Download-Setup-c7ff5e?style=for-the-badge&labelColor=141c31)](https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/download/v2.11.0/Flow-2.11.0-Setup.exe) [![Download Portable](https://img.shields.io/badge/%E2%86%93_Download-Portable-62e3fa?style=for-the-badge&labelColor=141c31)](https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/download/v2.11.0/Flow-2.11.0-Portable.exe)
 
 ### Compact Preview · a smaller optional host
 
 The same interface and full Node, FFmpeg, aria2 and video-extraction tools, using shared **Microsoft WebView2 + .NET Framework 4.8**. These system prerequisites are outside the reported download size. This remains an optional preview. [Compare editions →](docs/COMPACT-WINDOWS-PREVIEW.md)
 
-<a href="https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/download/v2.10.0/Flow-2.10.0-Compact-Preview-Setup.exe"><img src="docs/brand/download-compact.svg" width="320" alt="Download Compact Preview Setup — 59.6 MB"></a> <a href="https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/download/v2.10.0/Flow-2.10.0-Compact-Preview-Portable.exe"><img src="docs/brand/compact-portable.svg" width="320" alt="Download Compact Preview Portable — 62.2 MB"></a>
+<a href="https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/download/v2.11.0/Flow-2.11.0-Compact-Preview-Setup.exe"><img src="docs/brand/download-compact.svg" width="320" alt="Download Compact Preview Setup — 64.3 MB"></a> <a href="https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/download/v2.11.0/Flow-2.11.0-Compact-Preview-Portable.exe"><img src="docs/brand/compact-portable.svg" width="320" alt="Download Compact Preview Portable — 67.2 MB"></a>
 
-**Updating? Use Setup to replace the existing installation.** Portable opens separately. Exit Flow from the tray before updating. [Update walkthrough](docs/UPDATING.md) · [All release files](https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/latest) · [Checksums](https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/download/v2.10.0/SHA256SUMS.txt)
+**Updating? Use Setup to replace the existing installation.** Portable opens separately. Exit Flow from the tray before updating. [Update walkthrough](docs/UPDATING.md) · [All release files](https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/latest) · [Checksums](https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/download/v2.11.0/SHA256SUMS.txt)
 
 <img src="docs/brand/chapter-workspace.svg" width="100%" alt="03 — A workspace that feels like you. Light, dark and six accent palettes.">
 
@@ -124,7 +136,7 @@ Flow is an independent, AI-assisted project by **mohamed abdelnaby**. The origin
 
 | Explore | Build & contribute |
 | :--- | :--- |
-| [Feature reference](FEATURES.md) · [Changelog](CHANGELOG.md) | [Development guide](docs/DEVELOPMENT.md) · [Source ZIP](https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/download/v2.10.0/Flow-2.10.0-Source.zip) |
+| [Feature reference](FEATURES.md) · [Changelog](CHANGELOG.md) | [Development guide](docs/DEVELOPMENT.md) · [Source ZIP](https://github.com/Mohamedabdelnaby1/flow-download-manager/releases/download/v2.11.0/Flow-2.11.0-Source.zip) |
 | [Validation evidence](VALIDATION.md) · [Known boundaries](docs/LIMITATIONS.md) | [Report a bug](https://github.com/Mohamedabdelnaby1/flow-download-manager/issues/new?template=bug_report.yml) · [Suggest a feature](https://github.com/Mohamedabdelnaby1/flow-download-manager/issues/new?template=feature_request.yml) |
 | [Privacy and security](SECURITY.md) · [Third-party notices](THIRD-PARTY-NOTICES.md) | [Contributing](CONTRIBUTING.md) · [MIT license](LICENSE) |
 

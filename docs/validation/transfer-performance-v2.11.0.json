@@ -1,0 +1,30 @@
+{
+  "exit": 0,
+  "version": "2.11.0",
+  "packaged": true,
+  "passed": 4,
+  "checks": [
+    "1 connection setting reaches the actual detached engine and preserves exact bytes",
+    "8 connection setting reaches the actual detached engine and preserves exact bytes",
+    "both transfers complete while the desktop window is minimized without Resume",
+    "benchmark uses the independent engine, not a renderer-local substitute"
+  ],
+  "errors": [],
+  "results": [
+    {
+      "configuredConnections": 1,
+      "peakConcurrentRequests": 1,
+      "elapsedMs": 16439,
+      "bytes": 8388608
+    },
+    {
+      "configuredConnections": 8,
+      "peakConcurrentRequests": 8,
+      "elapsedMs": 2453,
+      "bytes": 8388608
+    }
+  ],
+  "speedup": 6.7,
+  "sha256": "a82389c100e7139972d596d025b5dabf0be38165d61bd93bf609018eda7b38fa",
+  "scope": "Controlled HTTP fixture limits each connection to 8 KiB per 10 ms; this is not an internet-wide speed claim."
+}

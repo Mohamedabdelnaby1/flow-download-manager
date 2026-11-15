@@ -1,0 +1,16 @@
+{
+  "version": "2.11.0",
+  "packaged": false,
+  "passed": 6,
+  "checks": [
+    "a real Windows read handle prevents replacement of the old encrypted session",
+    "desktop and tray remain available after the engine reconnect reports failure",
+    "the prior encrypted session remains unchanged while replacement is denied",
+    "the next download reconnects successfully without restarting the desktop",
+    "the recovered download contains the exact 2 MiB source bytes",
+    "the engine error clears and the replacement session stays encrypted"
+  ],
+  "bytes": 2097152,
+  "realWindowsFileLock": true,
+  "isolatedProfile": true
+}

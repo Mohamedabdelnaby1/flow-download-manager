@@ -1,0 +1,15 @@
+{
+  "version": "2.11.0",
+  "realUserInstallation": true,
+  "existingBridgeConfigurationReplacedTwice": true,
+  "protectedTokenRetained": true,
+  "companionVersion": "2.11.0",
+  "realNativeHandshake": true,
+  "firefoxNativeHandshake": true,
+  "firefoxBundleVersion": "2.11.0",
+  "libraryRecordsPreserved": 6,
+  "startupEnabled": true,
+  "trayResident": true,
+  "noAdditionalDownloadsCreated": true,
+  "existingDownloadAndSettingsHashesVerifiedInUpgradeReport": true
+}

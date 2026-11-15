@@ -21,6 +21,10 @@ to obtain the smaller package. Apple Realm build files are excluded from this
 Windows-only candidate. Android Realm development archives are also omitted;
 the actual Windows Realm native addon is retained.
 
+## 2.11.0 update
+
+The setup is 64,289,088 bytes; portable is 67,240,287 bytes. Both retain the full toolkit, use the verified official 2026.10.26 Windows extractor and include the corrected parallel video transport. The exact downloaded payload passed 3,158 SHA-256 checks, 14 integration checks, eight appearance checks and six portable checks. Real-tool tests exercised authenticated parallel HTTP video, pause/resume and decoded video/audio merge. [Release validation](../VALIDATION.md).
+
 ## 2.7.1 maintenance update
 
 The optional 2.7.1 setup is 59,474,834 bytes and portable is 62,122,754 bytes.

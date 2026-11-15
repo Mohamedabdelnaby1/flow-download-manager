@@ -1,0 +1,15 @@
+{
+  "version": "2.11.0",
+  "checkedOn": "2026-11-15",
+  "scope": "production dependencies; registry advisories at audit time",
+  "vulnerabilities": {
+    "info": 0,
+    "low": 0,
+    "moderate": 0,
+    "high": 0,
+    "critical": 0,
+    "total": 0
+  },
+  "FTPDependency": "6.2.6",
+  "addressedAdvisory": "https://github.com/advisories/GHSA-5pm8-86m8-9m6r"
+}

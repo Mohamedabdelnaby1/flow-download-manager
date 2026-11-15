@@ -1,0 +1,17 @@
+{
+  "version": "2.11.0",
+  "previousVersion": "2.10.0",
+  "actualExistingInstallation": true,
+  "installerExit": 0,
+  "sameInstallationLocation": true,
+  "libraryRecordsPreserved": 6,
+  "allSettingsPreserved": true,
+  "completedFileHashesPreserved": 6,
+  "trayResident": true,
+  "startupEnabled": true,
+  "browserBridgeRepaired": true,
+  "protectedTokenRetained": true,
+  "extensionVersion": "2.11.0",
+  "newDownloadsAdded": false,
+  "productionBuildCommit": "d6c67009ba771ea5d43b245f200766b8cfd9daac"
+}

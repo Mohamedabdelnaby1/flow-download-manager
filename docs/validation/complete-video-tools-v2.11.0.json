@@ -1,0 +1,8 @@
+{
+  "exit": 0,
+  "tests": 4,
+  "passed": true,
+  "version": "2.11.0",
+  "extractorVersion": "2026.10.26",
+  "FTPDependency": "6.2.6"
+}

@@ -1,5 +1,15 @@
 # Inside Flow
 
+## Clearer downloads in 2.11
+
+<table><tr><td width="35%"><img src="screenshots/v2.11/companion-popup.png" width="100%" alt="Companion with distinct surfaces and visible download actions"></td><td width="65%"><img src="screenshots/v2.11/progress-en.png" width="100%" alt="Real controlled transfer in the installed 2.11 release"></td></tr></table>
+
+![Confirmation and quality](screenshots/v2.11/quality-en.png)
+
+<table><tr><td width="50%"><img src="screenshots/v2.11/completion-en.png" width="100%" alt="Direct file actions after completion"></td><td width="50%"><img src="screenshots/v2.11/complete-ar-amoled.png" width="100%" alt="Arabic RTL completion in AMOLED"></td></tr></table>
+
+Captured from the exact installed release in isolated QA profiles. The transfer is a byte-verified 2 MiB local fixture; detected media and quality choices use controlled examples. Technical details expand when needed. [Validation](../VALIDATION.md).
+
 ## Browser-specific integration in 2.10
 
 ![Opera setup in Light](screenshots/v2.10/opera-setup-light.png)

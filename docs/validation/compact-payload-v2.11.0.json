@@ -1,0 +1,13 @@
+{
+  "version": "2.11.0",
+  "buildCommit": "857a2311a353285a5f728b35d06f1d1380236588",
+  "exactGitHubSetupPayload": true,
+  "filesVerified": 3158,
+  "allSHA256Match": true,
+  "nativeHostMatchesFirefoxAndOperaTestedBinary": true,
+  "allServiceSourcesMatch": true,
+  "extractorVersion": "2026.10.26",
+  "extractorDistributionFilesVerified": 143,
+  "FTPDependency": "6.2.6",
+  "nodeVersion": "22.14.0"
+}

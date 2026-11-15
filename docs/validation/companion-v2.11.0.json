@@ -1,0 +1,32 @@
+{
+  "exit": 0,
+  "version": "2.11.0",
+  "packaged": true,
+  "passed": 22,
+  "checks": [
+    "popup works on browser-internal pages without a URL exception",
+    "video page exposes one clear current-video action",
+    "audio preset reaches the handoff request",
+    "discovered sources are rendered as readable cards",
+    "source search filters visible cards",
+    "diagnostics omit pairing tokens and cookies",
+    "failed handoff restores the send button",
+    "popup has no horizontal document overflow",
+    "options normalize extensions and full site URLs",
+    "compact-button preference is saved as an explicit override",
+    "empty pages do not get a floating video button",
+    "Escape closes the video source menu",
+    "keyboard movement persists the button position",
+    "floating button offers three simple video/audio choices",
+    "floating quality choice reaches desktop handoff",
+    "light Companion text and primary action meet 4.5:1 contrast",
+    "dark Companion text and primary action meet 4.5:1 contrast",
+    "Companion AMOLED uses a true black surface",
+    "settings fits a narrow browser window without horizontal overflow",
+    "a protected player offers no direct-source download action",
+    "reinjection leaves one panel and one runtime/settings listener",
+    "reinjection preserves the saved position"
+  ],
+  "errors": [],
+  "browserAPIs": "controlled fixture; live browser integration tested separately"
+}

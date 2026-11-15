@@ -1,3 +1,34 @@
+# Validation — Flow 2.11.0
+
+Checks dated 15 November 2026. Production build commit: `857a2311a353285a5f728b35d06f1d1380236588`. Final documentation and QA-artifact changes do not alter production runtime code. The exact installed payload's **96 runtime text files** match the audited source.
+
+| Gate | Result | Evidence |
+| --- | --- | --- |
+| Both exact Windows build jobs | **292 passed, 0 failed** per job | [Source and CI](docs/validation/source-suite-v2.11.0.json) |
+| Real installed upgrade, then final audited candidate replacement | Same location and installation identity; six library records, settings and completed-file hashes preserved; startup/tray retained | [Initial upgrade](docs/validation/initial-installed-upgrade-v2.11.0.json), [Final installed copy](docs/validation/installed-upgrade-v2.11.0.json), [Browser handshake](docs/validation/installed-browser-v2.11.0.json) |
+| Exact installed runtime sources | **96 text files match** | [Payload](docs/validation/installed-payload-v2.11.0.json) |
+| Exact installed download windows | **21 passed**: inspection gating, native clipboard menu, progressive disclosure, one completion, direct Open and drag dispatch | [Download experience](docs/validation/downloads-v2.11.0.json) |
+| Exact installed Companion UI | **22 passed**: source search, handoff presets, site controls, menu cleanup, protected-player filtering and default light/dark text/action contrast ≥4.5:1 | [Companion](docs/validation/companion-v2.11.0.json) |
+| Exact installed design / appearance / system coherence | **57 / 50 / 163 passed**, including 76 English/Arabic states | [Design](docs/validation/design-system-v2.11.0.json), [Appearance](docs/validation/appearance-v2.11.0.json), [Coherence](docs/validation/system-coherence-v2.11.0.json) |
+| Exact installed independent-engine benchmark | **4 passed**, peak 1 / 8 actual connections; **16,439 / 2,453 ms**, exact 8 MiB; both finish minimized without Resume | [Controlled performance](docs/validation/transfer-performance-v2.11.0.json) |
+| Exact installed Windows session-lock recovery | **6 passed**, actual OS file lock, preserved encrypted metadata and a recovered 2 MiB transfer without restarting the desktop | [Recovery](docs/validation/engine-session-recovery-v2.11.0.json) |
+| Actual complete portable executable | **21 passed** download-experience checks | [Complete portable](docs/validation/complete-portable-v2.11.0.json) |
+| Exact Compact setup payload | **3,158 manifest file hashes match**, all audited service sources match | [Compact payload](docs/validation/compact-payload-v2.11.0.json) |
+| Compact native integration / appearance / actual portable | **14 / 8 / 6 passed**, including transfer continuity after UI termination | [Native](docs/validation/compact-integration-v2.11.0.json), [Appearance](docs/validation/compact-appearance-v2.11.0.json), [Portable](docs/validation/compact-portable-v2.11.0.json) |
+| Actual complete and compact video toolchains | **4 real-tool checks per edition**: authenticated parallel HTTP, pause/resume, decoded video/audio merge and format accounting; verified Windows extractor 2026.10.26 | [Complete media](docs/validation/complete-video-tools-v2.11.0.json), [Compact media](docs/validation/compact-video-tools-v2.11.0.json) |
+| Actual Firefox 159 / Opera 137 | **5 / 5 passed**, authenticated 1 MiB transfer and browser fallback; isolated profiles | [Firefox](docs/validation/firefox-live-v2.11.0.json), [Opera](docs/validation/opera-live-v2.11.0.json) |
+| Firefox package lint | **0 errors, warnings or notices** | [Mozilla lint](docs/validation/firefox-lint-v2.11.0.json) |
+| Simulated native policy refusal in real Electron startup | **4 passed**, clear error and no restart loop | [Startup policy](docs/validation/startup-policy-v2.11.0.json) |
+| Production dependency advisory audit | **0 known advisories** at check time; basic-ftp 6.2.6 addresses GHSA-5pm8-86m8-9m6r | [Dependency audit](docs/validation/dependency-audit-v2.11.0.json) |
+
+The browser-UI suite uses controlled browser API fixtures; real Firefox and Opera runs are separate. UI and media tests use isolated profiles and controlled files. The installer exercise separately preserves the real user library. Screenshots are client-area captures from the exact installed payload.
+
+**Performance scope:** the benchmark intentionally limits each connection to 8 KiB per 10 ms. Its **6.7×** result proves working parallelism in that fixture; it is not an internet-wide or faster-than-IDM claim. Small files can use fewer connections, and servers that ignore ranges remain on one safe connection. Account verification and protected media can prevent extraction.
+
+**Other boundaries:** permanent Firefox installation needs Mozilla signing. Windows installers and native modules remain unsigned; policy-refusal handling does not prove trusted-publisher acceptance or bypass Windows security. Linux packages remain deferred. Physical Explorer drag/drop and a real reboot were not newly tested. [Signing](docs/WINDOWS-SIGNING.md), [Firefox signing](docs/FIREFOX-SIGNING.md), [Audit and transfer behavior](docs/COMPANION-AND-TRANSFERS-2.11.md).
+
+---
+
 # Validation — Flow 2.10.0
 
 Checks dated 1 November 2026. Production build commit: `075cb198e959394e08204f61db946dcabeca4fc5`. Final documentation, test-harness maintenance and evidence changes do not change the production services or UI.

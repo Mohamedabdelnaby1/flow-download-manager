@@ -1,0 +1,34 @@
+{
+  "version": "2.11.0",
+  "buildCommit": "857a2311a353285a5f728b35d06f1d1380236588",
+  "local": {
+    "passed": 292,
+    "failed": 0,
+    "skipped": 0
+  },
+  "includes": [
+    "actual HTTP range and CDN rounded probes",
+    "detached engine continuation after UI termination",
+    "authorized site-video parallel transport",
+    "pause/resume without quota duplication",
+    "generated video and audio merging with full FFmpeg decode",
+    "durable companion acknowledgement and failed handoff fallback",
+    "bounded atomic session replacement preserves the last protected metadata",
+    "failed engine attachment keeps desktop startup available"
+  ],
+  "ci": [
+    {
+      "run": 43711590262,
+      "host": "complete Windows",
+      "passed": 292,
+      "failed": 0
+    },
+    {
+      "run": 43711592714,
+      "host": "compact Windows",
+      "passed": 292,
+      "failed": 0
+    }
+  ],
+  "notes": "Independent-engine verification waits for the committed complete state before reading its destination; a full-length destination can still be processing on Windows."
+}

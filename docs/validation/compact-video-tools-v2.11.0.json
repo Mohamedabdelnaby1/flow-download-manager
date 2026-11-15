@@ -1,0 +1,10 @@
+{
+  "exit": 0,
+  "tests": 4,
+  "passed": true,
+  "version": "2.11.0",
+  "extractorVersion": "2026.10.26",
+  "FTPDependency": "6.2.6",
+  "fixtureScope": "Exact Compact payload: authenticated parallel HTTP, pause/resume, actual decoded video/audio merge and verified current bundled tools",
+  "productionBuildCommit": "857a2311a353285a5f728b35d06f1d1380236588"
+}
