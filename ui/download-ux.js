@@ -16,7 +16,11 @@ function prepareVideoChoice(){
 openAdd=function(url=''){
  originalOpenAdd(url);if(!$('#add-form')||(!windowContext&&window.desktopAPI))return;
  addDialogActive=true;downloadCollection=null;collectionRequest++;prepareVideoChoice();const form=$('#add-form');
- const qualities=$('#video-qualities');$('#probe-result').before(qualities);
+ const source=document.createElement('section');source.className='download-source-section';const urlField=form.querySelector('[name=url]').closest('.field');urlField.before(source);source.append(urlField,$('#probe-result'),$('#video-qualities'));
+ const destination=document.createElement('details');destination.className='download-destination';destination.innerHTML='<summary>'+icon('folder')+'<span>'+t('اسم الملف ومكان الحفظ','File name & save location')+'</span></summary>';const nameField=form.querySelector('[name=name]').closest('.field'),folderField=form.querySelector('[name=directory]').closest('.field');source.after(destination);destination.append(nameField,folderField);for(const row of form.querySelectorAll(':scope>.field-row'))if(!row.querySelector('input,select,textarea'))row.remove();
+ const advanced=form.querySelector(':scope>details:not(.download-destination)');if(advanced)advanced.classList.add('transfer-advanced');
+ const qualities=$('#video-qualities');$('#probe-result').after(qualities);const probe=$('[data-action=probeAdd]');if(probe){probe.classList.add('inspect-again');source.append(probe);}
+ const foot=$('#dialog .modal-foot');foot.insertAdjacentHTML('afterbegin',button('close',t('إلغاء','Cancel'),null));const phase=document.createElement('small');phase.id='confirmation-phase';phase.className='confirmation-phase';phase.setAttribute('role','status');phase.textContent=t('انتظر التحقق من الرابط','Waiting for the link check');foot.prepend(phase);
  const pending=state.downloads.find(d=>d.id===windowArgs.get('id'));const quality=pending&&JSON.parse(pending.meta).quality;if(quality&&$('#f-quality'))$('#f-quality').value=quality;
  form.addEventListener('input',event=>{if(event.target.name!=='url')return;form.dataset.inspectedUrl='';setDownloadReady(false);clearTimeout(inspectionTimer);downloadCollection=null;collectionRequest++;api('collectionCancel').catch(()=>{});$('#form-error').replaceChildren();$('#probe-result').replaceChildren();$('#video-qualities').replaceChildren();prepareVideoChoice();const probe=$('[data-action=probeAdd]');if(probe)probe.disabled=false;if(/^https?:\/\//i.test(event.target.value))inspectionTimer=setTimeout(()=>inspectDownload(),400);else if(/^(magnet:|ftp:)/i.test(event.target.value))setDownloadReady(true);});
 
@@ -25,7 +29,7 @@ openAdd=function(url=''){
  form.addEventListener('change',event=>{if(event.target.name!=='mode')return;cancelProbe();form.dataset.inspectedUrl='';setDownloadReady(false);inspectDownload();});
 };
 function probeHeaders(){const d=readForm('#add-form'),headers={};if(d.referer)headers.referer=d.referer;if(d.cookie)headers.cookie=d.cookie;if(d.username||d.password)headers.authorization='Basic '+btoa(String.fromCharCode(...new TextEncoder().encode(d.username+':'+d.password)));return headers;}
-function setDownloadReady(ready){for(const element of $$('[data-action=addNow],[data-action=addLater]')){element.disabled=!ready;element.title=ready?'':t('انتظر اكتمال الفحص بنجاح أولًا','Wait for inspection to finish successfully');}}
+function setDownloadReady(ready){const form=$('#add-form');if(form)form.dataset.ready=String(ready);const phase=$('#confirmation-phase');if(phase)phase.textContent=ready?t('جاهز للتحميل','Ready to download'):t('التحميل يتاح بعد التحقق من الرابط','Download unlocks after the link check');for(const element of $$('[data-action=addNow],[data-action=addLater]')){element.disabled=!ready;element.title=ready?'':t('انتظر اكتمال الفحص بنجاح أولًا','Wait for inspection to finish successfully');}}
 async function inspectDownload(){
  const form=$('#add-form');if(!form)return;const url=$('#f-url').value;if(!url)return;form.dataset.inspectedUrl='';setDownloadReady(false);
  if(isPlaylistURL(url))return inspectDownloadCollection(url);

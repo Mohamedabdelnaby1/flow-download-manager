@@ -1,6 +1,8 @@
 # Changelog
 
-## 2.11.0 — Companion reliability and parallel transfers
+## 2.11.0 — Simpler downloads, dependable transfers
+
+- Simplify Companion, its settings, floating video choices and all download windows. Keep the main action visible; put file locations, graphs, connection details and advanced settings behind one disclosure. Preserve direct Open file, drag, cancel, pause and tray controls. Share the desktop appearance preferences, including AMOLED.
 
 - Update basic-ftp to 6.2.6, including the upstream MLSD parser denial-of-service fix (GHSA-5pm8-86m8-9m6r).
 
